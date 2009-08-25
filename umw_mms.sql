@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 22, 2009 at 10:13 PM
+-- Generation Time: Aug 25, 2009 at 03:03 PM
 -- Server version: 5.0.67
 -- PHP Version: 5.2.6
 
@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS `document_types` (
 INSERT INTO `document_types` (`id`, `description`) VALUES
 ('PO1', 'Purchase Order Type 1'),
 ('PO2', 'Purchase Order Type 2'),
-('GRN', 'Good Receive Note Type');
+('GRN', 'Good Receive Note Type'),
+('MT', 'Material Transfer');
 
 -- --------------------------------------------------------
 
@@ -100,7 +101,7 @@ CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
-  `assessment` enum('A','OK','Q','X') NOT NULL,
+  `assessment` enum('OK','NG','Q','X') NOT NULL default 'OK',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -167,7 +168,8 @@ CREATE TABLE IF NOT EXISTS `inv_items` (
 INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('AE1001', 'A', 'AE', 'AE1', '001', 'Power Pack; Detroit [1]', 8000, 4268, 'G1 - PP - 01', 'ea', 1.95735e+06, 'MYR', 2002, '', NULL, 1),
 ('AE1003', 'A', 'AE', 'AE1', '003', 'Power Pack 2', 8000, 4000, '1', 'ea', 288888, 'MYR', 2009, 'Testing Purposes', NULL, 1),
-('AE1002', 'A', 'AE', 'AE1', '002', 'Power Pack Detroit [2]', 8000, 5000, 'ER34985', 'ea', 388888, 'MYR', 2008, 'none', '/umw/storage/image/AE1002/Photo 19.jpg', 1);
+('AE1002', 'A', 'AE', 'AE1', '002', 'Power Pack Detroit [2]', 8000, 5000, 'ER34985', 'ea', 388888, 'MYR', 2008, 'none', '/umw/storage/image/AE1002/Photo 19.jpg', 1),
+('AT1001', 'A', 'AT', 'AT1', '001', 'Huge Tank', 40000, 8000, 'ERKd2938', 'ea', 2.88889e+07, 'MYR', 2009, 'Very big', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -289,9 +291,16 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
   `doc_tag` enum('po','pr') NOT NULL default 'pr',
+  `total` float NOT NULL,
   `supplier_1` varchar(20) NOT NULL,
   `supplier_2` varchar(20) default NULL,
   `supplier_3` varchar(20) default NULL,
+  `supplier_1_contact` varchar(50) NOT NULL,
+  `supplier_2_contact` varchar(50) NOT NULL,
+  `supplier_3_contact` varchar(50) NOT NULL,
+  `supplier_1_tel` varchar(30) NOT NULL,
+  `supplier_2_tel` varchar(30) NOT NULL,
+  `supplier_3_tel` varchar(30) NOT NULL,
   `requester` varchar(20) NOT NULL,
   `requester_date` date NOT NULL,
   `approver_1` varchar(20) default NULL,
@@ -373,5 +382,5 @@ CREATE TABLE IF NOT EXISTS `users` (
 INSERT INTO `users` (`username`, `password`, `name`, `email`, `branch_id`, `level`) VALUES
 ('Administrator', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Administrator', 'admin@admin.com', 'HQKL', 'admin'),
 ('User', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'User', 'user@user.com', 'KDSP', 'user'),
-('Guest', 'password', 'Guest', 'guest@user.com', 'HQKL', 'user'),
-('Boss', 'password', 'Boss', 'boss@admin.com', 'HQKL', 'admin');
+('Guest', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Guest', 'guest@user.com', 'HQKL', 'user'),
+('Boss', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Boss', 'boss@admin.com', 'HQKL', 'admin');
