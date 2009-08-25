@@ -6,7 +6,11 @@ if(isSet($_POST['type']))
 		fAuthorization::destroyUserInfo();
 	else if($_POST['type'] == "login")
 	{
-		$user = new User($_POST['username']);
+		try{
+			$user = new User($_POST['username']);
+		} catch (fException $e) {
+			fURL::redirect("/".URL_ROOT_TRIM."authentication.php");
+		}
 		if(sha1($_POST['password']) == $user->getPassword())
 		{
 			fAuthorization::setUserAuthLevel($user->getLevel());
@@ -14,7 +18,7 @@ if(isSet($_POST['type']))
 			fURL::redirect(fAuthorization::getRequestedUrl(true,"/".URL_ROOT_TRIM."inventory.php"));
 		}
 		else {
-			fURL::redirect(URL_ROOT."authentication.php");
+			fURL::redirect("/".URL_ROOT_TRIM."authentication.php");
 		}
 	}
 }else if(isSet($_GET['type']) == "logout")
