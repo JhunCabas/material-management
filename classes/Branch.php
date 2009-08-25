@@ -15,11 +15,11 @@
         return fRecordSet::build('Branch');    
     }
 
-	static function findAllOption()
+	static function findAllOption($default = null)
 	{
 		$tempRecords = self::findAll();
 		foreach($tempRecords as $tempRecord)
-			fHTML::printOption($tempRecord->prepareName(),$tempRecord->prepareId());
+			fHTML::printOption($tempRecord->prepareName(),$tempRecord->prepareId(), $default);
 	}
 
  }
