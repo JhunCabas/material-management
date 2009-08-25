@@ -9,7 +9,7 @@ if(isSet($_POST['type']))
 		try{
 			$user = new User($_POST['username']);
 		} catch (fException $e) {
-			fURL::redirect("/".URL_ROOT_TRIM."authentication.php");
+			fURL::redirect(URL_ROOT."authentication.php");
 		}
 		if(sha1($_POST['password']) == $user->getPassword())
 		{
@@ -18,7 +18,7 @@ if(isSet($_POST['type']))
 			fURL::redirect(fAuthorization::getRequestedUrl(true,"/".URL_ROOT_TRIM."inventory.php"));
 		}
 		else {
-			fURL::redirect("/".URL_ROOT_TRIM."authentication.php");
+			fURL::redirect(URL_ROOT."authentication.php");
 		}
 	}
 }else if(isSet($_GET['type']) == "logout")
