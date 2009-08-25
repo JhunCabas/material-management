@@ -1,6 +1,7 @@
 <?php
 define('DOC_ROOT', realpath(dirname(__FILE__) . '/../'));
 define('URL_ROOT', substr(DOC_ROOT, strlen(realpath($_SERVER['DOCUMENT_ROOT']))) . '/');
+define('URL_ROOT_TRIM', ltrim(URL_ROOT,"\\"));
 
 error_reporting(E_STRICT | E_ALL);
 fCore::enableErrorHandling('html');

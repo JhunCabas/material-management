@@ -11,7 +11,7 @@ if(isSet($_POST['type']))
 		{
 			fAuthorization::setUserAuthLevel($user->getLevel());
 			fAuthorization::setUserToken($_POST['username']);
-			fURL::redirect(fAuthorization::getRequestedUrl(true,URL_ROOT."inventory.php"));
+			fURL::redirect(fAuthorization::getRequestedUrl(true,"/".URL_ROOT_TRIM."inventory.php"));
 		}
 		else {
 			fURL::redirect(URL_ROOT."authentication.php");
