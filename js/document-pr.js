@@ -9,6 +9,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
+		var branch_id = $("#branch_id").val();
 		var supplier_1 = $("#sup1").val();
 		var supplier_1_contact = $("#con1").val();
 		var supplier_1_tel = $("#tel1").val();
@@ -24,6 +25,8 @@ $(function (){
 			type: "add",
 			doc_number: doc_number,
 			doc_type: doc_type,
+			branch_id: branch_id,
+			jsonForm: jsonForm(),
 			supplier_1: supplier_1,
 			supplier_1_contact: supplier_1_contact,
 			supplier_1_tel: supplier_1_tel,
@@ -37,7 +40,7 @@ $(function (){
 			requester_date: requester_date
 			}, function (data){
 				
-		});9
+		});
 	});
 });
 
@@ -46,14 +49,20 @@ function addingRow()
 	var addRow = "<td></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td></td><td><input class=\"itemUnitP\"/></td><td><input class=\"itemExtP\"/></td>";
 	var counterCell = $("<td></td>").text(++counter);
 	var itemCode = $("<td></td>").html($("<input size=\"7\" class=\"itemCode\"></input>"));
-	var wholeRow = $("<tr id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow);
+	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").append(counterCell).append(itemCode).append(addRow);
 	$("#formContent tbody").append(wholeRow);
 }
 
 function jsonForm()
 {
 	var jsonString = "[";
-		
-	jsonString = jsonString + "]";
+		$(".jsonRow").each(function (){
+		jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
+					+$(this).find(".itemCode").val()+"\","
+					+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
+					+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
+					+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";
+					});
+		jsonString = jsonString.substring(0, jsonString.length-1) + "]";
 	return jsonString;
 }
