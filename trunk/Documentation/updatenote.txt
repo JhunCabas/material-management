@@ -1,0 +1,6 @@
+Document number: system generate  [DocType]/[Branch]/[running number]/mm/yyyy
+Item code: incremental
+
+1 approval
+
+MTR, document type

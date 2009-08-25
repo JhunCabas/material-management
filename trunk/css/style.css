@@ -1,0 +1,185 @@
+#header{
+ 	background-image: url(../img/layout/headerBg.png);
+ 	height: 80px;
+	margin-top: 10px;
+}
+
+	#header .tab{
+	 	background-image: url(../img/layout/headerMenu.png);
+		height: 25px;
+	 	width: 80px;
+	 	margin-top: 55px;
+	 	padding: 5px;
+	 	font-weight: bold;
+	}
+	
+	#header div{
+		cursor: pointer;
+	}
+	
+		#header div a{
+			text-decoration: none;
+			color: black;
+		}
+	
+	#header #tab1{
+		margin-left: 10px;
+	}
+
+	#header .tabhover{
+	 	color: white;
+	}
+
+#toolbar{
+ 	border: 1px solid black;
+ 	height: 30px;
+ 	text-align: center;
+}
+
+	#toolbar div{
+	 	margin-left: 5px;
+	 	margin-top: 5px;
+	 	border: 1px solid black;
+	}
+	
+	#toolbar div a{
+		text-decoration: none;
+	}
+
+#loginForm{
+	border: 1px solid #999;
+	padding-left: 250px;
+}
+	#loginForm #loginBox{
+		padding-top: 20px;
+	}
+
+.tool-inventory{
+	cursor: pointer;
+}
+
+ul#icons {
+ 	margin:0;
+ 	padding:0;
+}
+
+	ul#icons li {
+	 	cursor:pointer;
+	 	float:left;
+		list-style-image:none;
+	 	list-style-position:outside;
+	 	list-style-type:none;
+	 	margin:2px;
+	 	padding:4px 0;
+	 	position:relative;
+	}
+
+	ul#icons span.ui-icon {
+	 	float:left;
+	 	margin:0 4px;
+	}
+
+#newItem{
+ background-color: #99CCFF;
+}
+
+	#newItem .addIcon {
+	 	padding-left: 20px;
+	}
+
+	#newItem #addBTN {
+	 	float: right;
+	}
+
+	#newItem table{
+	 	padding-left: 25px;
+	}
+
+.form-frame{
+ 	border: 1px solid #999;
+ 	padding: 10px;
+ 	margin-left: 8px;
+}
+
+.form-frame h3{
+	margin: 0;
+}
+
+.form-frame td{
+ 	padding: 0;
+}
+
+.form-frame table{
+
+}
+
+.form-frame input{
+ 	margin: 1px;
+}
+
+#formContent{
+
+}
+
+	#formContent thead tr td{
+	 	background-color: #C3D9FF;
+	}
+
+	#formContent td{
+	 	padding: 2px;
+	}
+
+	#formContent tfoot tr td{
+	 	background-color: #C3D9FF;
+	}
+
+	#formContent .tfootCaption{
+	 	text-align: right;
+	 	font-weight: bold;
+	}
+	
+	#addRowBTN{
+		font-style: normal;
+		cursor: pointer;
+	}
+	
+		#addRowBTN div{
+			margin-left: 100px;
+			margin-right: 20px;
+		}
+
+#approveContent {
+ 	padding-bottom: 10px;
+ 	border-bottom: 2px solid black;
+}
+
+#bottomline{
+	text-align: right;
+}
+
+tr.linkable{
+ 	cursor:pointer;
+}
+
+.highlight{
+ 	background-color: #FFEF8F;
+}
+
+.hideFirst{
+	display: none;
+} 
+
+.view-btn{
+	width: 75px;
+}
+
+.view-img{
+	width: 300px;
+	padding: 2px;
+	border: 1px solid #999;
+}
+
+.view-frame{
+	border: 1px solid #999;
+	padding: 10px;
+}
