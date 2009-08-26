@@ -18,11 +18,10 @@ $tmpl->place('menu');
 					$productionEntries = Production_issue::findAll();
 					foreach($productionEntries as $productionEntry)
 					{
-						printf("<tr><td>%s</td>%s<td>%s</td><td>%s</td></tr>"
-							,$productionEntry->prepareDocNumber()
-							,$productionEntry->prepareDocDate()
-							,$productionEntry->prepareIssuer()
-							,$productionEntry->prepareReceiver());
+						echo "<tr><td>".$productionEntry->prepareDocNumber()."</td>";
+						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$productionEntry->prepareIssuer()."</td>";
+						echo "<td>".$productionEntry->prepareReceiver()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
