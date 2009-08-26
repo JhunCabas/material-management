@@ -46,7 +46,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fDatabase
  * 
- * @version    1.0.0b15
+ * @version    1.0.0b18
+ * @changes    1.0.0b18  Updated the class for the new fResult and fUnbufferedResult APIs, fixed ::unescape() to not touch NULLs [wb, 2009-08-12]
+ * @changes    1.0.0b17  Added the ability to pass an array of all values as a single parameter to ::escape() instead of one value per parameter [wb, 2009-08-11]
+ * @changes    1.0.0b16  Fixed PostgreSQL and Oracle from trying to get auto-incrementing values on inserts when explicit values were given [wb, 2009-08-06]
  * @changes    1.0.0b15  Fixed a bug where auto-incremented values would not be detected when table names were quoted [wb, 2009-07-15]
  * @changes    1.0.0b14  Changed ::determineExtension() and ::determineCharacterSet() to be protected instead of private [wb, 2009-07-08]
  * @changes    1.0.0b13  Updated ::escape() to accept arrays of values for insertion into full SQL strings [wb, 2009-07-06]
@@ -813,6 +816,18 @@ class fDatabase
 	 *  - a scalar value - the escaped value is inserted into the SQL string
 	 *  - an array - the escaped values are inserted into the SQL string separated by commas
 	 * 
+	 * If `$sql_or_type` is a SQL string, it is also possible to pass an array
+	 * of all values as a single parameter instead of one value per parameter.
+	 * An example would look like the following:
+	 * 
+	 * {{{
+	 * #!php
+	 * $db->escape(
+	 *     "SELECT * FROM users WHERE status = %s AND authorization_level = %s",
+	 *     array('Active', 'Admin')
+	 * );
+	 * }}}
+	 * 
 	 * @param  string $sql_or_type  This can either be the data type to escape or an SQL string with a data type placeholder - see method description
 	 * @param  mixed  $value        The value to escape - both single values and arrays of values are supported, see method description for details
 	 * @param  mixed  ...
@@ -829,16 +844,7 @@ class fDatabase
 		}
 		
 		// Convert all objects into strings
-		$new_values = array();
-		foreach ($values as $value) {
-			if (is_object($value) && is_callable(array($value, '__toString'))) {
-				$value = $value->__toString();
-			} elseif (is_object($value)) {
-				$value = (string) $value;	
-			}
-			$new_values[] = $value;
-		}
-		$values = $new_values;
+		$values = $this->scalarize($values);
 		
 		$value = array_shift($values);
 		
@@ -885,6 +891,10 @@ class fDatabase
 		
 		if ($callback) {
 			if (is_array($value)) {
+				// If the values were passed as a single array, this handles that
+				if (count($value) == 1 && is_array(current($value))) {
+					$value = current($value);
+				}
 				return array_map($callback, $value);		
 			}
 			return call_user_func($callback, $value);
@@ -912,6 +922,21 @@ class fDatabase
 		
 		$pieces = preg_split('#(%[lbdfistp])\b#', $temp_sql, -1, PREG_SPLIT_DELIM_CAPTURE|PREG_SPLIT_NO_EMPTY);
 		$sql = '';
+		
+		// If the values were passed as a single array, this handles that
+		if (count($values) == 0 && is_array($value)) {
+			$placeholders = 0;
+			foreach ($pieces as $piece) {
+				if (strlen($piece) == 2 && $piece[0] == '%') {
+					$placeholders++;
+				}	
+			}
+			
+			if ($placeholders == count($value)) {
+				$values = $value;
+				$value  = array_shift($values);	
+			}
+		}
 		
 		$missing_values = -1;
 		
@@ -1607,7 +1632,7 @@ class fDatabase
 				}
 			}
 			
-			if (!isset($this->schema_info['sequences'][$table]) || preg_match('#INSERT\s+INTO\s+' . preg_quote($table, '#') . '\s+VALUES\s+\([^\)]*?\b' . preg_quote($this->schema_info['sequences'][$table]['column'], '#') . '\b#i', $result->getSQL())) {
+			if (!isset($this->schema_info['sequences'][$table]) || preg_match('#INSERT\s+INTO\s+' . preg_quote($table, '#') . '\s+\([^\)]*?\b' . preg_quote($this->schema_info['sequences'][$table]['column'], '#') . '\b#i', $result->getSQL())) {
 				return;	
 			}
 			
@@ -1638,7 +1663,7 @@ class fDatabase
 				}	
 			}
 			
-			if (!isset($this->schema_info['sequences'][$table]) || preg_match('#INSERT\s+INTO\s+' . preg_quote($table, '#') . '\s+VALUES\s+\([^\)]*?\b' . preg_quote($this->schema_info['sequences'][$table], '#') . '\b#i', $result->getSQL())) {
+			if (!isset($this->schema_info['sequences'][$table]) || preg_match('#INSERT\s+INTO\s+' . preg_quote($table, '#') . '\s+\([^\)]*?\b' . preg_quote($this->schema_info['sequences'][$table], '#') . '\b#i', $result->getSQL())) {
 				return;
 			} 		
 		}
@@ -1882,7 +1907,7 @@ class fDatabase
 			}	
 		}
 		
-		$result = new $result_class($this->type, $this->extension);
+		$result = new $result_class($this);
 		$result->setSQL($sql);
 		$result->setResult(TRUE);
 		return $result;
@@ -2062,7 +2087,7 @@ class fDatabase
 		$start_time = microtime(TRUE);	
 			
 		if (!$result = $this->handleTransactionQueries($sql, $result_type)) {
-			$result = new $result_type($this->type, $this->extension, $this->type == 'mssql' ? $this->schema_info['character_set'] : NULL);
+			$result = new $result_type($this, $this->type == 'mssql' ? $this->schema_info['character_set'] : NULL);
 			$result->setSQL($sql);
 			
 			if ($result_type == 'fResult') {
@@ -2097,6 +2122,29 @@ class fDatabase
 		}
 		
 		return $result;
+	}
+	
+	
+	/**
+	 * Turns an array possibly containing objects into an array of all strings
+	 * 
+	 * @param  array $values  The array of values to scalarize
+	 * @return array  The scalarized values
+	 */
+	private function scalarize($values)
+	{
+		$new_values = array();
+		foreach ($values as $value) {
+			if (is_object($value) && is_callable(array($value, '__toString'))) {
+				$value = $value->__toString();
+			} elseif (is_object($value)) {
+				$value = (string) $value;	
+			} elseif (is_array($value)) {
+				$value = $this->scalarize($value);	
+			}
+			$new_values[] = $value;
+		}
+		return $new_values;	
 	}
 	
 	
@@ -2299,6 +2347,10 @@ class fDatabase
 	 */
 	public function unescape($data_type, $value)
 	{
+		if ($value === NULL) {
+			return $value;	
+		}
+		
 		$callback = NULL;
 		
 		switch ($data_type) {

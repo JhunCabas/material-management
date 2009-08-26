@@ -45,7 +45,7 @@ $tmpl->place('header');
 				</tr>
 				<tr>
 					<td class="caption">Rate</td>
-					<td><span id="rate" class="varInput"><?php echo $inv_item->prepareRate(); ?></span></td>
+					<td><span id="rate" class="varInput"><?php echo $inv_item->prepareRate(2); ?></span></td>
 				</tr>
 				<tr>
 					<td class="caption">Currency</td>

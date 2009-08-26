@@ -9,7 +9,9 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fRecordSet
  * 
- * @version    1.0.0b20
+ * @version    1.0.0b22
+ * @changes    1.0.0b22  Changed ::__construct() to accept any Iterator instead of just an fResult object [wb, 2009-08-12]
+ * @changes    1.0.0b21  Added performance tweaks to ::prebuild() and ::precreate() [wb, 2009-07-31]
  * @changes    1.0.0b20  Changed the class to implement Countable, making the [http://php.net/count `count()`] function work [wb, 2009-07-29]
  * @changes    1.0.0b19  Fixed bugs with ::diff() and ::intersect() and empty record sets [wb, 2009-07-29]
  * @changes    1.0.0b18  Added method chaining support to prebuild, precount and precreate methods [wb, 2009-07-15]
@@ -439,12 +441,12 @@ class fRecordSet implements Iterator, Countable
 	/** 
 	 * Sets the contents of the set
 	 * 
-	 * @param  string  $class                  The type of records to create
-	 * @param  fResult $result_object          The fResult object of the records to create
-	 * @param  string  $non_limited_count_sql  An SQL statement to get the total number of rows that would have been returned if a `LIMIT` clause had not been used. Should only be passed if a `LIMIT` clause is used.
+	 * @param  string   $class                  The type of records to create
+	 * @param  Iterator $result_object          The fResult (or Iterator) object of the records to create
+	 * @param  string   $non_limited_count_sql  An SQL statement to get the total number of rows that would have been returned if a `LIMIT` clause had not been used. Should only be passed if a `LIMIT` clause is used.
 	 * @return fRecordSet
 	 */
-	protected function __construct($class, fResult $result_object=NULL, $non_limited_count_sql=NULL)
+	protected function __construct($class, $result_object=NULL, $non_limited_count_sql=NULL)
 	{
 		$this->class                 = $class;
 		$this->non_limited_count_sql = $non_limited_count_sql;
@@ -1171,36 +1173,9 @@ class fRecordSet implements Iterator, Countable
 				}
 			} catch (fExpectedException $e) { }
 			 
-			 
-			// Build the SQL for the record set we are injecting
-			$method = 'get' . fGrammar::camelize($relationship['column'], TRUE);
-			 
-			$sql  = "SELECT " . $related_table . ".* FROM :from_clause";
-			 
-			$where_conditions = array(
-				$table_with_route . '.' . $relationship['column'] . '=' => $record->$method()
-			);
-			$sql .= ' WHERE ' . fORMDatabase::createWhereClause($related_table, $where_conditions);
-			
-			$sql .= ' :group_by_clause ';
-			 
-			if ($order_bys = fORMRelated::getOrderBys($this->class, $related_class, $route)) {
-				$sql .= ' ORDER BY ' . fORMDatabase::createOrderByClause($related_table, $order_bys);
-			}
-			 
-			$sql = fORMDatabase::insertFromAndGroupByClauses($related_table, $sql);
-			 
 			
 			// Set up the result object for the new record set
-			$injected_result = new fResult(fORMDatabase::retrieve()->getType(), 'array');
-			$injected_result->setSQL($sql);
-			$injected_result->setResult($rows);
-			$injected_result->setReturnedRows(sizeof($rows));
-			$injected_result->setAffectedRows(0);
-			$injected_result->setAutoIncrementedValue(NULL);
-			 
-			$set = new fRecordSet($related_class, $injected_result);
-			 
+			$set = new fRecordSet($related_class, new ArrayIterator($rows)); 
 			 
 			// Inject the new record set into the record
 			$method = 'inject' . fGrammar::pluralize($related_class);
@@ -1300,12 +1275,13 @@ class fRecordSet implements Iterator, Countable
 			'*-to-one'
 		);
 		
+		$values = $this->call('get' . fGrammar::camelize($relationship['column'], TRUE));
+		$values = array_unique($values);
+		
 		self::build(
 			$related_class,
 			array(
-				$relationship['related_column'] . '=' => $this->call(
-					'get' . fGrammar::camelize($relationship['column'], TRUE)
-				)
+				$relationship['related_column'] . '=' => $values
 			)
 		);
 		

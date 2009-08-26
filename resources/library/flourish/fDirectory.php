@@ -9,7 +9,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fDirectory
  * 
- * @version    1.0.0b4
+ * @version    1.0.0b7
+ * @changes    1.0.0b7  Fixed ::__construct() to throw an fValidationException when the directory does not exist [wb, 2009-08-21]
+ * @changes    1.0.0b6  Fixed a bug where deleting a directory would prevent any future operations in the same script execution on a file or directory with the same path [wb, 2009-08-20]
+ * @changes    1.0.0b5  Added the ability to skip checks in ::__construct() for better performance in conjunction with fFilesystem::createObject() [wb, 2009-08-06]
  * @changes    1.0.0b4  Refactored ::scan() to use the new fFilesystem::createObject() method [wb, 2009-01-21]
  * @changes    1.0.0b3  Added the $regex_filter parameter to ::scan() and ::scanRecursive(), fixed bug in ::scanRecursive() [wb, 2009-01-05]
  * @changes    1.0.0b2  Removed some unnecessary error suppresion operators [wb, 2008-12-11]
@@ -110,38 +113,41 @@ class fDirectory
 	 * 
 	 * @throws fValidationException  When no directory was specified, when the directory does not exist or when the path specified is not a directory
 	 * 
-	 * @param  string $directory  The path to the directory
+	 * @param  string  $directory    The path to the directory
+	 * @param  boolean $skip_checks  If file checks should be skipped, which improves performance, but may cause undefined behavior - only skip these if they are duplicated elsewhere
 	 * @return fDirectory
 	 */
-	public function __construct($directory)
+	public function __construct($directory, $skip_checks=FALSE)
 	{
-		if (empty($directory)) {
-			throw new fValidationException('No directory was specified');
-		}
-		
-		if (!file_exists($directory)) {
-			throw new fValidationException(
-				'The directory specified, %s, does not exist',
-				$directory
-			);
-		}
-		if (!is_dir($directory)) {
-			throw new fValidationException(
-				'The directory specified, %s, is not a directory',
-				$directory
-			);
-		}
-		if (!is_readable($directory)) {
-			throw new fEnvironmentException(
-				'The directory specified, %s, is not readable',
-				$directory
-			);
+		if (!$skip_checks) {
+			if (empty($directory)) {
+				throw new fValidationException('No directory was specified');
+			}
+			
+			if (!is_readable($directory)) {
+				throw new fValidationException(
+					'The directory specified, %s, does not exist or is not readable',
+					$directory
+				);
+			}
+			if (!is_dir($directory)) {
+				throw new fValidationException(
+					'The directory specified, %s, is not a directory',
+					$directory
+				);
+			}
 		}
 		
 		$directory = self::makeCanonical(realpath($directory));
 		
 		$this->directory =& fFilesystem::hookFilenameMap($directory);
 		$this->exception =& fFilesystem::hookExceptionMap($directory);
+		
+		// If there is an exception and were not inside a transaction, but we've
+		// gotten to here, then the directory exists, so the exception must be outdated
+		if ($this->exception !== NULL && !fFilesystem::isInsideTransaction()) {
+			fFilesystem::updateExceptionMap($directory, NULL);
+		}
 	}
 	
 	
