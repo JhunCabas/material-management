@@ -1,5 +1,8 @@
 var counter = 0;
 $(function (){
+	$("#dialogBox").dialog({
+		autoOpen: false
+	});
 	$(".datepicker").datepicker();
 		addingRow();
 	$("#addRowBTN").click(function (){
@@ -18,6 +21,7 @@ $(function (){
 		var issuer_date = $("#issDate").val();
 		var receiver = $("#receiver").text();
 		var receiver_date = $("#recDate").val();
+		if(confirm("Continue?"))
 		$.post("parser/Production_issue.php",{
 			type: "add",
 			doc_number: doc_number,
@@ -33,14 +37,17 @@ $(function (){
 			},function(data){
 				if(data != "")
 				 {
-				 	 $("#dialogBox").html(data);
-					 $("#dialogBox").dialog('option', 'title', 'Error');
-					 $("#dialogBox").dialog('open');
+				 	$("#dialogBox").html(data);
+					$("#dialogBox").dialog('option', 'title', 'Error');
+					$("#dialogBox").dialog('open');
 				 }
 				 else{
 				 	$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Added");
-					 $("#dialogBox").dialog('option', 'title', 'Success');
-					 $("#dialogBox").dialog('open');
+					$("#dialogBox").dialog('option', 'title', 'Success');
+					$("#dialogBox").dialog('open');
+					$("#dialogBox").bind('dialogclose', function(event, ui) {
+						window.location = tellDir() + "list-pi.php";
+					 });
 				 }
 		});
 	});
@@ -66,4 +73,15 @@ function jsonForm()
 					});
 		jsonString = jsonString.substring(0, jsonString.length-1) + "}";
 	return jsonString;
+}
+
+function tellDir() {
+	var montage=window.location.href.split("/");
+	var simple=montage.length-2;
+	var final="";
+	for(var i=0;i<=simple;i++)
+	{
+		final=final+montage[i]+"/";
+	}
+	return final;
 }

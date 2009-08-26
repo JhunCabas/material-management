@@ -18,12 +18,11 @@ $tmpl->place('menu');
 					$grnEntries = Good_receipt_note::findAll();
 					foreach($grnEntries as $grnEntry)
 					{
-						printf("<tr><td>%s</td>%s<td>%s</td><td>%s</td><td>%s</td></tr>"
-							,$grnEntry->prepareDocNumber()
-							,$grnEntry->prepareDocDate()
-							,$grnEntry->prepareDoNo()
-							,$grnEntry->preparePoNo()
-							,$grnEntry->prepareStatus());
+						echo "<tr><td>".$grnEntry->prepareDocNumber()."</td>";
+						echo "<td>".$grnEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$grnEntry->prepareDoNo()."</td>";
+						echo "<td>".$grnEntry->preparePoNo()."</td>";
+						echo "<td>".$grnEntry->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
