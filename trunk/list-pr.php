@@ -24,15 +24,15 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPR();
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						printf("<tr><td>%s</td>%s<td>%s</td><td>%s</td></tr>"
-							,$purchaseEntry->prepareDocNumber()
-							,$purchaseEntry->prepareDocDate()
-							,$purchaseEntry->prepareRequester()
-							,$purchaseEntry->prepareStatus());
+						echo "<tr><td>".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
+						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
 				}
+				
 			?>
 		</tbody>
 	</table>
