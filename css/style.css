@@ -169,6 +169,10 @@ tr.linkable{
 	display: none;
 } 
 
+.hideEdit{
+	display: none;
+}
+
 .view-btn{
 	width: 75px;
 }
