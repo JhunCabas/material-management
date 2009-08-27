@@ -1,19 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 2.11.9.2
+-- version 3.2.0.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 25, 2009 at 03:03 PM
--- Server version: 5.0.67
--- PHP Version: 5.2.6
+-- Generation Time: Aug 27, 2009 at 08:25 AM
+-- Server version: 5.1.37
+-- PHP Version: 5.3.0
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
 
 --
 -- Database: `umw_mms`
@@ -30,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `branches` (
   `name` varchar(50) NOT NULL,
   `location` varchar(100) NOT NULL,
   `phone_no` varchar(15) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -49,8 +43,8 @@ INSERT INTO `branches` (`id`, `name`, `location`, `phone_no`) VALUES
 
 CREATE TABLE IF NOT EXISTS `document_types` (
   `id` varchar(10) NOT NULL,
-  `description` varchar(200) default NULL,
-  PRIMARY KEY  (`id`)
+  `description` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -73,21 +67,24 @@ CREATE TABLE IF NOT EXISTS `good_receipt_notes` (
   `doc_number` varchar(20) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
+  `branch_id` varchar(10) NOT NULL,
   `supplier` varchar(20) NOT NULL,
   `do_no` varchar(30) NOT NULL,
   `po_no` varchar(20) NOT NULL,
-  `inspector` varchar(20) NOT NULL,
-  `inspector_date` date NOT NULL,
-  `receiver` varchar(20) NOT NULL,
-  `receiver_date` date NOT NULL,
-  `status` enum('complete','incomplete') NOT NULL,
-  PRIMARY KEY  (`doc_number`)
+  `inspector` varchar(20) DEFAULT NULL,
+  `inspector_date` date DEFAULT NULL,
+  `receiver` varchar(20) DEFAULT NULL,
+  `receiver_date` date DEFAULT NULL,
+  `status` enum('complete','incomplete') NOT NULL DEFAULT 'incomplete',
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `good_receipt_notes`
 --
 
+INSERT INTO `good_receipt_notes` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `supplier`, `do_no`, `po_no`, `inspector`, `inspector_date`, `receiver`, `receiver_date`, `status`) VALUES
+('a', '2009-08-26', 'GRN', '', 'a', 'a', 'a', NULL, '2009-08-26', NULL, '2009-08-26', 'incomplete');
 
 -- --------------------------------------------------------
 
@@ -96,13 +93,13 @@ CREATE TABLE IF NOT EXISTS `good_receipt_notes` (
 --
 
 CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
-  `id` int(15) NOT NULL auto_increment,
-  `doc_number` varchar(20) NOT NULL,
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `doc_number` varchar(30) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
-  `assessment` enum('OK','NG','Q','X') NOT NULL default 'OK',
-  PRIMARY KEY  (`id`)
+  `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 --
@@ -122,7 +119,7 @@ CREATE TABLE IF NOT EXISTS `inv_classifications` (
   `description` varchar(50) NOT NULL,
   `sub_category_code` varchar(20) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -156,9 +153,9 @@ CREATE TABLE IF NOT EXISTS `inv_items` (
   `currency` varchar(3) NOT NULL,
   `purchase_year` int(4) NOT NULL,
   `detailed_description` varchar(100) NOT NULL,
-  `image_url` varchar(1000) default NULL,
+  `image_url` varchar(1000) DEFAULT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -181,7 +178,7 @@ CREATE TABLE IF NOT EXISTS `inv_maincategories` (
   `category_code` varchar(20) NOT NULL,
   `description` varchar(50) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`category_code`)
+  PRIMARY KEY (`category_code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -199,11 +196,11 @@ INSERT INTO `inv_maincategories` (`category_code`, `description`, `status`) VALU
 --
 
 CREATE TABLE IF NOT EXISTS `inv_stocks` (
-  `id` int(15) NOT NULL auto_increment,
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `branch_id` varchar(20) NOT NULL,
   `item_id` varchar(20) NOT NULL,
-  `quantity` int(15) NOT NULL default '0',
-  PRIMARY KEY  (`id`)
+  `quantity` int(15) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
@@ -225,7 +222,7 @@ CREATE TABLE IF NOT EXISTS `inv_subcategories` (
   `description` varchar(50) NOT NULL,
   `main_category_code` varchar(20) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
@@ -240,6 +237,53 @@ INSERT INTO `inv_subcategories` (`id`, `category_code`, `description`, `main_cat
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `material_transfers`
+--
+
+CREATE TABLE IF NOT EXISTS `material_transfers` (
+  `doc_number` varchar(30) NOT NULL,
+  `doc_date` date NOT NULL,
+  `doc_type` varchar(20) NOT NULL,
+  `branch_id` varchar(10) NOT NULL,
+  `approver` varchar(20) DEFAULT NULL,
+  `approver_date` date DEFAULT NULL,
+  `requester` varchar(20) NOT NULL,
+  `requester_date` date NOT NULL,
+  PRIMARY KEY (`doc_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `material_transfers`
+--
+
+INSERT INTO `material_transfers` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `approver`, `approver_date`, `requester`, `requester_date`) VALUES
+('sss', '2009-08-26', 'GRN', 'HQKL', NULL, NULL, 'Administrator', '2009-08-26');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `material_transfer_details`
+--
+
+CREATE TABLE IF NOT EXISTS `material_transfer_details` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `doc_number` varchar(30) NOT NULL,
+  `item_id` varchar(20) NOT NULL,
+  `quantity` int(15) NOT NULL,
+  `remark` varchar(500) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+--
+-- Dumping data for table `material_transfer_details`
+--
+
+INSERT INTO `material_transfer_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES
+(1, 'sss', '2', 0, '2');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `production_issues`
 --
 
@@ -247,18 +291,21 @@ CREATE TABLE IF NOT EXISTS `production_issues` (
   `doc_number` varchar(20) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
-  `notes` varchar(1000) default NULL,
-  `issuer` varchar(20) NOT NULL,
-  `issuer_date` date NOT NULL,
-  `receiver` varchar(20) NOT NULL,
-  `receiver_date` date NOT NULL,
-  PRIMARY KEY  (`doc_number`)
+  `branch_id` varchar(10) NOT NULL,
+  `notes` varchar(1000) DEFAULT NULL,
+  `issuer` varchar(20) DEFAULT NULL,
+  `issuer_date` date DEFAULT NULL,
+  `receiver` varchar(20) DEFAULT NULL,
+  `receiver_date` date DEFAULT NULL,
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `production_issues`
 --
 
+INSERT INTO `production_issues` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `notes`, `issuer`, `issuer_date`, `receiver`, `receiver_date`) VALUES
+('a', '2009-08-27', 'GRN', '', 'aaaa', NULL, '2009-08-26', NULL, '2009-08-26');
 
 -- --------------------------------------------------------
 
@@ -267,18 +314,20 @@ CREATE TABLE IF NOT EXISTS `production_issues` (
 --
 
 CREATE TABLE IF NOT EXISTS `production_issue_details` (
-  `id` int(15) NOT NULL auto_increment,
-  `doc_number` varchar(20) NOT NULL,
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `doc_number` varchar(30) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `production_issue_details`
 --
 
+INSERT INTO `production_issue_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES
+(1, 'a', 'a', 0, 'a');
 
 -- --------------------------------------------------------
 
@@ -287,34 +336,37 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
 --
 
 CREATE TABLE IF NOT EXISTS `purchases` (
-  `doc_number` varchar(20) NOT NULL,
+  `doc_number` varchar(30) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
-  `doc_tag` enum('po','pr') NOT NULL default 'pr',
-  `total` float NOT NULL,
+  `doc_tag` enum('po','pr') NOT NULL DEFAULT 'pr',
+  `branch_id` varchar(10) NOT NULL,
+  `total` float NOT NULL DEFAULT '0',
   `supplier_1` varchar(20) NOT NULL,
-  `supplier_2` varchar(20) default NULL,
-  `supplier_3` varchar(20) default NULL,
+  `supplier_2` varchar(20) DEFAULT NULL,
+  `supplier_3` varchar(20) DEFAULT NULL,
   `supplier_1_contact` varchar(50) NOT NULL,
-  `supplier_2_contact` varchar(50) NOT NULL,
-  `supplier_3_contact` varchar(50) NOT NULL,
+  `supplier_2_contact` varchar(50) DEFAULT NULL,
+  `supplier_3_contact` varchar(50) DEFAULT NULL,
   `supplier_1_tel` varchar(30) NOT NULL,
-  `supplier_2_tel` varchar(30) NOT NULL,
-  `supplier_3_tel` varchar(30) NOT NULL,
+  `supplier_2_tel` varchar(30) DEFAULT NULL,
+  `supplier_3_tel` varchar(30) DEFAULT NULL,
   `requester` varchar(20) NOT NULL,
   `requester_date` date NOT NULL,
-  `approver_1` varchar(20) default NULL,
-  `approver_1_date` date default NULL,
-  `approver_2` varchar(20) default NULL,
-  `approver_2_date` date default NULL,
-  `status` enum('approved','rejected','unapproved') NOT NULL default 'unapproved',
-  PRIMARY KEY  (`doc_number`)
+  `approver_1` varchar(20) DEFAULT NULL,
+  `approver_1_date` date DEFAULT NULL,
+  `approver_2` varchar(20) DEFAULT NULL,
+  `approver_2_date` date DEFAULT NULL,
+  `status` enum('approved','rejected','unapproved') NOT NULL DEFAULT 'unapproved',
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
 -- Dumping data for table `purchases`
 --
 
+INSERT INTO `purchases` (`doc_number`, `doc_date`, `doc_type`, `doc_tag`, `branch_id`, `total`, `supplier_1`, `supplier_2`, `supplier_3`, `supplier_1_contact`, `supplier_2_contact`, `supplier_3_contact`, `supplier_1_tel`, `supplier_2_tel`, `supplier_3_tel`, `requester`, `requester_date`, `approver_1`, `approver_1_date`, `approver_2`, `approver_2_date`, `status`) VALUES
+('1', '2009-08-26', 'GRN', 'pr', '', 0, '1', '1', '1', '1', '1', '1', '1', '1', '1', 'Administrator', '2009-08-26', NULL, NULL, NULL, NULL, 'unapproved');
 
 -- --------------------------------------------------------
 
@@ -323,19 +375,21 @@ CREATE TABLE IF NOT EXISTS `purchases` (
 --
 
 CREATE TABLE IF NOT EXISTS `purchase_details` (
-  `id` int(15) NOT NULL,
-  `doc_number` varchar(20) NOT NULL,
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `doc_number` varchar(30) NOT NULL,
   `item_id` varchar(20) NOT NULL,
-  `quantity` int(15) NOT NULL default '0',
-  `unit_price` float NOT NULL default '0',
-  `extended_price` float NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+  `quantity` int(15) NOT NULL DEFAULT '0',
+  `unit_price` float NOT NULL DEFAULT '0',
+  `extended_price` float NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 --
 -- Dumping data for table `purchase_details`
 --
 
+INSERT INTO `purchase_details` (`id`, `doc_number`, `item_id`, `quantity`, `unit_price`, `extended_price`) VALUES
+(1, '1', '1', 1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -344,20 +398,22 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
 --
 
 CREATE TABLE IF NOT EXISTS `suppliers` (
-  `id` int(15) NOT NULL auto_increment,
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
+  `address` text NOT NULL,
+  `contact_person` varchar(100) NOT NULL,
   `contact` varchar(20) NOT NULL,
-  `info` varchar(1000) default NULL,
-  `image_url` varchar(1000) default NULL,
-  PRIMARY KEY  (`id`)
+  `info` varchar(1000) DEFAULT NULL,
+  `image_url` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 --
 -- Dumping data for table `suppliers`
 --
 
-INSERT INTO `suppliers` (`id`, `name`, `contact`, `info`, `image_url`) VALUES
-(1, 'Mahen Sdn Bhd', '+6012-2222222', 'owned by Mahendran Balakrishnan', NULL);
+INSERT INTO `suppliers` (`id`, `name`, `address`, `contact_person`, `contact`, `info`, `image_url`) VALUES
+(1, 'Mahen Sdn Bhd', '', '', '+6012-2222222', 'owned by Mahendran Balakrishnan', NULL);
 
 -- --------------------------------------------------------
 
@@ -372,7 +428,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `email` varchar(20) NOT NULL,
   `branch_id` varchar(20) NOT NULL,
   `level` varchar(20) NOT NULL,
-  PRIMARY KEY  (`username`)
+  PRIMARY KEY (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 --
