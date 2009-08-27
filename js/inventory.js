@@ -57,7 +57,7 @@ $(function (){
 		window.open("inventory-view.php?"+"id="+$(this).children("#itemID").children().text());
 	});
 	$("#newItem").click(function (){
-		$(".addItem").fadeIn();
+		$(".addItem").show();
 	});
 	$("#addmaincc").click(function (){
 		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
@@ -70,7 +70,7 @@ $(function (){
 		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
 		function (data){
 			$("#addclassific").html(data).removeAttr("disabled");
-			$("table#tableDetail").fadeIn("slow");
+			$("table#tableDetail").show();
 		});
 	});
 	$("#idInput").blur(function (){
