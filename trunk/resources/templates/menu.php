@@ -15,7 +15,7 @@
         	<a href="admin-user.php">Admin</a>
         </div>
 		<div id="tab4" class="span-3 tab ui-corner-top">
-        	Approval
+        	Report
         </div>
 		<?php
 			echo "<p style=\"float: right;\">";
