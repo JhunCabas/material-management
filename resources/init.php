@@ -15,7 +15,7 @@ $tmpl->set('menuDocument','document-menu.php');
 $tmpl->set('footer', 'footer.php');
 $tmpl->add('js','./resources/library/jquery/js/jquery-1.3.2.min.js');
 $tmpl->add('js','./resources/library/jquery/js/jquery-ui-1.7.2.custom.min.js');
-$tmpl->add('js','./resources/menu.js');
+$tmpl->add('js','./resources/templates/main.js');
 $tmpl->add('css',array('path' => './resources/library/blueprint/screen.css','media' => 'screen, projection'));
 $tmpl->add('css',array('path' => './resources/library/blueprint/print.css','media' => 'print'));
 $tmpl->add('css','./resources/library/jquery/css/cupertino/jquery-ui-1.7.2.custom.css');
