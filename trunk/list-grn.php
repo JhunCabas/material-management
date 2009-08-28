@@ -1,6 +1,15 @@
 <?php
 include './resources/init.php';
 $tmpl->place('header');
+?>
+<script type="text/javascript" charset="utf-8">
+	$(function (){
+		$("tr.linkable").click(function (){
+			window.open("document-grn-view.php?"+"id="+$(this).children(".docNumber").text());
+		});
+	});
+</script>
+<?php
 $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
@@ -18,7 +27,7 @@ $tmpl->place('menu');
 					$grnEntries = Good_receipt_note::findAll();
 					foreach($grnEntries as $grnEntry)
 					{
-						echo "<tr><td>".$grnEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$grnEntry->prepareDocNumber()."</td>";
 						echo "<td>".$grnEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$grnEntry->prepareDoNo()."</td>";
 						echo "<td>".$grnEntry->preparePoNo()."</td>";

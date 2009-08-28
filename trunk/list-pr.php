@@ -2,8 +2,16 @@
 include './resources/init.php';
 fAuthorization::requireLoggedIn();
 $tmpl->place('header');
+?>
+<script type="text/javascript" charset="utf-8">
+	$(function (){
+		$("tr.linkable").click(function (){
+			window.open("document-pr-view.php?"+"id="+$(this).children(".docNumber").text());
+		});
+	});
+</script>
+<?php
 $tmpl->place('menu');
-
 ?>
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
@@ -24,7 +32,7 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPR();
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						echo "<tr><td>".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
 						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";

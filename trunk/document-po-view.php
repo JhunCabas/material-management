@@ -3,7 +3,7 @@ include './resources/init.php';
 fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
-<script type="text/javascript" src="./js/document-pr-view.js"></script>
+<script type="text/javascript" src="./js/document-po-view.js"></script>
 <?php
 $tmpl->place('menu');
 ?>
@@ -97,7 +97,7 @@ $tmpl->place('menu');
 					<td><label>Requester </label></td><td id="requester"><?php echo $purchase->prepareRequester(); ?></td><td><label>Date </label><?php echo $purchase->prepareRequesterDate("j F Y"); ?></td>
 				</tr>
 				<tr>
-					<td><label>Approver 1 </label></td><td><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="app1Date" class="datepicker"></input></td>
+					<td><label>Approver 1 </label></td><td id="approver"><?php echo $purchase->prepareApprover1(); ?></td><td><label>Date </label><?php echo $purchase->prepareApprover1Date("j F Y"); ?></td>
 				</tr>
 				<tr style="display: none;">
 					<td><label>Approver 2 </label></td><td></td><td><label>Date </label><input type="text" id="app2Date" class="datepicker"></input></td>

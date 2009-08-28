@@ -1,6 +1,15 @@
 <?php
 include './resources/init.php';
 $tmpl->place('header');
+?>
+<script type="text/javascript" charset="utf-8">
+	$(function (){
+		$("tr.linkable").click(function (){
+			window.open("document-mtr-view.php?"+"id="+$(this).children(".docNumber").text());
+		});
+	});
+</script>
+<?php
 $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
@@ -10,9 +19,25 @@ $tmpl->place('menu');
 	<h3>List</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>From Department</th><th>Item Code</th><th>Quantity</th></tr>
+			<tr><th>Document Number</th><th>Document Date</th><th>Requester</th><th>Department</th></tr>
 		</thead>
-		<tbody></tbody>
+		<tbody>
+			<?php
+				try{
+					$mattrans = Material_transfer::findAll();
+					foreach($mattrans as $mattran)
+					{
+						$branch = new Branch($mattran->getBranchId());
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
+						echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$mattran->prepareRequester()."</td>";
+						echo "<td>".$branch->prepareName()."</td></tr>";
+					}
+				}catch (fExpectedException $e) {
+					echo $e->printMessage();
+				}
+			?>
+		</tbody>
 	</table>
 </div>
 <?php $tmpl->place('footer'); ?>

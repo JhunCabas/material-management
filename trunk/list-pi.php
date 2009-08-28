@@ -1,12 +1,21 @@
 <?php
 include './resources/init.php';
 $tmpl->place('header');
+?>
+<script type="text/javascript" charset="utf-8">
+	$(function (){
+		$("tr.linkable").click(function (){
+			window.open("document-pi-view.php?"+"id="+$(this).children(".docNumber").text());
+		});
+	});
+</script>
+<?php
 $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
-	<h2>Purchase Request</h2>
-	<h3>Add Purchase Request : <a href="document-pi.php">Form</a></h3>
+	<h2>Production Issue</h2>
+	<h3>Add Production Issue : <a href="document-pi.php">Form</a></h3>
 	<h3>List</h3>
 	<table>
 		<thead>
@@ -18,7 +27,7 @@ $tmpl->place('menu');
 					$productionEntries = Production_issue::findAll();
 					foreach($productionEntries as $productionEntry)
 					{
-						echo "<tr><td>".$productionEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$productionEntry->prepareIssuer()."</td>";
 						echo "<td>".$productionEntry->prepareReceiver()."</td></tr>";

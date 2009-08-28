@@ -1,6 +1,15 @@
 <?php
 include './resources/init.php';
 $tmpl->place('header');
+?>
+<script type="text/javascript" charset="utf-8">
+	$(function (){
+		$("tr.linkable").click(function (){
+			window.open("document-po-view.php?"+"id="+$(this).children(".docNumber").text());
+		});
+	});
+</script>
+<?php
 $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
@@ -17,11 +26,10 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPO();
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						printf("<tr><td>%s</td>%s<td>%s</td><td>%s</td></tr>"
-							,$purchaseEntry->prepareDocNumber()
-							,$purchaseEntry->prepareDocDate()
-							,$purchaseEntry->prepareRequester()
-							,$purchaseEntry->prepareStatus());
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
+						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
