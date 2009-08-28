@@ -3,6 +3,9 @@ include './resources/init.php';
 fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/lib/jquery.bgiframe.min.js"></script>
+<link media="screen, projection" href="./resources/library/jquery.autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="./js/document-pi.js"></script>
 <?php
 $tmpl->place('menu');
