@@ -1,7 +1,11 @@
 <?php
 include './resources/init.php';
+fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/lib/jquery.bgiframe.min.js"></script>
+<link media="screen, projection" href="./resources/library/jquery.autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="./js/document-grn.js"></script>
 <?php
 $tmpl->place('menu');
@@ -23,7 +27,7 @@ $tmpl->place('menu');
 				<td><label>DO No </label></td>
 				<td><label>PO No </label></td>
 			</tr>
-			<tr><td><input type="text" id="supplier"></input></td>
+			<tr><td><input type="text" id="supplierAuto"></input><input type="hidden" id="supplier"/></td>
 				<td><input type="text" id="doNo"></input></td>
 				<td><input type="text" id="poNo"></input></td>
 			</tr>

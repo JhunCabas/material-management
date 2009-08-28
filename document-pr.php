@@ -3,6 +3,9 @@ include './resources/init.php';
 fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/lib/jquery.bgiframe.min.js"></script>
+<link media="screen, projection" href="./resources/library/jquery.autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="./js/document-pr.js"></script>
 <?php
 $tmpl->place('menu');
@@ -22,15 +25,15 @@ $tmpl->place('menu');
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
 		<p>
 		<table>
-			<tr><td><label>Supplier 1 </label><input type="text" id="sup1"></input></td>
+			<tr><td><label>Supplier 1 </label><input type="text" id="sup1auto"></input><input type="hidden" id="sup1"></input></td>
 				<td><label>Contact Person </label><input type="text" id="con1"></input></td>
 				<td><label>Tel No </label><input type="text" id="tel1"></input></td>
 			</tr>
-			<tr><td><label>Supplier 2 </label><input type="text" id="sup2"></input></td>
+			<tr><td><label>Supplier 2 </label><input type="text" id="sup2auto"><input type="hidden" id="sup2"></input></input></td>
 				<td><label>Contact Person </label><input type="text" id="con2"></input></td>
 				<td><label>Tel No </label><input type="text" id="tel2"></input></td>
 			</tr>
-			<tr><td><label>Supplier 3 </label><input type="text" id="sup3"></input></td>
+			<tr><td><label>Supplier 3 </label><input type="text" id="sup3auto"><input type="hidden" id="sup3"></input></input></td>
 				<td><label>Contact Person </label><input type="text" id="con3"></input></td>
 				<td><label>Tel No </label><input type="text" id="tel3"></input></td>
 			</tr>

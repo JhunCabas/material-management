@@ -26,6 +26,12 @@
 		return fRecordSet::build('Purchase',
 			array('doc_tag=' => 'pr'));
 	}
+	
+	static function findByDocType($key)
+	{
+		return fRecordSet::build('Purchase',
+			array('doc_type=' => $key));
+	}
  }
 
 ?>
