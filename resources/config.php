@@ -7,7 +7,7 @@ error_reporting(E_STRICT | E_ALL);
 fCore::enableErrorHandling('html');
 fCore::enableExceptionHandling('html');
 
-//fTimestamp::setDefaultTimezone('America/New_York');
+fTimestamp::setDefaultTimezone('Asia/Kuala_Lumpur');
 
 fAuthorization::setLoginPage(URL_ROOT . 'authentication.php');
 fAuthorization::setAuthLevels(
