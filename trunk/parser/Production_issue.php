@@ -30,6 +30,43 @@
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
 				$error = true;
+			}	
+		}else if($_POST['type'] == "removeStock")
+		{
+			$records = Inv_stock::gotoStock($_POST['itemCode'],$_POST['branch']);
+			if($records->count())
+				foreach($records as $record)
+				{
+					if($record->getQuantity() < $_POST['itemQuan'])
+						echo "Item not enough quantity";
+					else
+					{
+						Inv_stock::removeStock($_POST['itemCode'],$_POST['branch'],$_POST['itemQuan']);
+						$stock = new Production_issue_detail($_POST['detailId']);
+						$stock->setStatus('completed');
+						$stock->store();
+					}
+				}
+			else
+				echo "Item not enough quantity.";
+		}else if($_POST['type'] == "save")
+		{
+			try{
+				$production = new Production_issue($_POST['key']);
+				//$production->populate();
+				if($_POST['issuer'] != "")
+				{
+					$production->setIssuer($_POST['issuer']);
+					$production->setIssuerDate($_POST['issuer_date']);
+				}
+				if($_POST['receiver'] != "")
+				{
+					$production->setReceiver($_POST['receiver']);
+					$production->setReceiverDate($_POST['receiver_date']);
+				}
+				$production->store();
+			}catch (fExpectedException $e) {
+					echo $e->printMessage();
 			}
 		}
 	}

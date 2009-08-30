@@ -19,7 +19,7 @@ $tmpl->place('menu');
 	<h3>List</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>Requester</th><th>Department</th></tr>
+			<tr><th>Document Number</th><th>Document Date</th><th>Requester</th><th>Department</th><th>Status</th></tr>
 		</thead>
 		<tbody>
 			<?php
@@ -31,7 +31,8 @@ $tmpl->place('menu');
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
 						echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$mattran->prepareRequester()."</td>";
-						echo "<td>".$branch->prepareName()."</td></tr>";
+						echo "<td>".$branch->prepareName()."</td>";
+						echo "<td>".$mattran->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();

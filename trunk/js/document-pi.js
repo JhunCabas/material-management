@@ -15,7 +15,10 @@ $(function (){
 		addingRow();
 	});
 	$(".signHere").click(function (){
-		$(this).parent().html($("#whoami").val());
+		if($(this).parent().next().children("input").val() == "")
+			alert("Input Date first");
+		else
+			$(this).parent().html($("#whoami").val());
 	});
 	$("#submitBTN").click(function (){
 		var doc_number = $("#doc_num").val();

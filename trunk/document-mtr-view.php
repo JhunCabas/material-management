@@ -29,21 +29,30 @@ $tmpl->place('menu');
 		<label for="doc_type">Document Type </label>
 			<?php echo $mattrans->prepareDocType(); ?><br />
 		<label for="branch_id">Branch </label>
-			<?php $branch = new Branch($mattrans->getBranchId()); echo $branch->prepareName() . " / " . $mattrans->prepareBranchId();?><br />
+			<?php $branch = new Branch($mattrans->getBranchId()); echo $branch->prepareName() . " / <span id=\"branchId\">" . $mattrans->prepareBranchId()."</span>";?><br />
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
-					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th></tr>
+					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>From Branch</th></tr>
 			</thead>
 			<tbody>
 				<?php
 					$counter = 1;
 					foreach($mattrans_details as $mattrans_detail)
 					{
-						echo "<td>".$counter."</td><td>".$mattrans_detail->prepareItemId()."</td>";
+						echo "<tr class=\"jsonRow\"><td>".$counter."</td><td class=\"itemCode\">".$mattrans_detail->prepareItemId()."</td>";
 						$item = new Inv_item($mattrans_detail->getItemId());
-						echo "<td>".$item->prepareDescription()."</td><td>".$mattrans_detail->prepareQuantity()."</td>
+						echo "<td>".$item->prepareDescription()."</td><td class=\"itemQuan\">".$mattrans_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$mattrans_detail->prepareRemark()."</td>";
+						echo "<td><select id=\"fromBranch\">";
+						$tempRecords = Inv_stock::findByStock($mattrans_detail->getItemId(),$mattrans_detail->getQuantity());
+						foreach($tempRecords as $tempRecord)
+						{
+							$branch = new Branch($tempRecord->getBranchId());
+							fHTML::printOption($branch->prepareName().
+								"[".$tempRecord->prepareQuantity()."]",$tempRecord->prepareBranchId());
+						}
+						echo "</select></td></tr>";
 						$counter++;
 					}
 				?>
@@ -53,14 +62,12 @@ $tmpl->place('menu');
 			<tbody>
 				<tr>
 					<td><label>Requester </label></td><td id="requester"><?php echo $mattrans->prepareRequester(); ?></td><td><label>Date </label><?php echo $mattrans->prepareRequesterDate("j F Y"); ?></td>
-					<tr>
-						<td><label>Approver </label></td><td id="approver"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="appDate" class="datepicker"></input></td>
-					</tr>
 				</tr>
 			</tbody>
 		</table>
-		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
+					if($mattrans->getStatus() == 'pending')
+						echo "<input type=\"button\" id=\"submitBTN\" value=\"Submit\" style=\"float: right;\"/>";
 					$me = fAuthorization::getUserToken(); 
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
 				} catch (fExpectedException $e) {

@@ -23,43 +23,69 @@ $tmpl->place('menu');
 	<h2>Production Issue Form</h2>
 	<div class="form-frame span-23 last">
 		<h3>Production Issue Form</h3><br />
-		<label for="doc_num">Document Number </label><?php echo $production->prepareDocNumber(); ?><br />
+		<label for="doc_num">Document Number </label><span id="docNum"><?php echo $production->prepareDocNumber(); ?></span><br />
 		<label for="doc_date">Document Date </label><?php echo $production->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label><?php echo $production->prepareDocType(); ?><br />
 		<label for="branch_id">Branch </label>
-				<?php $branch = new Branch($production->getBranchId()); echo $branch->prepareName() . " / " . $production->prepareBranchId();?><br />
+				<?php $branch = new Branch($production->getBranchId()); echo $branch->prepareName() . " / " . "<span id=\"branchId\">" .$production->prepareBranchId()."</span>";?><br />
 		<table id="formContent">
 			<thead>
-				<tr><td>No</td>
-					<td>Item Code</td><td width="400">Description</td><td>Quantity</td><td>UOM</td><td>Remarks</td></tr>
+				<tr><th>No</th>
+					<th>Item Code</th><th width="400">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>Icons</th></tr>
 			</thead>
 			<tbody>
 				<?php
 					$counter = 1;
 					foreach($production_details as $production_detail)
 					{
-						echo "<td>".$counter."</td><td>".$production_detail->prepareItemId()."</td>";
+						echo "<tr id=\"rowNo".$counter."\"><td id=\"detailId\" class=\"hideFirst\">".$production_detail->prepareId()."</td><td>".$counter."</td><td id=\"itemCode\">".$production_detail->prepareItemId()."</td>";
 						$item = new Inv_item($production_detail->getItemId());
-						echo "<td>".$item->prepareDescription()."</td><td>".$production_detail->prepareQuantity()."</td>
+						echo "<td>".$item->prepareDescription()."</td><td id=\"itemQuan\">".$production_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$production_detail->prepareRemark()."</td>";
+						if($production_detail->getStatus() == "pending")
+							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\"><li id=\"save\" title=\"Save\" class=\"ui-state-default ui-corner-all\"><span class=\"ui-icon ui-icon-disk\"></span></li><li title=\"Loading\" class=\"hideFirst ui-corner-all\"><img src=\"./img/layout/ajax-loader2.gif\" /></li></ul></td></tr>";
+						else
+							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\"><li title=\"Complete\" class=\"ui-state-default ui-corner-all\"><span class=\"ui-icon ui-icon-check\"></span></li><li title=\"Loading\" class=\"hideFirst ui-corner-all\"><img src=\"./img/layout/ajax-loader2.gif\" /></li></ul></td></tr>";
 						$counter++;
 					}
 				?>
 			</tbody>
-			<tfoot>
-				<tr><td colspan="6" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
-			</tfoot>
 		</table>
 		<label>Notes</label><br /><?php echo $production->prepareNotes(); ?><br />
 		<table id="approveContent">
 			<tbody>
 				<tr>
-					<td><label>Issued by </label></td><td id="issuer"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="issDate" class="datepicker"></input></td>
-					<td><label>Received by </label></td><td id="receiver"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="recDate" class="datepicker"></input></td>
+					<td><label>Issued by </label></td>
+						<?php 
+							if($production->getIssuer()!=null)
+								echo "<td>".$production->prepareIssuer()."</td>";
+							else
+								echo "<td id=\"issuer\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
+						?></td><td><label>Date </label>
+						<?php 
+							if($production->getIssuer_date()!=null)
+								echo $production->prepareIssuer_date("j F Y");
+							else
+								echo "<input type=\"text\" id=\"issDate\" class=\"datepicker\"></input>";
+						?></td>
+					<td><label>Received by </label></td>
+						<?php
+							if($production->getReceiver()!=null)
+								echo "<td>".$production->prepareReceiver()."</td>";
+							else
+								echo "<td id=\"receiver\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
+						?></td><td><label>Date </label>
+						<?php
+							if($production->getReceiver_date()!=null)
+								echo $production->prepareReceiver_date("j F Y");
+							else
+								echo "<input type=\"text\" id=\"recDate\" class=\"datepicker\"></input>";
+						?></td>
 				</tr>
 		</table>
-		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
+					if($production->getStatus() == 'pending')
+						echo "<input type=\"button\" id=\"submitBTN\" value=\"Submit\" style=\"float: right;\"/>";
 					$me = fAuthorization::getUserToken(); 
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
 				} catch (fExpectedException $e) {
