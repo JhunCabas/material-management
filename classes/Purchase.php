@@ -21,6 +21,13 @@
 			array('doc_tag=' => 'po'));
 	}
 	
+	static function findAllUncompletePO()
+	{
+		return fRecordSet::build('Purchase',
+			array('doc_tag=' => 'po', 'status!' => 'completed'));
+
+	}
+	
 	static function findAllPR()
 	{
 		return fRecordSet::build('Purchase',

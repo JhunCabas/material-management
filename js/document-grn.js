@@ -9,6 +9,20 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
+	$("#poNo").autocomplete("parser/autocomplete/Purchase.php",{
+						parse: function(data) {
+							return $.map(eval(data), function(row) {
+								return {
+									data: row,
+									value: row.name,
+									result: row.name
+								}
+							});
+						},
+						formatItem: function(item) {
+							return format(item);
+						}
+					})
 	$("#supplierAuto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
