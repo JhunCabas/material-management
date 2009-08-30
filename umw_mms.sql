@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 30, 2009 at 05:11 AM
+-- Generation Time: Aug 30, 2009 at 04:27 PM
 -- Server version: 5.1.37
 -- PHP Version: 5.3.0
 
@@ -209,14 +209,17 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 --
 -- Dumping data for table `inv_stocks`
 --
 
 INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES
-(1, 'HQKL', 'AE1001', 10);
+(1, 'HQKL', 'AE1001', 150),
+(2, 'KDSP', 'AE1001', 0),
+(3, 'KDSP', 'AE1002', 450),
+(4, 'HQKL', 'AE1002', 210);
 
 -- --------------------------------------------------------
 
@@ -257,6 +260,7 @@ CREATE TABLE IF NOT EXISTS `material_transfers` (
   `approver_date` date DEFAULT NULL,
   `requester` varchar(20) NOT NULL,
   `requester_date` date NOT NULL,
+  `status` enum('pending','completed') NOT NULL,
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -264,8 +268,8 @@ CREATE TABLE IF NOT EXISTS `material_transfers` (
 -- Dumping data for table `material_transfers`
 --
 
-INSERT INTO `material_transfers` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `approver`, `approver_date`, `requester`, `requester_date`) VALUES
-('sss', '2009-08-26', 'GRN', 'HQKL', NULL, NULL, 'Administrator', '2009-08-26');
+INSERT INTO `material_transfers` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `approver`, `approver_date`, `requester`, `requester_date`, `status`) VALUES
+('sss', '2009-08-26', 'GRN', 'HQKL', NULL, NULL, 'Administrator', '2009-08-26', 'completed');
 
 -- --------------------------------------------------------
 
@@ -280,14 +284,15 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `material_transfer_details`
 --
 
 INSERT INTO `material_transfer_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES
-(1, 'sss', 'AE1002', 0, '2');
+(1, 'sss', 'AE1002', 10, '2'),
+(2, 'sss', 'AE1001', 100, '');
 
 -- --------------------------------------------------------
 
@@ -305,6 +310,7 @@ CREATE TABLE IF NOT EXISTS `production_issues` (
   `issuer_date` date DEFAULT NULL,
   `receiver` varchar(20) DEFAULT NULL,
   `receiver_date` date DEFAULT NULL,
+  `status` enum('pending','completed') NOT NULL,
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -312,8 +318,8 @@ CREATE TABLE IF NOT EXISTS `production_issues` (
 -- Dumping data for table `production_issues`
 --
 
-INSERT INTO `production_issues` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `notes`, `issuer`, `issuer_date`, `receiver`, `receiver_date`) VALUES
-('a', '2009-08-27', 'GRN', 'KDSP', 'aaaa', NULL, '2009-08-26', NULL, '2009-08-26');
+INSERT INTO `production_issues` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `notes`, `issuer`, `issuer_date`, `receiver`, `receiver_date`, `status`) VALUES
+('a', '2009-08-27', 'GRN', 'KDSP', 'aaaa', 'Administrator', '2009-08-31', 'Administrator', '2009-08-31', 'pending');
 
 -- --------------------------------------------------------
 
@@ -327,15 +333,17 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
+  `status` enum('pending','completed') NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `production_issue_details`
 --
 
-INSERT INTO `production_issue_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES
-(1, 'a', 'AE1002', 0, 'a');
+INSERT INTO `production_issue_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`, `status`) VALUES
+(1, 'a', 'AE1002', 10, 'a', 'completed'),
+(2, 'a', 'AE1001', 100, '', 'pending');
 
 -- --------------------------------------------------------
 
@@ -375,7 +383,7 @@ CREATE TABLE IF NOT EXISTS `purchases` (
 --
 
 INSERT INTO `purchases` (`doc_number`, `running_number`, `doc_date`, `doc_type`, `doc_tag`, `branch_id`, `total`, `supplier_1`, `supplier_2`, `supplier_3`, `supplier_1_contact`, `supplier_2_contact`, `supplier_3_contact`, `supplier_1_tel`, `supplier_2_tel`, `supplier_3_tel`, `requester`, `requester_date`, `approver_1`, `approver_1_date`, `approver_2`, `approver_2_date`, `status`) VALUES
-('1', 1, '2009-08-26', 'GRN', 'pr', 'HQKL', 0, '1', '2', '', '1', '2', '', '1', '2', '', 'Administrator', '2009-08-26', NULL, NULL, NULL, NULL, 'unapproved');
+('1', 1, '2009-08-26', 'GRN', 'po', 'HQKL', 4, '1', '2', '', '1', '2', '', '1', '2', '', 'Administrator', '2009-08-26', 'Administrator', '2009-08-30', NULL, NULL, 'approved');
 
 -- --------------------------------------------------------
 
@@ -391,14 +399,15 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `unit_price` float NOT NULL DEFAULT '0',
   `extended_price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
 
 --
 -- Dumping data for table `purchase_details`
 --
 
 INSERT INTO `purchase_details` (`id`, `doc_number`, `item_id`, `quantity`, `unit_price`, `extended_price`) VALUES
-(1, '1', 'AE1001', 1, 1, 1);
+(1, '1', 'AE1001', 1, 1, 2),
+(9, '1', 'AT1001', 1, 1, 2);
 
 -- --------------------------------------------------------
 
