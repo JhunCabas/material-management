@@ -72,6 +72,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
+		var total = $("#purchaseTotal").text();
 		var branch_id = $("#branch_id").val();
 		var supplier_1 = $("#sup1").val();
 		var supplier_1_contact = $("#con1").val();
@@ -90,6 +91,7 @@ $(function (){
 			doc_number: doc_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
+			total: total,
 			branch_id: branch_id,
 			jsonForm: jsonForm(),
 			supplier_1: supplier_1,
@@ -142,14 +144,24 @@ function addingRow()
 											}
 										})
 										.result(function(e, item) {
+											$(this).parent().parent().removeClass("emptyRow");
 											$(this).parent().parent().find("#descAuto").text(item.desc);
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 
-	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input class=\"itemUnitP\"/></td><td><input class=\"itemExtP\"/></td>";
+	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input class=\"itemUnitP\"/></td>";
+	var extendedInner = $("<input></input>").addClass("itemExtP")
+						.bind("blur",function (){
+							var total = 0;
+							$(".itemExtP").each(function (){
+								total = total + parseFloat($(this).val());
+							});
+							$("#purchaseTotal").text(formatAsMoney(total));
+						});
+	var extendedCell = $("<td></td>").html(extendedInner);
 	var counterCell = $("<td></td>").text(++counter);
 	var itemCode = $("<td></td>").html(itemCodeInner);
-	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").append(counterCell).append(itemCode).append(addRow);
+	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").addClass("emptyRow").append(counterCell).append(itemCode).append(addRow).append(extendedCell);
 	$("#formContent tbody").append(wholeRow);
 }
 
@@ -157,11 +169,12 @@ function jsonForm()
 {
 	var jsonString = "{";
 		$(".jsonRow").each(function (){
-		jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
-					+$(this).find(".itemCode").val()+"\","
-					+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
-					+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
-					+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";
+					if(!$(this).hasClass("emptyRow"))
+					jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
+								+$(this).find(".itemCode").val()+"\","
+								+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
+								+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
+								+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";
 					});
 		jsonString = jsonString.substring(0, jsonString.length-1) + "}";
 	return jsonString;
@@ -172,4 +185,12 @@ function getRunningNumber()
 	$.post("parser/Purchase.php",{type:"countPR", doc:$("#doc_type").val()},function (data){
 		
 	});
+}
+
+function formatAsMoney(mnt) {
+    mnt -= 0;
+    mnt = (Math.round(mnt*100))/100;
+    return (mnt == Math.floor(mnt)) ? mnt + '.00' 
+              : ( (mnt*10 == Math.floor(mnt*10)) ? 
+                       mnt + '0' : mnt);
 }

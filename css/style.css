@@ -157,6 +157,10 @@ ul#icons {
 	text-align: right;
 }
 
+#purchaseTotal{
+	text-align: right;
+}
+
 tr.linkable{
  	cursor:pointer;
 }
