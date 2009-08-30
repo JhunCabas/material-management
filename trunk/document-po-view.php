@@ -20,9 +20,9 @@ $tmpl->place('menu');
 				$purchase = new Purchase($_GET['id']);
 				$purchase_details = Purchase_detail::findDetail($_GET['id']);
 	?>
-	<h2>Purchase Request</h2>
+	<h2>Purchase Order</h2>
 	<div class="form-frame span-23 last">
-		<h3>Purchase Request</h3><br />
+		<h3>Purchase Order</h3><br />
 		<label for="doc_num">Document Number </label>
 			<?php echo $purchase->prepareDocNumber(); ?><br />
 		<label for="doc_date">Document Date </label>
@@ -78,17 +78,17 @@ $tmpl->place('menu');
 					$counter = 1;
 					foreach($purchase_details as $purchase_detail)
 					{
-						echo "<td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
+						echo "<tr><td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
 						$item = new Inv_item($purchase_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->prepareUnitPrice()."</td>
-								<td>".$purchase_detail->prepareExtendedPrice()."</td>";
+								<td>".$purchase_detail->prepareExtendedPrice()."</td></tr>";
 						$counter++;
 					}
 				?>
 			</tbody>
 			<tfoot>
-				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"></td></tr>
+				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"><?php echo $purchase->prepareTotal(2); ?></td></tr>
 			</tfoot>
 		</table>
 		<table id="approveContent">
@@ -104,7 +104,6 @@ $tmpl->place('menu');
 				</tr>
 			</tbody>
 		</table>
-		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
 					$me = fAuthorization::getUserToken(); 
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
