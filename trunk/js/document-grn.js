@@ -40,6 +40,11 @@ $(function (){
 					.result(function(e, item) {
 						$("#supplier").val(item.to)});
 	$(".datepicker").datepicker();
+	$(".datepicker").blur(function (){ getRunningNumber(); });
+	$("#branch_id").change(function (){ getRunningNumber(); });
+	$("#doc_type").change(function (){ getRunningNumber(); });
+	$("#doc_num").attr("readonly","true");
+	getRunningNumber();
 		addingRow();
 	$("#addRowBTN").click(function (){
 		addingRow();
@@ -123,6 +128,14 @@ function addingRow()
 						.html("<option value=\"OK\">OK</option><option value=\"NG\">NG</option><option value=\"Q\">Q</option><option value=\"X\">X</option>"));
 	var wholeRow = $("<tr class=\"jsonRow\"id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow).append(assess);
 	$("#formContent tbody").append(wholeRow);
+}
+
+function getRunningNumber()
+{
+	$.post("parser/Good_receipt_note.php",{type:"count"},function (data){
+		$("#run_num").val(data);
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+	});
 }
 
 function jsonForm()

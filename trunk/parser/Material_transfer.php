@@ -31,6 +31,10 @@
 				echo $e->printMessage();
 				$error = true;
 			}
+		}else if($_POST['type'] == "count")
+		{
+			$records = Material_transfer::findAll();
+			echo sprintf("%04d",$records->count() + 1);
 		}
 	}
 ?>

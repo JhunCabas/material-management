@@ -10,6 +10,11 @@ $(function (){
 		autoOpen: false
 	});
 	$(".datepicker").datepicker();
+	$(".datepicker").blur(function (){ getRunningNumber(); });
+	$("#branch_id").change(function (){ getRunningNumber(); });
+	$("#doc_type").change(function (){ getRunningNumber(); });
+	$("#doc_num").attr("readonly","true");
+	getRunningNumber();
 		addingRow();
 	$("#addRowBTN").click(function (){
 		addingRow();
@@ -89,6 +94,14 @@ function addingRow()
 	var itemCode = $("<td></td>").html(itemCodeInner);
 	var wholeRow = $("<tr class=\"jsonRow\" id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow);
 	$("#formContent tbody").append(wholeRow);
+}
+
+function getRunningNumber()
+{
+	$.post("parser/Production_issue.php",{type:"count"},function (data){
+		$("#run_num").val(data);
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+	});
 }
 
 function jsonForm()

@@ -71,7 +71,7 @@
 			}
 		}else if($_POST['type'] == "countPR")
 		{
-			$countPR = Purchase::findByDocType($_POST['doc']);
+			$countPR = Purchase::findAll();
 			echo sprintf("%04d",$countPR->count() + 1);
 		}
 	}

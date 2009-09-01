@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Aug 30, 2009 at 04:27 PM
+-- Generation Time: Aug 31, 2009 at 05:23 PM
 -- Server version: 5.1.37
 -- PHP Version: 5.3.0
 
@@ -374,7 +374,7 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `approver_1_date` date DEFAULT NULL,
   `approver_2` varchar(20) DEFAULT NULL,
   `approver_2_date` date DEFAULT NULL,
-  `status` enum('approved','rejected','unapproved') NOT NULL DEFAULT 'unapproved',
+  `status` enum('approved','rejected','unapproved','completed') NOT NULL DEFAULT 'unapproved',
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 

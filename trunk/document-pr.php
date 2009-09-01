@@ -15,6 +15,7 @@ $tmpl->place('menu');
 	<h2>Purchase Request</h2>
 	<div class="form-frame span-23 last">
 		<h3>Purchase Request</h3><br />
+			<input type="hidden" name="run_num" value="" id="run_num"/>
 		<label for="doc_num">Document Number </label>
 			<input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label>

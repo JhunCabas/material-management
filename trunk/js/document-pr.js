@@ -12,7 +12,6 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
-	
 	$("#sup1auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
@@ -63,12 +62,17 @@ $(function (){
 						$("#sup3").val(item.to)});
 	
 	$(".datepicker").datepicker();
+	$(".datepicker").blur(function (){ getRunningNumber(); });
+	$("#branch_id").change(function (){ getRunningNumber(); });
+	$("#doc_type").change(function (){ getRunningNumber(); });
+	$("#doc_num").attr("readonly","true");
 	getRunningNumber();
-	
+	$()
 	$("#addRowBTN").click(function (){
 		addingRow();
 	});
 	$("#submitBTN").click(function (){
+		var running_number = $("#run_num").val();
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
@@ -91,6 +95,7 @@ $(function (){
 			doc_number: doc_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
+			running_number: running_number,
 			total: total,
 			branch_id: branch_id,
 			jsonForm: jsonForm(),
@@ -182,8 +187,9 @@ function jsonForm()
 
 function getRunningNumber()
 {
-	$.post("parser/Purchase.php",{type:"countPR", doc:$("#doc_type").val()},function (data){
-		
+	$.post("parser/Purchase.php",{type:"countPR"},function (data){
+		$("#run_num").val(data);
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 

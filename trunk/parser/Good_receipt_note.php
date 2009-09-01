@@ -32,6 +32,10 @@
 				echo $e->printMessage();
 				$error = true;
 			}
+		}else if($_POST['type'] == "count")
+		{
+			$records = Good_receipt_note::findAll();
+			echo sprintf("%04d",$records->count() + 1);
 		}
 	}
 ?>
