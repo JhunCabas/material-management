@@ -64,8 +64,34 @@ $tmpl->place('menu');
 					}
 					else
 					{
-						$inv_items = Inv_item::findAll();
+						if(!isSet($_GET['page'])||$_GET['page']==1)
+						{
+							$first = 0;
+							$last = 30;
+						}else
+						{
+							$first = ($_GET['page'] - 1)*30 + 1;
+							$last = $first + 30 - 1;
+						}
+						$inv_counter = count(Inv_item::findAll());
+						$inv_items = Inv_item::findAllLimit($first,$last);
+						//echo "FIRST:". $first ."LAST:". $last;
+						$times = ceil($inv_counter/30);
+						//$times = 30;
 						echo "<h3>All results</h3>";
+						if($times < 2)
+						{
+							echo "<span id=\"pagination\"><a href=\"inventory.php?maincc=all\">First </a>";
+							echo "<a href=\"inventory.php?maincc=all&page=$times\">Last</a></span>";
+						}else
+						{
+							echo "<span id=\"pagination\"><a href=\"inventory.php?maincc=all\">First </a>";
+							for($i=1;$i<$times;$i++)
+							{
+								echo "<a href=\"inventory.php?maincc=all&page=$i\">$i </a></span>";
+							}
+							echo "<a href=\"inventory.php?maincc=all&page=$times\">Last</a></span>";
+						}
 					}
 				} catch (fExpectedException $e) {
 					echo $e->printMessage();
