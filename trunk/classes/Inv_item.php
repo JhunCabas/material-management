@@ -39,6 +39,11 @@
 		return fRecordSet::build('Inv_item',
 			array('main_category_code=' => $key));
 	}
+	
+	static function fastCountAll()
+	{
+		return $db->query('SELECT count(*) FROM inv_items');
+	}
  }
 
 ?>

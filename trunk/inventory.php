@@ -73,7 +73,12 @@ $tmpl->place('menu');
 							$first = ($_GET['page'] - 1)*100 + 1;
 							$last = $first + 100 - 1;
 						}
-						$inv_counter = count(Inv_item::findAll());
+						//$inv_counter = count(Inv_item::findAll());
+						$inv_counter = 0;
+							$temps = $db->query('SELECT count(*) as num FROM inv_items');
+							foreach ($temps as $row) {
+							    $inv_counter = $row['num'];
+							}
 						$inv_items = Inv_item::findAllLimit($first,$last);
 						//echo "FIRST:". $first ."LAST:". $last;
 						$times = ceil($inv_counter/100);
