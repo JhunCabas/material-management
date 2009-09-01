@@ -40,6 +40,7 @@ $(function (){
 	$("#classific").children("select").attr("disabled","true");
 	$("#addsubcc").attr("disabled","true");
 	$("#addclassific").attr("disabled","true");
+	$("#idInput").attr("disabled","true");
 	$("#maincc").click(function (){
 		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).children("select").val() },
 		function (data){
@@ -75,6 +76,15 @@ $(function (){
 	});
 	$("#idInput").blur(function (){
 		$("#idSpan").text($("#addclassific").val() + $("#idInput").val());
+	});
+	$("#addclassific").click(function (){
+		if($(this).val() != "")
+		{
+			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
+				$("#idInput").val(data);
+			})
+			$("#idSpan").text($("#addclassific").val()+$("#idInput").val());
+		}
 	});
 	$("#addBTN").click(function (){
 		$.post("parser/Inv_item.php", { 

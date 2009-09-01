@@ -45,6 +45,10 @@
 			echo "<select>";
 			Status::printOption();
 			echo "</select>";
+		}else if($_POST['type'] == "lastCode")
+		{
+			$counter = Inv_item::findByClassificationCode($_POST['classific']);
+			echo sprintf("%03d",$counter->count() + 1);
 		}
 	}
 ?>

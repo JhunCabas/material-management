@@ -111,7 +111,7 @@ $tmpl->place('menu');
 								<select id="addclassific" name = "addclassific"></select><br />
 							<table id="tableDetail" class="hideFirst">
 							<tbody>
-								<tr><td>Item Code: </td><td><input type="text" id="idInput"></input><span id="idSpan"></span><br /></td></tr>
+								<tr><td>Item Code: </td><td><input type="hidden" id="idInput"></input><span id="idSpan"></span><br /></td></tr>
 								<tr><td>Description: </td><td><input type="text" id="desc"></input><br /></td></tr>
 								<tr><td>Weight: </td><td><input type="text" id="weight"></input><br /></td></tr>
 								<tr><td>Dimension: </td><td><input type="text" id="dim"></input><br /></td></tr>
