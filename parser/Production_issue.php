@@ -68,6 +68,10 @@
 			}catch (fExpectedException $e) {
 					echo $e->printMessage();
 			}
+		}else if($_POST['type'] == "count")
+		{
+			$records = Production_issue::findAll();
+			echo sprintf("%04d",$records->count() + 1);
 		}
 	}
 ?>
