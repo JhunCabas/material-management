@@ -10,7 +10,10 @@ $(function (){
 		autoOpen: false
 	});
 	$(".signHere").click(function (){
-		$(this).parent().html($("#whoami").val());
+		if($(this).parent().next().children("input").val() == "")
+			alert("Input Date first");
+		else
+			$(this).parent().html($("#whoami").val());
 	});
 	$(".itemExtP").each(function (){
 		$(this).bind("blur",function (){

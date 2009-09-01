@@ -67,7 +67,6 @@ $(function (){
 	$("#doc_type").change(function (){ getRunningNumber(); });
 	$("#doc_num").attr("readonly","true");
 	getRunningNumber();
-	$()
 	$("#addRowBTN").click(function (){
 		addingRow();
 	});
