@@ -76,8 +76,8 @@ $tmpl->place('menu');
 								echo "<td id=\"receiver\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
 						?></td><td><label>Date </label>
 						<?php
-							if($production->getReceiver_date()!=null)
-								echo $production->prepareReceiver_date("j F Y");
+							if($production->getReceiverDate()!=null)
+								echo $production->prepareReceiverDate("j F Y");
 							else
 								echo "<input type=\"text\" id=\"recDate\" class=\"datepicker\"></input>";
 						?></td>

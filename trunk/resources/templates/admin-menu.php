@@ -6,7 +6,7 @@
 		<a href="admin-branch.php">Branch</a>
 	</div>
 	<div class="tool-inventory ui-corner-all span-3">
-		Level
+		<a href="admin-currency.php">Currency</a>
 	</div>
 	<div class="tool-inventory ui-corner-all span-3">
 		<a href="admin-supplier.php">Supplier</a>

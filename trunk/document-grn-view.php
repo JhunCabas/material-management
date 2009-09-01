@@ -2,6 +2,9 @@
 include './resources/init.php';
 $tmpl->place('header');
 ?>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/jquery.autocomplete.min.js"></script>
+<script type="text/javascript" src="./resources/library/jquery.autocomplete/lib/jquery.bgiframe.min.js"></script>
+<link media="screen, projection" href="./resources/library/jquery.autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="./js/document-grn-view.js"></script>
 <?php
 $tmpl->place('menu');
@@ -23,7 +26,7 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Goods Receipt Note</h3><br />
 		<label for="doc_num">Document Number </label>
-			<?php echo $grn->prepareDocNumber(); ?><br />
+			<span id="doc_num"><?php echo $grn->prepareDocNumber(); ?></span><br />
 		<label for="doc_date">Document Date </label>
 			<?php echo $grn->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
@@ -56,7 +59,7 @@ $tmpl->place('menu');
 						$item = new Inv_item($grn_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td>".$grn_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$grn_detail->prepareRemark()."</td>
-								<td>".$grn_detail->prepareAssessment()."</td>";
+								<td class=\"assessText\">".$grn_detail->prepareAssessment()."</td>";
 						$counter++;
 					}
 				?>
@@ -75,13 +78,36 @@ $tmpl->place('menu');
 				</tr>
 			</tfoot>
 		</table>
+		<?php echo "<input type=\"hidden\" id=\"lastCount\" value=\"".$counter."\"></input>";?>
 		<table id="approveContent">
 			<tbody>
 				<tr>
-					<td><label>Inspected By </label></td><td id="inspector"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="insDate" class="datepicker"></input></td>
-				</tr>
-				<tr>
-					<td><label>Received By </label></td><td id="receiver"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="recDate" class="datepicker"></input></td>
+					<td><label>Inspected by </label></td>
+						<?php 
+							if($grn->getInspector()!=null)
+								echo "<td>".$grn->prepareInspector()."</td>";
+							else
+								echo "<td id=\"inspector\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
+						?></td><td><label>Date </label>
+						<?php 
+							if($grn->getInspector_date()!=null)
+								echo $grn->prepareInspector_date("j F Y");
+							else
+								echo "<input type=\"text\" id=\"insDate\" class=\"datepicker\"></input>";
+						?></td>
+					<td><label>Received by </label></td>
+						<?php
+							if($grn->getReceiver()!=null)
+								echo "<td>".$grn->prepareReceiver()."</td>";
+							else
+								echo "<td id=\"receiver\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
+						?></td><td><label>Date </label>
+						<?php
+							if($grn->getReceiverDate()!=null)
+								echo $grn->prepareReceiverDate("j F Y");
+							else
+								echo "<input type=\"text\" id=\"recDate\" class=\"datepicker\"></input>";
+						?></td>
 				</tr>
 			</tbody>
 		</table>
