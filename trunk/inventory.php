@@ -67,16 +67,16 @@ $tmpl->place('menu');
 						if(!isSet($_GET['page'])||$_GET['page']==1)
 						{
 							$first = 0;
-							$last = 30;
+							$last = 100;
 						}else
 						{
-							$first = ($_GET['page'] - 1)*30 + 1;
-							$last = $first + 30 - 1;
+							$first = ($_GET['page'] - 1)*100 + 1;
+							$last = $first + 100 - 1;
 						}
 						$inv_counter = count(Inv_item::findAll());
 						$inv_items = Inv_item::findAllLimit($first,$last);
 						//echo "FIRST:". $first ."LAST:". $last;
-						$times = ceil($inv_counter/30);
+						$times = ceil($inv_counter/100);
 						//$times = 30;
 						echo "<h3>All results</h3>";
 						if($times < 2)
