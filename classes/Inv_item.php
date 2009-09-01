@@ -14,6 +14,13 @@
     {
         return fRecordSet::build('Inv_item');    
     }
+
+	static function findAllLimit($first = 0, $last = 2)
+	{
+		return fRecordSet::buildFromSQL('Inv_item',
+			"SELECT * FROM inv_items LIMIT $first , $last",
+			"SELECT count(*) FROM inv_items");
+	}
 	
 	static function findByClassificationCode($key)
 	{
