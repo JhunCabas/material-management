@@ -10,6 +10,12 @@
 				case 1:
 					$output = "Active";
 					break;
+				case 2:
+					$output = "Repair";
+					break;
+				case 3:
+					$output = "Standby";
+					break;
 			}
 			return $output;
 		}
