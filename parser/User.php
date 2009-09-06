@@ -26,7 +26,16 @@
 			try{
 				$user = new User();
 				$user->populate();
-				$user->setPassword(sha1(password));
+				$user->setPassword(sha1($_POST['password']));
+				$user->store();
+			}catch (fExpectedException $e) {
+				echo $e->printMessage();
+			}
+		}else if($_POST['type'] == "reset")
+		{
+			try{
+				$user = new User($_POST['key']);
+				$user->setPassword(sha1('password'));
 				$user->store();
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();

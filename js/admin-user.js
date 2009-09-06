@@ -78,14 +78,30 @@ $(function (){
 			 }
 		 });
 	 });
+	 $(".uPassword").click(function (){
+		$.post("parser/User.php",{type: "reset", key: $(this).attr("user")},function (data){
+			if(data != "")
+			 {
+				 $("#dialogBox").html(data);
+				 $("#dialogBox").dialog('option', 'title', 'Error');
+				 $("#dialogBox").dialog('open');
+			 }
+			 else{
+			 	 $("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Password Changed");
+				 $("#dialogBox").dialog('option', 'title', 'Success');
+				 $("#dialogBox").dialog('open');
+			};
+		});
+	 });
 	 $("li#add").click(function (){
 		 var username = $("#nuUser").val();
 		 var name = $("#nuName").val();
+		 var password = $("#nuPassword").val();
 		 var branch = $("#nuBranch").val();
 		 var email = $("#nuEmail").val();
 		 var level = $("#nuLevel").val();
 		 if(confirm("Continue?"))
-			$.post("parser/User.php",{type: "add", username: username, name: name, branch_id: branch, email: email, level: level},function (data){
+			$.post("parser/User.php",{type: "add", username: username, name: name, password: password, branch_id: branch, email: email, level: level},function (data){
 		 		if(data != "")
 				 {
 				 	 $("#dialogBox").html(data);
@@ -97,7 +113,7 @@ $(function (){
 					 $("#dialogBox").dialog('option', 'title', 'Success');
 					 $("#dialogBox").dialog('open');
 					 $.post("parser/Branch.php",{type: "name", key: branch},function (data){
-					 	var prependedText = "<tr><td>"+name+"</td><td>"+username+"</td><td>"+data+"</td><td>"+email+"</td><td>"+level+"</td></tr>";
+					 	var prependedText = "<tr><td>"+name+"</td><td>"+username+"</td><td>"+data+"</td><td>"+email+"</td><td>"+level+"</td><td><input type=\"button\"></input></td></tr>";
 						 $("#newItem").before(prependedText);
 					 });
 				 }
