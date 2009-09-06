@@ -19,11 +19,14 @@ $tmpl->place('menu');
 		<label for="doc_num">Document Number </label>
 			<input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label>
-			<input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
+			<input type="text" name="doc_date" value="" id="doc_date" /><br />
 		<label for="doc_type">Document Type </label>
 			<select type="text" name="doc_type" value="" id="doc_type"><?php Document_type::findAllOption();?></select><br />
 		<label for="branch_id">Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
+			<label for="currency_id">Currency </label>
+				<select type="text" name="currency_id" id="currency_id">
+				</select><br />
 		<p>
 		<table>
 			<tr><td><label>Supplier 1 </label><input type="text" id="sup1auto"></input><input type="hidden" id="sup1"></input></td>

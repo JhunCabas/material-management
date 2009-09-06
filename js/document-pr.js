@@ -62,7 +62,16 @@ $(function (){
 						$("#sup3").val(item.to)});
 	
 	$(".datepicker").datepicker();
-	$(".datepicker").blur(function (){ getRunningNumber(); });
+	$("#doc_date").datepicker({
+			onSelect: function(dateText, inst){
+				getRunningNumber();
+				var month = Date.parseExact(dateText, "M/d/yyyy").toString("MM")
+				var year = Date.parseExact(dateText, "M/d/yyyy").toString("yyyy")
+				$.post("parser/Currency.php",{type: "option", month: month, year: year}, function (data){
+					$("#currency_id").html(data);
+				});
+			}
+	});
 	$("#branch_id").change(function (){ getRunningNumber(); });
 	$("#doc_type").change(function (){ getRunningNumber(); });
 	$("#doc_num").attr("readonly","true");
@@ -75,6 +84,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
+		var currency = $("#currency_id").val();
 		var total = $("#purchaseTotal").text();
 		var branch_id = $("#branch_id").val();
 		var supplier_1 = $("#sup1").val();
@@ -94,6 +104,7 @@ $(function (){
 			doc_number: doc_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
+			currency: currency,
 			running_number: running_number,
 			total: total,
 			branch_id: branch_id,
@@ -188,7 +199,7 @@ function getRunningNumber()
 {
 	$.post("parser/Purchase.php",{type:"countPR"},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 
