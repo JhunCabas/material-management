@@ -34,6 +34,8 @@ $tmpl->place('menu');
 			<?php echo $purchase->prepareDocType(); ?><br />
 		<label for="branch_id">Branch </label>
 			<?php $branch = new Branch($purchase->getBranchId()); echo $branch->prepareName() . " / " . $purchase->prepareBranchId();?><br />
+		<label for="currency_id">Currency </label>
+				<?php $currency = new Currency($purchase->getCurrency()); echo $currency->prepareCountry()." [".$currency->prepareExchange(2)."]"; ?>
 		<p>
 		<table>
 			<tr><td>
