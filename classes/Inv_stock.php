@@ -21,6 +21,12 @@
 			array('branch_id=' => $key));
 	}
 	
+	static function findByItem($key)
+	{
+		return fRecordSet::build('Inv_stock',
+			array('item_id=' => $key));
+	}
+	
 	static function findByStock($item_id, $quantity)
 	{
 		return fRecordSet::build('Inv_stock',
