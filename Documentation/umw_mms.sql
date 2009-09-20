@@ -188,7 +188,7 @@ CREATE TABLE IF NOT EXISTS `inv_items` (
   `dimension` int(9) NOT NULL,
   `part_number` varchar(30) NOT NULL,
   `unit_of_measure` varchar(10) NOT NULL,
-  `rate` float NOT NULL,
+  `rate` decimal(14,2) NOT NULL,
   `currency` varchar(3) NOT NULL,
   `purchase_year` int(4) NOT NULL,
   `detailed_description` varchar(100) NOT NULL,
