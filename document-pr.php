@@ -21,7 +21,12 @@ $tmpl->place('menu');
 		<label for="doc_date">Document Date </label>
 			<input type="text" name="doc_date" value="" id="doc_date" /><br />
 		<label for="doc_type">Document Type </label>
-			<select type="text" name="doc_type" value="" id="doc_type"><?php Document_type::findAllOption();?></select><br />
+			<select type="text" name="doc_type" value="" id="doc_type">
+				<option value="PR1">PR1 – Purchase Request (Assets)</option>
+				<option value="PR2">PR2 – Purchase Request (Stocks)</option>
+				<option value="PR3">PR3 – Purchase Request (Service)</option>
+				<option value="PR4">PR4 – Purchase Request (3rd Party)</option>
+			</select><br />
 		<label for="branch_id">Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
 			<label for="currency_id">Currency </label>

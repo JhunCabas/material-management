@@ -12,7 +12,7 @@
         	<a href="inventory.php">Inventory</a>
         </div>
 		<div id="tab4" class="span-3 tab ui-corner-top">
-        	Report
+        	<a href="report.php">Report</a>
         </div>
 		<?php
 			echo "<p style=\"float: right;\">";
