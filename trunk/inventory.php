@@ -15,6 +15,7 @@ $tmpl->place('menu');
 	<div id="main" class="span-24 last">
 		<div id="categories span-24 last">
 			<h2>Inventory</h2>
+				<a href="#addTable">Add Item</a>
 				<form action = "inventory.php" method = "get">
 					<label for="maincc">Choose Main Category: </label>
 					<span id="maincc">
@@ -102,7 +103,7 @@ $tmpl->place('menu');
 					echo $e->printMessage();
 				}
 
-				printf("<table class=\"scrollContent\"><thead><tr><th>Item ID</th><th>Item Description</th><th>UOM</th><th>Dimension</th><th>Weight</th><th>Standard Rate</th><th>Status</th></tr></thead><tbody>");
+				printf("<div class=\"tableContainer\"><table class=\"scrollContent\"><thead><tr><th>Item ID</th><th>Item Description</th><th>UOM</th><th>Dimension</th><th>Weight</th><th>Standard Rate</th><th>Status</th></tr></thead><tbody>");
 				foreach($inv_items as $inv_item)
 				{
 					printf("<tr class=\"linkable\"><td id=\"itemID\"><span>%s</span></td>
@@ -120,7 +121,13 @@ $tmpl->place('menu');
 							$inv_item->prepareRate(2),
 							Status::convert($inv_item->prepareStatus()));
 				}
+				
+					echo "</tbody></table></div>";
+			}
+				
 			?>
+			<table id="addTable">
+			<tbody>
 				<tr id="newItem">
 					<td id="iconCell" class="addIcon" colspan="7">
 						<ul id="icons" class="ui-widget ui-helper-clearfix">
@@ -161,10 +168,8 @@ $tmpl->place('menu');
 						</form>
 					</td>
 				</tr>
-			<?php
-				echo "</tbody></table>";
-			}
-			?>
+			</tbody>
+			</table>
 		</div>
 	</div>
 </div>
