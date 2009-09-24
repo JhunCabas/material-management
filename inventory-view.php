@@ -19,7 +19,34 @@ $tmpl->place('header');
 	?>
 		<div id="content">
 		<div id="Id" class="span-8"><h1 id="idCaption"><?php echo $inv_item->prepareId(); ?></h1>
-			<img class="view-img" src="<?php echo $inv_item->prepareImageUrl(); ?>">
+			<?php
+			 	try{
+					$profile = new fImage($inv_item->getImageUrl()); 
+					if($profile->getWidth() != 300)
+					{
+						$profile->resize(300,0);
+						$profile->saveChanges();
+						echo "Picture resized";
+					}
+					echo "<img class=\"view-img\" src=\"".$inv_item->prepareImageUrl()."\"></img>";
+				} catch (fExpectedException $e) {
+					if($e->getMessage() === "No filename was specified")
+					{
+						echo "No picture available, please upload.<br />";
+					}
+				}
+			?>
+			<form id="uploadBox" action="parser/Inv_item.php" method="POST" enctype="multipart/form-data">
+			    <fieldset>
+			        <p>
+			            <label for="file">Image </label>
+			            <input id="file" type="file" name="file" />
+						<input name="type" type="hidden" value="upload" />
+						<input name="hiddenId" type="hidden" value="<?php echo $inv_item->prepareId();?>"/>
+						<input type="submit" value="Upload" />
+			        </p>
+			    </fieldset>
+			</form>
 		</div>
 		<div id="ViewTable" class="span-14 last">
 			<table>

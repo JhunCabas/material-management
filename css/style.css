@@ -161,6 +161,10 @@ ul#icons {
 	text-align: right;
 }
 
+#uploadBox{
+	padding-top: 10px;
+}
+
 tr.linkable{
  	cursor:pointer;
 }
@@ -190,6 +194,11 @@ tr.linkable{
 .view-frame{
 	border: 1px solid #999;
 	padding: 10px;
+}
+
+div.tableContainer{
+	height: 320px;
+	overflow: auto;
 }
 
 form select{

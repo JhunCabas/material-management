@@ -49,6 +49,35 @@
 		{
 			$counter = Inv_item::findByClassificationCode($_POST['classific']);
 			echo sprintf("%03d",$counter->count() + 1);
+		}else if($_POST['type'] == "upload")
+		{
+			try{
+				$uploadDirectory = new fDirectory('../storage/image/'.$_POST['hiddenId']);
+			} catch (fExpectedException $e)
+			{
+				$uploadDirectory = fDirectory::create('../storage/image/'.$_POST['hiddenId']);
+			}
+			try{
+				
+				$uploader = new fUpload();
+				$uploader->setMIMETypes(
+				    array(
+					        'image/gif',
+					        'image/jpeg',
+					        'image/pjpeg',
+					        'image/png'
+					),
+					    'The file uploaded is not an image'
+				);
+				$uploader->enableOverwrite();
+				$file = $uploader->move($uploadDirectory, 'file');
+				$inv_item = new Inv_item($_POST['hiddenId']);
+				$inv_item->setImageUrl('storage/image/'.$_POST['hiddenId'].'/'.$file->getFilename());
+				$inv_item->store();
+				echo "Image uploaded";
+			} catch (fExpectedException $e) {
+				echo $e->printMessage();
+			}
 		}
 	}
 ?>

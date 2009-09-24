@@ -112,6 +112,11 @@ $(function (){
 				$("#dialogBox").dialog('option', 'title', 'Error');
 				$("#dialogBox").dialog('open');
 			}else{
+				$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Success");
+				$("#dialogBox").dialog('option', 'title', 'Success');
+				$("#dialogBox").dialog('open');
+				$(".tobeDelete").fadeOut();
+				/*
 				$("#uploadBox").dialog('option', 'title', 'Success');
 				$("#uploadify").uploadify({
 					'uploader'	: './resources/library/jquery.uploadify/uploadify.swf',
@@ -128,6 +133,7 @@ $(function (){
 								}
 				});
 				$("#uploadBox").dialog('open');
+				*/
 			}
 		});
 	});
