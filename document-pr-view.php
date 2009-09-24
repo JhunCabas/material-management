@@ -93,6 +93,7 @@ $tmpl->place('menu');
 				?>
 			</tbody>
 			<tfoot>
+				<tr><td colspan="5"></td><td>Discount</td><td><input type="text" id="discountRate" value="<?php echo $purchase->prepareDiscount(2); ?>"></input></td></tr>
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"><?php echo $purchase->prepareTotal(2); ?></td></tr>
 			</tfoot>
 		</table>

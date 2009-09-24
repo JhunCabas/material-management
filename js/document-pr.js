@@ -60,7 +60,14 @@ $(function (){
 					})
 					.result(function(e, item) {
 						$("#sup3").val(item.to)});
-	
+	$("#discountRate").blur(function (){
+		var total = 0;
+		$(".itemExtP").each(function (){
+			total = total + parseFloat($(this).val());
+		});
+		total = total - $("#discountRate").val();
+		$("#purchaseTotal").text(formatAsMoney(total));
+	});
 	$(".datepicker").datepicker();
 	$("#doc_date").datepicker({
 			onSelect: function(dateText, inst){
@@ -84,6 +91,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
+		var discount = $("#discountRate").val();
 		var currency = $("#currency_id").val();
 		var total = $("#purchaseTotal").text();
 		var branch_id = $("#branch_id").val();
@@ -105,6 +113,7 @@ $(function (){
 			doc_date: doc_date,
 			doc_type: doc_type,
 			currency: currency,
+			discount: discount,
 			running_number: running_number,
 			total: total,
 			branch_id: branch_id,
@@ -171,6 +180,7 @@ function addingRow()
 							$(".itemExtP").each(function (){
 								total = total + parseFloat($(this).val());
 							});
+							total = total - $("#discountRate").val();
 							$("#purchaseTotal").text(formatAsMoney(total));
 						});
 	var extendedCell = $("<td></td>").html(extendedInner);
