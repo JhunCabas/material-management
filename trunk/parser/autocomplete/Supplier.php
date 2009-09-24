@@ -7,7 +7,9 @@ $jsonString = "[";
 foreach($suppliers as $supplier)
 {
 	if(strpos(strtolower($supplier->getName()),$q) !== false){
-		$jsonString = $jsonString . "{ name: \"".$supplier->prepareName()."\", to: \"".$supplier->prepareId()."\" },";
+		$jsonString = $jsonString . "{ name: \"".$supplier->prepareName().
+									"\", to: \"".$supplier->prepareId().
+									"\" },";
 	}
 }
 $jsonString = substr($jsonString,0,strlen($jsonString)-1) . "]";

@@ -15,12 +15,21 @@ $(function (){
 		else
 			$(this).parent().html($("#whoami").val());
 	});
+	$("#discountRate").blur(function (){
+		var total = 0;
+		$(".itemExtP").each(function (){
+			total = total + parseFloat($(this).val());
+		});
+		total = total - $("#discountRate").val();
+		$("#purchaseTotal").text(formatAsMoney(total));
+	});
 	$(".itemExtP").each(function (){
 		$(this).bind("blur",function (){
 			var total = 0;
 			$(".itemExtP").each(function (){
 				total = total + parseFloat($(this).val());
 			});
+			total = total - $("#discountRate").val();
 			$("#purchaseTotal").text(formatAsMoney(total));
 		});
 	});
@@ -32,6 +41,7 @@ $(function (){
 	}
 	$("#submitBTN").click(function (){
 		var total = $("#purchaseTotal").text();
+		var discount = $("#discountRate").val();
 		var approver1 = $("#approver1").text();
 		var approver1_date = $("#app1Date").val();
 		if(confirm("Continue?"))
@@ -39,6 +49,7 @@ $(function (){
 			type: "edit",
 			key: $("#docNum").text(),
 			jsonForm: jsonForm(),
+			discount: discount,
 			total: total,
 			approver_1: approver1,
 			approver_1_date: approver1_date
@@ -50,11 +61,11 @@ $(function (){
 					 $("#dialogBox").dialog('open');
 				 }
 				 else{
-				 	$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Added");
+				 	$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Edited");
 					 $("#dialogBox").dialog('option', 'title', 'Success');
 					 $("#dialogBox").dialog('open');
 					 $("#dialogBox").bind('dialogclose', function(event, ui) {
-						window.location = tellDir() + "list-pr.php";
+						history.go(-1);
 					 });
 				 }
 			});
@@ -69,7 +80,6 @@ function editableBody(){
 
 function addingRow()
 {
-	
 	var itemCodeInner = $("<input size=\"7\" class=\"itemCode\"></input>")
 						.autocomplete("parser/autocomplete/Inv_item.php",{
 											width: 300,
