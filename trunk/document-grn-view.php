@@ -55,17 +55,19 @@ $tmpl->place('menu');
 					$counter = 1;
 					foreach($grn_details as $grn_detail)
 					{
-						echo "<td>".$counter."</td><td>".$grn_detail->prepareItemId()."</td>";
+						echo "<tr><td>".$counter."</td><td>".$grn_detail->prepareItemId()."</td>";
 						$item = new Inv_item($grn_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td>".$grn_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$grn_detail->prepareRemark()."</td>
-								<td class=\"assessText\">".$grn_detail->prepareAssessment()."</td>";
+								<td class=\"assessText\">".$grn_detail->prepareAssessment()."</td></tr>";
 						$counter++;
 					}
 				?>
 			</tbody>
 			<tfoot>
+				<?php if($grn->getStatus() != "completed"){ ?>
 				<tr><td colspan="7" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
+				<?php } ?>
 				<tr><td colspan="7">
 					<p>
 						<label>Assesment Of Condition (A)</label><br />

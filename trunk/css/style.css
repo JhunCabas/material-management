@@ -196,6 +196,16 @@ tr.linkable{
 	padding: 10px;
 }
 
+.exporter{
+	text-align: right;
+}
+
+div.pdbox{
+	padding: 5px;
+	height: 70px;
+	margin-bottom: 10px;
+}
+
 div.tableContainer{
 	height: 320px;
 	overflow: auto;
