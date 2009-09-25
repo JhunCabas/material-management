@@ -88,9 +88,12 @@ $tmpl->place('menu');
 				?>
 			</tbody>
 			<tfoot>
+				<tr><td colspan="5"></td><td>Discount</td><td><?php echo $purchase->prepareDiscount(2); ?></td></tr>
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"><?php echo $purchase->prepareTotal(2); ?></td></tr>
 			</tfoot>
 		</table>
+		<div class="span-11"><label>Payment Terms</label><br /><?php echo $purchase->preparePayment(); ?></div>
+		<div class="span-11"><label>Delivery Terms</label><br /><?php echo $purchase->prepareDelivery(); ?></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>

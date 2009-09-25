@@ -106,6 +106,8 @@ $(function (){
 		var supplier_3_tel = $("#tel3").val();
 		var requester = $("#requester").text();
 		var requester_date = $("#reqDate").val();
+		var payment = $("#payment").val();
+		var delivery = $("#delivery").val();
 		if(confirm("Continue?"))
 		$.post("parser/Purchase.php",{
 			type: "add",
@@ -128,7 +130,9 @@ $(function (){
 			supplier_3_contact: supplier_3_contact,
 			supplier_3_tel: supplier_3_tel,
 			requester: requester,
-			requester_date: requester_date
+			requester_date: requester_date,
+			payment: payment,
+			delivery: delivery
 			}, function (data){
 		 		if(data != "")
 				 {
