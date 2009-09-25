@@ -60,6 +60,8 @@ $tmpl->place('menu');
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"></td></tr>
 			</tfoot>
 		</table>
+		<div class="span-11"><label>Payment Terms</label><br /><textarea id="payment" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
+		<div class="span-11"><label>Delivery Terms</label><br /><textarea id="delivery" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>
@@ -67,9 +69,6 @@ $tmpl->place('menu');
 				</tr>
 				<tr style="display: none;">
 					<td><label>Approver 1 </label></td><td></td><td><label>Date </label><input type="text" id="app1Date" class="datepicker"></input></td>
-				</tr>
-				<tr style="display: none;">
-					<td><label>Approver 2 </label></td><td></td><td><label>Date </label><input type="text" id="app2Date" class="datepicker"></input></td>
 				</tr>
 			</tbody>
 		</table>
