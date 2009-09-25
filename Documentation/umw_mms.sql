@@ -1,34 +1,44 @@
 -- phpMyAdmin SQL Dump
--- version 2.8.2.4
+-- version 3.1.3.1
 -- http://www.phpmyadmin.net
--- 
--- Host: localhost:3306
--- Generation Time: Sep 24, 2009 at 03:44 PM
--- Server version: 5.0.84
--- PHP Version: 5.2.6
--- 
+--
+-- Host: localhost
+-- Generation Time: Sep 25, 2009 at 09:07 AM
+-- Server version: 5.1.33
+-- PHP Version: 5.2.9
+
+SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+--
 -- Database: `umw_mms`
--- 
+--
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `branches`
--- 
+--
 
-CREATE TABLE `branches` (
+CREATE TABLE IF NOT EXISTS `branches` (
   `id` varchar(10) NOT NULL,
   `name` varchar(50) NOT NULL,
   `location` varchar(100) NOT NULL,
   `phone_no` varchar(15) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `branches`
--- 
+--
 
-INSERT INTO `branches` (`id`, `name`, `location`, `phone_no`) VALUES ('HQKL', 'Headquarters', 'Kuala Lumpur', '+603-45454433'),
+INSERT INTO `branches` (`id`, `name`, `location`, `phone_no`) VALUES
+('HQKL', 'Headquarters', 'Kuala Lumpur', '+603-45454433'),
 ('KDSP', 'Kedah Branch', 'Sungai Petani', '+604-4222222'),
 ('ASB', 'Asian Suply Base', 'Labuan', '087-461 846'),
 ('KSB', 'Kemaman Supply Base', 'Kemaman', '609-8635186'),
@@ -38,43 +48,45 @@ INSERT INTO `branches` (`id`, `name`, `location`, `phone_no`) VALUES ('HQKL', 'H
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `currencies`
--- 
+--
 
-CREATE TABLE `currencies` (
-  `id` int(10) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `currencies` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
   `country` varchar(20) NOT NULL,
   `exchange` float NOT NULL,
   `month` date NOT NULL,
-  `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `currencies`
--- 
+--
 
-INSERT INTO `currencies` (`id`, `country`, `exchange`, `month`, `timestamp`) VALUES (1, 'USD', 3.6, '2009-09-01', '2009-09-07 00:46:42'),
+INSERT INTO `currencies` (`id`, `country`, `exchange`, `month`, `timestamp`) VALUES
+(1, 'USD', 3.6, '2009-09-01', '2009-09-07 00:46:42'),
 (2, 'MYR', 1, '2009-09-01', '2009-09-07 11:17:52');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `document_types`
--- 
+--
 
-CREATE TABLE `document_types` (
+CREATE TABLE IF NOT EXISTS `document_types` (
   `id` varchar(10) NOT NULL,
-  `description` varchar(200) default NULL,
-  PRIMARY KEY  (`id`)
+  `description` varchar(200) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `document_types`
--- 
+--
 
-INSERT INTO `document_types` (`id`, `description`) VALUES ('PO1', 'Purchase Order Type 1'),
+INSERT INTO `document_types` (`id`, `description`) VALUES
+('PO1', 'Purchase Order Type 1'),
 ('PO2', 'Purchase Order Type 2'),
 ('GRN', 'Good Receive Note Type'),
 ('MT', 'Material Transfer'),
@@ -88,40 +100,11 @@ INSERT INTO `document_types` (`id`, `description`) VALUES ('PO1', 'Purchase Orde
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `good_receipt_note_details`
--- 
-
-CREATE TABLE `good_receipt_note_details` (
-  `id` int(15) NOT NULL auto_increment,
-  `doc_number` varchar(50) NOT NULL,
-  `item_id` varchar(20) NOT NULL,
-  `quantity` int(15) NOT NULL,
-  `remark` varchar(500) default NULL,
-  `assessment` enum('OK','NG','Q','X') NOT NULL default 'OK',
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
-
--- 
--- Dumping data for table `good_receipt_note_details`
--- 
-
-INSERT INTO `good_receipt_note_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`, `assessment`) VALUES (1, 'a', 'AE1001', 200, 'Testing', 'OK'),
-(2, 'GRN/KDSP/0002/09/2009', 'AE1001', 20, 'nil', 'OK'),
-(3, 'GRN/KDSP/0003/09/2009', 'AT1001', 10, NULL, 'OK'),
-(4, 'GRN/KDSP/0003/09/2009', 'AE1001', 50, NULL, 'OK'),
-(5, 'GRN/HQKL/0004/09/2009', 'AE1001', 80, NULL, 'NG'),
-(6, 'GRN/HQKL/0006/09/2009', 'AE1001', 10, NULL, 'NG'),
-(7, 'GRN/HQKL/0006/09/2009/rev', 'AT1001', 10, NULL, 'OK'),
-(8, 'GRN/HQKL/0008/09/2009', 'AT2003', 10, 'All fully delivered', 'OK');
-
--- --------------------------------------------------------
-
--- 
+--
 -- Table structure for table `good_receipt_notes`
--- 
+--
 
-CREATE TABLE `good_receipt_notes` (
+CREATE TABLE IF NOT EXISTS `good_receipt_notes` (
   `doc_number` varchar(50) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
@@ -129,19 +112,20 @@ CREATE TABLE `good_receipt_notes` (
   `supplier` varchar(20) NOT NULL,
   `do_no` varchar(30) NOT NULL,
   `po_no` varchar(50) NOT NULL,
-  `inspector` varchar(20) default NULL,
-  `inspector_date` date default NULL,
-  `receiver` varchar(20) default NULL,
-  `receiver_date` date default NULL,
-  `status` enum('completed','incomplete') NOT NULL default 'incomplete',
-  PRIMARY KEY  (`doc_number`)
+  `inspector` varchar(20) DEFAULT NULL,
+  `inspector_date` date DEFAULT NULL,
+  `receiver` varchar(20) DEFAULT NULL,
+  `receiver_date` date DEFAULT NULL,
+  `status` enum('completed','incomplete') NOT NULL DEFAULT 'incomplete',
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `good_receipt_notes`
--- 
+--
 
-INSERT INTO `good_receipt_notes` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `supplier`, `do_no`, `po_no`, `inspector`, `inspector_date`, `receiver`, `receiver_date`, `status`) VALUES ('a', '2009-08-26', 'GRN', 'HQKL', '2', 'a', 'a', 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', 'completed'),
+INSERT INTO `good_receipt_notes` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `supplier`, `do_no`, `po_no`, `inspector`, `inspector_date`, `receiver`, `receiver_date`, `status`) VALUES
+('a', '2009-08-26', 'GRN', 'HQKL', '2', 'a', 'a', 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', 'completed'),
 ('GRN/KDSP/0002/09/2009', '2009-09-02', 'GRN', 'KDSP', '2', '12', 'PO1/HQKL/0002/09/2009', 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', 'completed'),
 ('GRN/KDSP/0003/09/2009', '2009-09-01', 'GRN', 'KDSP', '1', '234', 'PO1/HQKL/0002/09/2009', 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', 'completed'),
 ('GRN/HQKL/0004/09/2009', '2009-09-01', 'GRN', 'HQKL', '1', '123', 'PO1/HQKL/0002/09/2009', 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', 'completed'),
@@ -152,24 +136,55 @@ INSERT INTO `good_receipt_notes` (`doc_number`, `doc_date`, `doc_type`, `branch_
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `inv_classifications`
--- 
+--
+-- Table structure for table `good_receipt_note_details`
+--
 
-CREATE TABLE `inv_classifications` (
+CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
+  `doc_number` varchar(50) NOT NULL,
+  `item_id` varchar(20) NOT NULL,
+  `quantity` int(15) NOT NULL,
+  `remark` varchar(500) DEFAULT NULL,
+  `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
+
+--
+-- Dumping data for table `good_receipt_note_details`
+--
+
+INSERT INTO `good_receipt_note_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`, `assessment`) VALUES
+(1, 'a', 'AE1001', 200, 'Testing', 'OK'),
+(2, 'GRN/KDSP/0002/09/2009', 'AE1001', 20, 'nil', 'OK'),
+(3, 'GRN/KDSP/0003/09/2009', 'AT1001', 10, NULL, 'OK'),
+(4, 'GRN/KDSP/0003/09/2009', 'AE1001', 50, NULL, 'OK'),
+(5, 'GRN/HQKL/0004/09/2009', 'AE1001', 80, NULL, 'NG'),
+(6, 'GRN/HQKL/0006/09/2009', 'AE1001', 10, NULL, 'NG'),
+(7, 'GRN/HQKL/0006/09/2009/rev', 'AT1001', 10, NULL, 'OK'),
+(8, 'GRN/HQKL/0008/09/2009', 'AT2003', 10, 'All fully delivered', 'OK');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inv_classifications`
+--
+
+CREATE TABLE IF NOT EXISTS `inv_classifications` (
   `id` varchar(20) NOT NULL,
   `classification_code` varchar(20) NOT NULL,
   `description` varchar(50) NOT NULL,
   `sub_category_code` varchar(20) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `inv_classifications`
--- 
+--
 
-INSERT INTO `inv_classifications` (`id`, `classification_code`, `description`, `sub_category_code`, `status`) VALUES ('AT1', '1', 'Gait 1', 'AT', 1),
+INSERT INTO `inv_classifications` (`id`, `classification_code`, `description`, `sub_category_code`, `status`) VALUES
+('AT1', '1', 'Gait 1', 'AT', 1),
 ('AT2', '2', 'Gait 2', 'AT', 1),
 ('AE1', '1', 'Gait 1', 'AE', 1),
 ('AE2', '2', 'Gait 2', 'AE', 1),
@@ -204,35 +219,36 @@ INSERT INTO `inv_classifications` (`id`, `classification_code`, `description`, `
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `inv_items`
--- 
+--
 
-CREATE TABLE `inv_items` (
+CREATE TABLE IF NOT EXISTS `inv_items` (
   `id` varchar(20) NOT NULL,
   `main_category_code` varchar(20) NOT NULL,
   `sub_category_code` varchar(20) NOT NULL,
   `classification_code` varchar(20) NOT NULL,
   `item_code` varchar(20) NOT NULL,
-  `description` varchar(50) NOT NULL,
-  `weight` int(9) NOT NULL,
-  `dimension` int(9) NOT NULL,
-  `part_number` varchar(30) NOT NULL,
-  `unit_of_measure` varchar(10) NOT NULL,
-  `rate` decimal(14,2) NOT NULL,
-  `currency` varchar(3) NOT NULL,
-  `purchase_year` int(4) NOT NULL,
-  `detailed_description` varchar(100) NOT NULL,
-  `image_url` varchar(1000) default NULL,
+  `description` varchar(50) DEFAULT NULL,
+  `weight` int(9) DEFAULT NULL,
+  `dimension` int(9) DEFAULT NULL,
+  `part_number` varchar(30) DEFAULT NULL,
+  `unit_of_measure` varchar(10) DEFAULT NULL,
+  `rate` decimal(14,2) DEFAULT NULL,
+  `currency` varchar(3) DEFAULT NULL,
+  `purchase_year` int(4) DEFAULT NULL,
+  `detailed_description` varchar(100) DEFAULT NULL,
+  `image_url` varchar(1000) DEFAULT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `inv_items`
--- 
+--
 
-INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES ('AE1001', 'A', 'AE', 'AE1', '001', 'Power Pack; Detroit [1]', 8000, 4268, 'G1 - PP - 01', 'ea', 1.00, 'MYR', 2002, '', '', 0),
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
+('AE1001', 'A', 'AE', 'AE1', '001', 'Power Pack; Detroit [1]', 8000, 4268, 'G1 - PP - 01', 'ea', 1.00, 'MYR', 2002, '', '', 0),
 ('AE1003', 'A', 'AE', 'AE1', '003', 'Mud Pump, HT-400; Detroit', 10000, 5791, '', 'ea', 592.00, 'MYR', 2002, '', '/umw/storage/image/AE1002/Photo 19.jpg', 0),
 ('AE1002', 'A', 'AE', 'AE1', '002', 'Power Pack; Detroit [2]', 8000, 4268, '', 'ea', 1.00, 'MYR', 2002, '', '', 0),
 ('AT1001', 'A', 'AT', 'AT1', '001', 'Circulation Tank, 200 BBL c/w Gas Buster [1]', 6000, 6706, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
@@ -623,7 +639,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('AR3025', 'A', 'AR', 'AR3', '025', 'Counter Balance Panel G3', 0, 0, '', 'ea', 1.00, 'MYR', 2007, '', '', 0),
 ('AR3026', 'A', 'AR', 'AR3', '026', 'Counter Balance Winch G3', 2000, 1321, '', 'ea', 64.00, 'MYR', 2007, '', '', 0),
 ('AR3027', 'A', 'AR', 'AR3', '027', 'Gin Pole G3', 3000, 13106, '', 'ea', 186.00, 'MYR', 2007, '', '', 0),
-('AR3028', 'A', 'AR', 'AR3', '028', 'Stand Pipe G3 [1]', 0, 0, '', 'ea', 25.00, 'MYR', 0, '', '', 0),
+('AR3028', 'A', 'AR', 'AR3', '028', 'Stand Pipe G3 [1]', 0, 0, '', 'ea', 25.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('AR3029', 'A', 'AR', 'AR3', '029', 'Stand Pipe G3 [2]', 0, 0, '', 'ea', 25.00, 'MYR', 0, '', '', 0),
 ('AR3030', 'A', 'AR', 'AR3', '030', 'Mouse Hole G3', 1500, 9449, '', 'ea', 1.00, 'MYR', 2007, '', '', 0),
 ('AR3031', 'A', 'AR', 'AR3', '031', 'Rotary Table G3', 5000, 1346, '', 'ea', 137.00, 'MYR', 2007, '', '', 0),
@@ -1048,7 +1065,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('BL2012', 'B', 'BL', 'BL2', '012', '1 Leg - 22mm x 10ft Wire Rope Sling SWL: 6.2MT', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('BL2013', 'B', 'BL', 'BL2', '013', '1 Leg - 3/8" x 225ft Wire Rope Sling SWL: 1tonne c', 0, 0, '', 'set', 1.00, 'MYR', 0, '', '', 0),
 ('BL2014', 'B', 'BL', 'BL2', '014', 'Single Leg Sling 5/8" x 11feet c/w Eye Thimble Bot', 0, 0, '', 'length', 930.00, 'MYR', 0, '', '', 0),
-('BL2015', 'B', 'BL', 'BL2', '015', 'Safety Sling - 4"', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
+('BL2015', 'B', 'BL', 'BL2', '015', 'Safety Sling - 4"', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('BL2016', 'B', 'BL', 'BL2', '016', '1 Leg - 19mm x 20 ft Wire Rope Sling SWL: 3.8T c/w', 0, 0, '', 'lgth', 190.00, 'MYR', 0, '', '', 0),
 ('BL2017', 'B', 'BL', 'BL2', '017', '1 Leg - 5/8" Dia x 80 ft x with Wire Rope Sling SW', 0, 0, '', 'ea', 984.00, 'MYR', 0, '', '', 0),
 ('BL2018', 'B', 'BL', 'BL2', '018', '1 Leg - 5/8" Dia x 75 ft x with Wire Rope Sling SW', 0, 0, '', 'ea', 923.00, 'MYR', 0, '', '', 0),
@@ -1477,7 +1495,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('BT9009', 'B', 'BT', 'BT9', '009', 'Grease Head Coupler; Climax', 0, 0, '', 'ea', 885.00, 'MYR', 0, '', '', 0),
 ('CB1001', 'C', 'CB', 'CB1', '001', '1" x 12-1/4", Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0),
 ('CB1002', 'C', 'CB', 'CB1', '002', '1" x 2-1/2", Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0),
-('CB1003', 'C', 'CB', 'CB1', '003', '1" x 4", Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0),
+('CB1003', 'C', 'CB', 'CB1', '003', '1" x 4", Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CB1004', 'C', 'CB', 'CB1', '004', '1" x 6-1/2", Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0),
 ('CB1005', 'C', 'CB', 'CB1', '005', '1/2" x 2", c/w F/washer, Full Thread', 0, 0, '', 'set', 2.00, 'MYR', 0, '', '', 0),
 ('CB1006', 'C', 'CB', 'CB1', '006', '1/2 x 5-1/2, Stud Bolt & Nut', 0, 0, '', 'ea', 20.00, 'MYR', 0, '', '', 0),
@@ -1904,7 +1923,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CC3092', 'C', 'CC', 'CC3', '092', '8" NB Sch 40 Butt Weld, Elbow 90§', 0, 0, '', 'ea', 348.00, 'MYR', 0, '', '', 0),
 ('CC3093', 'C', 'CC', 'CC3', '093', '10" Elbow 90§ (SGP Welding type)', 0, 0, '', 'ea', 470.00, 'MYR', 0, '', '', 0),
 ('CC3094', 'C', 'CC', 'CC3', '094', '6" Elbow 90§ (SGP Welding type)', 0, 0, '', 'ea', 150.00, 'MYR', 0, '', '', 0),
-('CC3095', 'C', 'CC', 'CC3', '095', '3-1/2" Elbow 90§, Sch 40 Welding Type', 0, 0, '', 'ea', 65.00, 'MYR', 0, '', '', 0),
+('CC3095', 'C', 'CC', 'CC3', '095', '3-1/2" Elbow 90§, Sch 40 Welding Type', 0, 0, '', 'ea', 65.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CC3096', 'C', 'CC', 'CC3', '096', '1-1/2" Galvanised Iron, Elbow 90§, Welding Type', 0, 0, '', 'ea', 6.50, 'MYR', 0, '', '', 0),
 ('CC3097', 'C', 'CC', 'CC3', '097', 'x', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CC3098', 'C', 'CC', 'CC3', '098', '2'''' 3000 psi A105 SW Elbow 45ø', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
@@ -2331,7 +2351,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CE9015', 'C', 'CE', 'CE9', '015', 'Battery Terminal', 0, 0, '', 'ea', 6.00, 'MYR', 0, '', '', 0),
 ('CE9016', 'C', 'CE', 'CE9', '016', 'Battery Terminal; Caterpillar', 0, 0, '', 'ea', 4.50, 'MYR', 0, '', '', 0),
 ('CE9017', 'C', 'CE', 'CE9', '017', 'Cable Clamp; Killark', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
-('CE9018', 'C', 'CE', 'CE9', '018', 'Carbon Brush, P/N: RE 39247', 0, 0, 'RE 39247', 'set', 1.00, 'MYR', 0, '', '', 0),
+('CE9018', 'C', 'CE', 'CE9', '018', 'Carbon Brush, P/N: RE 39247', 0, 0, 'RE 39247', 'set', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CE9019', 'C', 'CE', 'CE9', '019', 'Current Transformer; Rudolf P/N:7694', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CE9020', 'C', 'CE', 'CE9', '020', 'E8310 Incandescent Explosion Proof Handlamp, 230V,', 0, 0, '', 'set', 725.00, 'MYR', 0, '', '', 0),
 ('CE9021', 'C', 'CE', 'CE9', '021', 'Evolution Timed Ignitor Lamp Holder Assembly, 250-', 0, 0, 'SEV01-0022', 'ea', 677.00, 'MYR', 0, '', '', 0),
@@ -2732,7 +2753,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CH2130', 'C', 'CH', 'CH2', '130', '3/8 x 3 ft, JIC (F) Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
 ('CH2131', 'C', 'CH', 'CH2', '131', '3/8 x 3 ft, JIC (F) Both Ends, 5000 psi', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
 ('CH2132', 'C', 'CH', 'CH2', '132', '3/8 x 4 ft, JIC (F) Both Ends, 3000 psi', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
-('CH2133', 'C', 'CH', 'CH2', '133', '3/8 x 45 ft, NPT (M) Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
+('CH2133', 'C', 'CH', 'CH2', '133', '3/8 x 45 ft, NPT (M) Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CH2134', 'C', 'CH', 'CH2', '134', '3/8 X 5 ft, JIC (F) 45ø Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
 ('CH2135', 'C', 'CH', 'CH2', '135', '3/8 x 5 ft, JIC (F) 90ø Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
 ('CH2136', 'C', 'CH', 'CH2', '136', '3/8 x 6 ft, JIC (F) Both Ends', 0, 0, '', 'lgth', 30.00, 'MYR', 0, '', '', 0),
@@ -3127,7 +3149,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CM4132', 'C', 'CM', 'CM4', '132', 'Back Connection ,Gauge 3000 psi ( Just for Coomey ', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CM4133', 'C', 'CM', 'CM4', '133', 'Barrel Counter 20ft c/w lithium battery and pick u', 0, 0, '', 'set', 4.00, 'MYR', 0, '', '', 0),
 ('CM4134', 'C', 'CM', 'CM4', '134', 'Temperature Gauge, 120 - 260§ F, 2" Face c/w 24'' C', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
-('CM4135', 'C', 'CM', 'CM4', '135', '2-1/2" Air Gauge Panel Mount, 0-6000, P/N: 2516013', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
+('CM4135', 'C', 'CM', 'CM4', '135', '2-1/2" Air Gauge Panel Mount, 0-6000, P/N: 2516013', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CM4136', 'C', 'CM', 'CM4', '136', '2-1/2" Air Gauge, Panel Mount 0 - 3000psi P/N: 251', 0, 0, '', 'ea', 580.80, 'MYR', 0, '', '', 0),
 ('CM4137', 'C', 'CM', 'CM4', '137', '2-1/2" Air Gauge, Panel Mount 0 - 10,000psi P/N: 2', 0, 0, '', 'ea', 580.80, 'MYR', 0, '', '', 0),
 ('CM4138', 'C', 'CM', 'CM4', '138', 'Pressure Gauge, 0 - 1000psi, 4" Face, 1/2" Bottom ', 0, 0, '', 'ea', 480.00, 'MYR', 0, '', '', 0),
@@ -3534,7 +3557,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CQ9002', 'C', 'CQ', 'CQ9', '002', '3/4, Pipe coupling', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CQ9003', 'C', 'CQ', 'CQ9', '003', 'Hydraulic Coupling (F)', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CQ9004', 'C', 'CQ', 'CQ9', '004', 'Hydraulic Coupling (M)', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
-('CQ9005', 'C', 'CQ', 'CQ9', '005', 'Rubber Coupling ; TB Woods P/N:7JS (PMX)', 0, 0, '7JS (PMX)', 'ea', 1.00, 'MYR', 0, '', '', 0),
+('CQ9005', 'C', 'CQ', 'CQ9', '005', 'Rubber Coupling ; TB Woods P/N:7JS (PMX)', 0, 0, '7JS (PMX)', 'ea', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CQ9006', 'C', 'CQ', 'CQ9', '006', 'Rubber Coupling ; TB Woods P/N:7SMPB (MNW)', 0, 0, '7SMPB (MNW)', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CQ9007', 'C', 'CQ', 'CQ9', '007', 'Rubber Coupling ; TB Woods P/N:8JS (PNY)', 0, 0, '8JS (PNY)', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CQ9008', 'C', 'CQ', 'CQ9', '008', 'Rubber Coupling ; TB Woods P/N:8SMPB (TMY)', 0, 0, '8SMPB (TMY)', 'ea', 1.00, 'MYR', 0, '', '', 0),
@@ -3929,7 +3953,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('CV2009', 'C', 'CV', 'CV2', '009', '6" Butterfly Valve, ANSI 150, DIN PN/10/16, JIS 10', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CV2010', 'C', 'CV', 'CV2', '010', '4" Butterfly Valve; CIM', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CV2011', 'C', 'CV', 'CV2', '011', '4" Butterfly Valve, PN: 3228444; Weco', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
-('CV2012', 'C', 'CV', 'CV2', '012', '4", Butterfly Valve, Flange Connection, BS5155SG', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
+('CV2012', 'C', 'CV', 'CV2', '012', '4", Butterfly Valve, Flange Connection, BS5155SG', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('CV2013', 'C', 'CV', 'CV2', '013', '4" Butterfly Valve 10 k DN 100', 0, 0, '', 'ea', 750.00, 'MYR', 0, '', '', 0),
 ('CV2014', 'C', 'CV', 'CV2', '014', '4''''- 6'''' Handle F/Weco Model12 and 12N Butterfly V', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('CV2015', 'C', 'CV', 'CV2', '015', '4" Butterfly Valve (Water Type)', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
@@ -4346,7 +4371,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('DH9009', 'D', 'DH', 'DH9', '009', 'Safety Signage, Adhesive Sticker, "Cecair Mudah Te', 0, 400, '', 'ea', 9.00, 'MYR', 2008, '', '', 0),
 ('DH9010', 'D', 'DH', 'DH9', '010', 'Safety Signage, Adhesive Sticker, "Pepejal Mudah T', 0, 400, '', 'ea', 9.00, 'MYR', 2008, '', '', 0),
 ('DH9011', 'D', 'DH', 'DH9', '011', 'Safety Signage, Adhesive Sticker, "Campuran Pelbag', 0, 400, '', 'ea', 9.00, 'MYR', 2008, '', '', 0),
-('DH9012', 'D', 'DH', 'DH9', '012', 'Safety Signage, Adhesive Sticker, "Bahan Toksik"', 0, 400, '', 'ea', 9.00, 'MYR', 2008, '', '', 0),
+('DH9012', 'D', 'DH', 'DH9', '012', 'Safety Signage, Adhesive Sticker, "Bahan Toksik"', 0, 400, '', 'ea', 9.00, 'MYR', 2008, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('DH9013', 'D', 'DH', 'DH9', '013', 'Waste Disposal Sticker', 0, 0, '-', 'ea', 6.00, 'MYR', 2008, 'Pre-printed with Petronas approved wording', '', 0),
 ('DH9014', 'D', 'DH', 'DH9', '014', 'Eye Wash Station', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('DH9015', 'D', 'DH', 'DH9', '015', 'Welding Dark Lens', 0, 0, '', 'ea', 1.50, 'MYR', 2009, '', '', 0),
@@ -4777,7 +4803,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('DS1059', 'D', 'DS', 'DS1', '059', 'Seal Fan Shaft', 0, 0, '', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('DS1060', 'D', 'DS', 'DS1', '060', 'Seal for Discharge Passage, P/N: 316-2547', 0, 0, '316-2547', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('DS1061', 'D', 'DS', 'DS1', '061', 'Seal for Float Value Flapper Type For 3-1/2 IF,P/N', 0, 0, 'M03986', 'set', 1.00, 'MYR', 0, '', '', 0),
-('DS1062', 'D', 'DS', 'DS1', '062', 'Seal G, P/N: 4W 0452; Caterpillar', 0, 0, '4W 0452', 'set', 1.00, 'MYR', 0, '', '', 0),
+('DS1062', 'D', 'DS', 'DS1', '062', 'Seal G, P/N: 4W 0452; Caterpillar', 0, 0, '4W 0452', 'set', 1.00, 'MYR', 0, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('DS1063', 'D', 'DS', 'DS1', '063', 'Seal GP Cran, P/N: 9Y-9895', 0, 0, '9Y-9895', 'set', 1.00, 'MYR', 0, '', '', 0),
 ('DS1064', 'D', 'DS', 'DS1', '064', 'Seal Kit V10; Metaris', 0, 0, 'M-923548', 'ea', 1.00, 'MYR', 0, '', '', 0),
 ('DS1065', 'D', 'DS', 'DS1', '065', 'Seal Lube Pkg  WQ 4-1/2, P/N : 316 23395', 0, 0, '316 23395', 'set', 1.00, 'MYR', 0, '', '', 0),
@@ -5173,7 +5200,8 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 ('ER3002', 'E', 'ER', 'ER3', '002', 'Fabricate Mitsubishi Generator Canopy by using 2.8', 0, 0, '', 'lot', 36.00, 'MYR', 2008, 'No insulation for internal wall', '', 0),
 ('ER3003', 'E', 'ER', 'ER3', '003', 'Painting of Canopy with 1 Layer Primer and 1 Layer', 0, 0, '', 'lot', 2.00, 'MYR', 2008, '', '', 0),
 ('ER3004', 'E', 'ER', 'ER3', '004', 'Reinstate All Instruments, Testing and Commissioni', 0, 0, '', 'lot', 1.00, 'MYR', 2008, '', '', 0),
-('ER3005', 'E', 'ER', 'ER3', '005', 'Sand Blasting Canopy SA2.5, Primer, Zinc Chromite,', 0, 0, '', 'lot', 5.00, 'MYR', 2008, '', '', 0),
+('ER3005', 'E', 'ER', 'ER3', '005', 'Sand Blasting Canopy SA2.5, Primer, Zinc Chromite,', 0, 0, '', 'lot', 5.00, 'MYR', 2008, '', '', 0);
+INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `classification_code`, `item_code`, `description`, `weight`, `dimension`, `part_number`, `unit_of_measure`, `rate`, `currency`, `purchase_year`, `detailed_description`, `image_url`, `status`) VALUES
 ('ER3006', 'E', 'ER', 'ER3', '006', 'Rewind and service 1 unit 3-Phase Ex-motor coil. S', 0, 0, '', 'lot', 3.00, 'MYR', 2008, '', '', 0),
 ('ER3007', 'E', 'ER', 'ER3', '007', 'Fabricate 3 Nos of Pad Eye As Per Drawing', 0, 0, '', 'lot', 1.00, 'MYR', 2008, 'i) Weld Pad Eyes On The I-Beam As Per Drawing.\r\nii) Perform MPI Inspection By Third Party.\r\niii) Coa', '', 0),
 ('ER3008', 'E', 'ER', 'ER3', '008', 'Design, Fabricate and Install 2x30000mm Runway Bea', 0, 0, '', 'unit', 61.00, 'MYR', 2008, 'Mobile crane by UMW', '', 0),
@@ -5337,22 +5365,23 @@ INSERT INTO `inv_items` (`id`, `main_category_code`, `sub_category_code`, `class
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `inv_maincategories`
--- 
+--
 
-CREATE TABLE `inv_maincategories` (
+CREATE TABLE IF NOT EXISTS `inv_maincategories` (
   `category_code` varchar(20) NOT NULL,
   `description` varchar(50) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`category_code`)
+  PRIMARY KEY (`category_code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `inv_maincategories`
--- 
+--
 
-INSERT INTO `inv_maincategories` (`category_code`, `description`, `status`) VALUES ('A', 'Asset', 1),
+INSERT INTO `inv_maincategories` (`category_code`, `description`, `status`) VALUES
+('A', 'Asset', 1),
 ('B', 'Rig Support', 1),
 ('C', 'Spare', 1),
 ('D', 'Consumable', 1),
@@ -5360,23 +5389,24 @@ INSERT INTO `inv_maincategories` (`category_code`, `description`, `status`) VALU
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `inv_stocks`
--- 
+--
 
-CREATE TABLE `inv_stocks` (
-  `id` int(15) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `inv_stocks` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `branch_id` varchar(20) NOT NULL,
   `item_id` varchar(20) NOT NULL,
-  `quantity` int(15) NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4113 DEFAULT CHARSET=latin1 AUTO_INCREMENT=4113 ;
+  `quantity` int(15) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4113 ;
 
--- 
+--
 -- Dumping data for table `inv_stocks`
--- 
+--
 
-INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES (1, 'HQKL', 'AE1001', 1240),
+INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES
+(1, 'HQKL', 'AE1001', 1240),
 (2, 'KDSP', 'AE1001', 50),
 (3, 'KDSP', 'AE1002', 450),
 (4, 'HQKL', 'AE1002', 210),
@@ -7349,7 +7379,8 @@ INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES (1, '
 (1972, 'G1', 'CH2069', 1),
 (1973, 'ASB', 'CH2070', 1),
 (1974, 'G2', 'CH2070', 5),
-(1975, 'G2', 'CH2071', 6),
+(1975, 'G2', 'CH2071', 6);
+INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES
 (1976, 'G2', 'CH2072', 5),
 (1977, 'G1', 'CH2073', 1),
 (1978, 'G2', 'CH2074', 5),
@@ -9268,7 +9299,8 @@ INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES (1, '
 (3891, 'ASB', 'DS3039', 3),
 (3892, 'KSB', 'DS3040', 10),
 (3893, 'KSB', 'DS3041', 10),
-(3894, 'KSB', 'DS3042', 10),
+(3894, 'KSB', 'DS3042', 10);
+INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES
 (3895, 'KSB', 'DS3043', 2),
 (3896, 'ASB', 'DS3044', 1),
 (3897, 'G1', 'DS3045', 5),
@@ -9490,24 +9522,25 @@ INSERT INTO `inv_stocks` (`id`, `branch_id`, `item_id`, `quantity`) VALUES (1, '
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `inv_subcategories`
--- 
+--
 
-CREATE TABLE `inv_subcategories` (
+CREATE TABLE IF NOT EXISTS `inv_subcategories` (
   `id` varchar(20) NOT NULL,
   `category_code` varchar(20) NOT NULL,
   `description` varchar(50) NOT NULL,
   `main_category_code` varchar(20) NOT NULL,
   `status` int(3) NOT NULL,
-  PRIMARY KEY  (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `inv_subcategories`
--- 
+--
 
-INSERT INTO `inv_subcategories` (`id`, `category_code`, `description`, `main_category_code`, `status`) VALUES ('AT', 'T', 'Tank', 'A', 1),
+INSERT INTO `inv_subcategories` (`id`, `category_code`, `description`, `main_category_code`, `status`) VALUES
+('AT', 'T', 'Tank', 'A', 1),
 ('BC', 'C', 'Consummables', 'B', 1),
 ('AE', 'E', 'Engine & Electrical', 'A', 1),
 ('AM', 'M', 'Miscellaneius', 'A', 1),
@@ -9548,121 +9581,177 @@ INSERT INTO `inv_subcategories` (`id`, `category_code`, `description`, `main_cat
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `material_transfer_details`
--- 
+--
+-- Table structure for table `material_transfers`
+--
 
-CREATE TABLE `material_transfer_details` (
-  `id` int(15) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `material_transfers` (
+  `doc_number` varchar(30) NOT NULL,
+  `doc_date` date NOT NULL,
+  `doc_type` varchar(20) NOT NULL,
+  `branch_id` varchar(10) NOT NULL,
+  `approver` varchar(20) DEFAULT NULL,
+  `approver_date` date DEFAULT NULL,
+  `requester` varchar(20) NOT NULL,
+  `requester_date` date NOT NULL,
+  `status` enum('pending','completed') NOT NULL,
+  PRIMARY KEY (`doc_number`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+--
+-- Dumping data for table `material_transfers`
+--
+
+INSERT INTO `material_transfers` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `approver`, `approver_date`, `requester`, `requester_date`, `status`) VALUES
+('sss', '2009-08-26', 'GRN', 'HQKL', NULL, NULL, 'Administrator', '2009-08-26', 'completed');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `material_transfer_details`
+--
+
+CREATE TABLE IF NOT EXISTS `material_transfer_details` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `doc_number` varchar(30) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `material_transfer_details`
--- 
+--
 
-INSERT INTO `material_transfer_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES (1, 'sss', 'AE1002', 10, '2'),
+INSERT INTO `material_transfer_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`) VALUES
+(1, 'sss', 'AE1002', 10, '2'),
 (2, 'sss', 'AE1001', 100, '');
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `material_transfers`
--- 
+--
+-- Table structure for table `production_issues`
+--
 
-CREATE TABLE `material_transfers` (
-  `doc_number` varchar(30) NOT NULL,
+CREATE TABLE IF NOT EXISTS `production_issues` (
+  `doc_number` varchar(20) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
   `branch_id` varchar(10) NOT NULL,
-  `approver` varchar(20) default NULL,
-  `approver_date` date default NULL,
-  `requester` varchar(20) NOT NULL,
-  `requester_date` date NOT NULL,
+  `notes` varchar(1000) DEFAULT NULL,
+  `issuer` varchar(20) DEFAULT NULL,
+  `issuer_date` date DEFAULT NULL,
+  `receiver` varchar(20) DEFAULT NULL,
+  `receiver_date` date DEFAULT NULL,
   `status` enum('pending','completed') NOT NULL,
-  PRIMARY KEY  (`doc_number`)
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
--- Dumping data for table `material_transfers`
--- 
+--
+-- Dumping data for table `production_issues`
+--
 
-INSERT INTO `material_transfers` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `approver`, `approver_date`, `requester`, `requester_date`, `status`) VALUES ('sss', '2009-08-26', 'GRN', 'HQKL', NULL, NULL, 'Administrator', '2009-08-26', 'completed');
+INSERT INTO `production_issues` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `notes`, `issuer`, `issuer_date`, `receiver`, `receiver_date`, `status`) VALUES
+('a', '2009-08-27', 'GRN', 'KDSP', 'aaaa', 'Administrator', '2009-08-31', 'Administrator', '2009-08-31', 'pending');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `production_issue_details`
--- 
+--
 
-CREATE TABLE `production_issue_details` (
-  `id` int(15) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `production_issue_details` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `doc_number` varchar(30) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) NOT NULL,
   `status` enum('pending','completed') NOT NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
--- 
+--
 -- Dumping data for table `production_issue_details`
--- 
+--
 
-INSERT INTO `production_issue_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`, `status`) VALUES (1, 'a', 'AE1002', 10, 'a', 'completed'),
+INSERT INTO `production_issue_details` (`id`, `doc_number`, `item_id`, `quantity`, `remark`, `status`) VALUES
+(1, 'a', 'AE1002', 10, 'a', 'completed'),
 (2, 'a', 'AE1001', 100, '', 'pending');
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `production_issues`
--- 
+--
+-- Table structure for table `purchases`
+--
 
-CREATE TABLE `production_issues` (
-  `doc_number` varchar(20) NOT NULL,
+CREATE TABLE IF NOT EXISTS `purchases` (
+  `doc_number` varchar(50) NOT NULL,
+  `running_number` int(6) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
+  `doc_tag` enum('po','pr') NOT NULL DEFAULT 'pr',
   `branch_id` varchar(10) NOT NULL,
-  `notes` varchar(1000) default NULL,
-  `issuer` varchar(20) default NULL,
-  `issuer_date` date default NULL,
-  `receiver` varchar(20) default NULL,
-  `receiver_date` date default NULL,
-  `status` enum('pending','completed') NOT NULL,
-  PRIMARY KEY  (`doc_number`)
+  `currency` varchar(20) DEFAULT NULL,
+  `discount` float NOT NULL,
+  `total` float NOT NULL DEFAULT '0',
+  `supplier_1` varchar(20) NOT NULL,
+  `supplier_2` varchar(20) DEFAULT NULL,
+  `supplier_3` varchar(20) DEFAULT NULL,
+  `supplier_1_contact` varchar(50) NOT NULL,
+  `supplier_2_contact` varchar(50) DEFAULT NULL,
+  `supplier_3_contact` varchar(50) DEFAULT NULL,
+  `supplier_1_tel` varchar(30) NOT NULL,
+  `supplier_2_tel` varchar(30) DEFAULT NULL,
+  `supplier_3_tel` varchar(30) DEFAULT NULL,
+  `requester` varchar(20) NOT NULL,
+  `requester_date` date NOT NULL,
+  `approver_1` varchar(20) DEFAULT NULL,
+  `approver_1_date` date DEFAULT NULL,
+  `payment` text,
+  `delivery` text,
+  `status` enum('approved','rejected','unapproved','completed') NOT NULL DEFAULT 'unapproved',
+  PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
--- Dumping data for table `production_issues`
--- 
+--
+-- Dumping data for table `purchases`
+--
 
-INSERT INTO `production_issues` (`doc_number`, `doc_date`, `doc_type`, `branch_id`, `notes`, `issuer`, `issuer_date`, `receiver`, `receiver_date`, `status`) VALUES ('a', '2009-08-27', 'GRN', 'KDSP', 'aaaa', 'Administrator', '2009-08-31', 'Administrator', '2009-08-31', 'pending');
+INSERT INTO `purchases` (`doc_number`, `running_number`, `doc_date`, `doc_type`, `doc_tag`, `branch_id`, `currency`, `discount`, `total`, `supplier_1`, `supplier_2`, `supplier_3`, `supplier_1_contact`, `supplier_2_contact`, `supplier_3_contact`, `supplier_1_tel`, `supplier_2_tel`, `supplier_3_tel`, `requester`, `requester_date`, `approver_1`, `approver_1_date`, `payment`, `delivery`, `status`) VALUES
+('1', 1, '2009-08-26', 'GRN', 'po', 'HQKL', '', 0, 4, '1', '2', '', '1', '2', '', '1', '2', '', 'Administrator', '2009-08-26', 'Administrator', '2009-08-30', '', '', 'approved'),
+('PO1/HQKL/0002/09/2009', 2, '2009-09-01', 'PO1', 'po', 'HQKL', NULL, 0, 1, '1', NULL, NULL, 'Mahen', NULL, NULL, '012-1212121', NULL, NULL, 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', '', '', 'approved'),
+('PR1/ASB/0003/09/2009', 3, '2009-09-02', 'PR1', 'po', 'ASB', NULL, 0, 20, '1', NULL, NULL, '012435676783', NULL, NULL, '234526452', NULL, NULL, 'administrator', '2009-09-02', 'administrator', '2009-09-02', '', '', 'approved'),
+('PR1/HQKL/0004/09/2009', 4, '2009-09-02', 'PR1', 'po', 'HQKL', NULL, 0, 20, '2', NULL, NULL, 'Mahendran', NULL, NULL, '912348632', NULL, NULL, 'administrator', '2009-09-02', 'administrator', '2009-09-02', '', '', 'approved'),
+('PR2/KDSP/0005/09/2009', 5, '2009-09-07', 'PR2', 'po', 'KDSP', '1', 0, 540, '5', '1', NULL, 'frederick yeo', '-', NULL, '087-420 399', '-', NULL, 'user', '2009-09-07', 'Test', '2009-09-14', '', '', 'approved'),
+('PR1/HQKL/0006/09/2009', 6, '2009-09-07', 'PR1', 'po', 'HQKL', '1', 0, 20, '5', NULL, NULL, 'hara', NULL, NULL, '0125840902', NULL, NULL, 'Administrator', '2009-09-07', 'Administrator', '2009-09-07', '', '', 'approved'),
+('PR1/HQKL/0007/09/2009', 7, '2009-09-07', 'PR1', 'po', 'HQKL', '1', 0, 20, '5', NULL, NULL, 'lim', NULL, NULL, '0125840902', NULL, NULL, 'Administrator', '2009-09-07', 'Administrator', '2009-09-07', '', '', 'approved'),
+('PR2/G1/0008/09/2009', 8, '2009-09-01', 'PR2', 'po', 'G1', '1', 2, 9, '1', NULL, NULL, '2', NULL, NULL, '2', NULL, NULL, 'Administrator', '2009-09-24', 'Administrator', '2009-09-25', '', '', 'approved'),
+('PO1/HQKL/0009/09/2009', 9, '2009-09-25', 'PO1', 'po', 'HQKL', '1', 1, 1, '1', NULL, NULL, '3', NULL, NULL, '3', NULL, NULL, 'Administrator', '2009-09-25', 'Administrator', '2009-09-25', '', '', 'approved'),
+('PO2/HQKL/0010/09/2009', 10, '2009-09-25', 'PO2', 'po', 'HQKL', '1', 0, 2, '5', NULL, NULL, 'ee', NULL, NULL, '123', NULL, NULL, 'Administrator', '2009-09-25', 'Administrator', '2009-09-24', '1 day', '2 day', 'approved');
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `purchase_details`
--- 
+--
 
-CREATE TABLE `purchase_details` (
-  `id` int(15) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `purchase_details` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `doc_number` varchar(50) NOT NULL,
   `item_id` varchar(20) NOT NULL,
-  `quantity` int(15) NOT NULL default '0',
-  `unit_price` float NOT NULL default '0',
-  `extended_price` float NOT NULL default '0',
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=17 DEFAULT CHARSET=latin1 AUTO_INCREMENT=17 ;
+  `quantity` int(15) NOT NULL DEFAULT '0',
+  `unit_price` float NOT NULL DEFAULT '0',
+  `extended_price` float NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
 
--- 
+--
 -- Dumping data for table `purchase_details`
--- 
+--
 
-INSERT INTO `purchase_details` (`id`, `doc_number`, `item_id`, `quantity`, `unit_price`, `extended_price`) VALUES (1, '1', 'AE1001', 1, 1, 2),
+INSERT INTO `purchase_details` (`id`, `doc_number`, `item_id`, `quantity`, `unit_price`, `extended_price`) VALUES
+(1, '1', 'AE1001', 1, 1, 2),
 (9, '1', 'AT1001', 1, 1, 2),
 (10, 'PO1/HQKL/0002/09/2009', 'AE1001', 1, 1, 1),
 (11, 'PR1/ASB/0003/09/2009', 'AT1002', 10, 2, 20),
@@ -9670,100 +9759,59 @@ INSERT INTO `purchase_details` (`id`, `doc_number`, `item_id`, `quantity`, `unit
 (13, 'PR2/KDSP/0005/09/2009', 'DM9066', 13, 24, 240),
 (14, 'PR2/KDSP/0005/09/2009', 'DP1001', 10, 30, 300),
 (15, 'PR1/HQKL/0006/09/2009', 'AE1001', 1, 20, 20),
-(16, 'PR1/HQKL/0007/09/2009', 'AE1001', 1, 20, 20);
+(16, 'PR1/HQKL/0007/09/2009', 'AE1001', 1, 20, 20),
+(17, 'PR2/G1/0008/09/2009', 'AE1001', 11, 1, 11),
+(19, 'PO1/HQKL/0009/09/2009', 'AE1002', 1, 2, 2),
+(20, 'PO2/HQKL/0010/09/2009', 'ER2009', 1, 2, 2);
 
 -- --------------------------------------------------------
 
--- 
--- Table structure for table `purchases`
--- 
-
-CREATE TABLE `purchases` (
-  `doc_number` varchar(50) NOT NULL,
-  `running_number` int(6) NOT NULL,
-  `doc_date` date NOT NULL,
-  `doc_type` varchar(20) NOT NULL,
-  `doc_tag` enum('po','pr') NOT NULL default 'pr',
-  `branch_id` varchar(10) NOT NULL,
-  `currency` varchar(20) default NULL,
-  `total` float NOT NULL default '0',
-  `supplier_1` varchar(20) NOT NULL,
-  `supplier_2` varchar(20) default NULL,
-  `supplier_3` varchar(20) default NULL,
-  `supplier_1_contact` varchar(50) NOT NULL,
-  `supplier_2_contact` varchar(50) default NULL,
-  `supplier_3_contact` varchar(50) default NULL,
-  `supplier_1_tel` varchar(30) NOT NULL,
-  `supplier_2_tel` varchar(30) default NULL,
-  `supplier_3_tel` varchar(30) default NULL,
-  `requester` varchar(20) NOT NULL,
-  `requester_date` date NOT NULL,
-  `approver_1` varchar(20) default NULL,
-  `approver_1_date` date default NULL,
-  `approver_2` varchar(20) default NULL,
-  `approver_2_date` date default NULL,
-  `status` enum('approved','rejected','unapproved','completed') NOT NULL default 'unapproved',
-  PRIMARY KEY  (`doc_number`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- 
--- Dumping data for table `purchases`
--- 
-
-INSERT INTO `purchases` (`doc_number`, `running_number`, `doc_date`, `doc_type`, `doc_tag`, `branch_id`, `currency`, `total`, `supplier_1`, `supplier_2`, `supplier_3`, `supplier_1_contact`, `supplier_2_contact`, `supplier_3_contact`, `supplier_1_tel`, `supplier_2_tel`, `supplier_3_tel`, `requester`, `requester_date`, `approver_1`, `approver_1_date`, `approver_2`, `approver_2_date`, `status`) VALUES ('1', 1, '2009-08-26', 'GRN', 'po', 'HQKL', '', 4, '1', '2', '', '1', '2', '', '1', '2', '', 'Administrator', '2009-08-26', 'Administrator', '2009-08-30', NULL, NULL, 'approved'),
-('PO1/HQKL/0002/09/2009', 2, '2009-09-01', 'PO1', 'po', 'HQKL', NULL, 1, '1', NULL, NULL, 'Mahen', NULL, NULL, '012-1212121', NULL, NULL, 'Administrator', '2009-09-01', 'Administrator', '2009-09-01', NULL, NULL, 'approved'),
-('PR1/ASB/0003/09/2009', 3, '2009-09-02', 'PR1', 'po', 'ASB', NULL, 20, '1', NULL, NULL, '012435676783', NULL, NULL, '234526452', NULL, NULL, 'administrator', '2009-09-02', 'administrator', '2009-09-02', NULL, NULL, 'approved'),
-('PR1/HQKL/0004/09/2009', 4, '2009-09-02', 'PR1', 'po', 'HQKL', NULL, 20, '2', NULL, NULL, 'Mahendran', NULL, NULL, '912348632', NULL, NULL, 'administrator', '2009-09-02', 'administrator', '2009-09-02', NULL, NULL, 'approved'),
-('PR2/KDSP/0005/09/2009', 5, '2009-09-07', 'PR2', 'po', 'KDSP', '1', 540, '5', '1', NULL, 'frederick yeo', '-', NULL, '087-420 399', '-', NULL, 'user', '2009-09-07', 'Test', '2009-09-14', NULL, NULL, 'approved'),
-('PR1/HQKL/0006/09/2009', 6, '2009-09-07', 'PR1', 'po', 'HQKL', '1', 20, '5', NULL, NULL, 'hara', NULL, NULL, '0125840902', NULL, NULL, 'Administrator', '2009-09-07', 'Administrator', '2009-09-07', NULL, NULL, 'approved'),
-('PR1/HQKL/0007/09/2009', 7, '2009-09-07', 'PR1', 'po', 'HQKL', '1', 20, '5', NULL, NULL, 'lim', NULL, NULL, '0125840902', NULL, NULL, 'Administrator', '2009-09-07', 'Administrator', '2009-09-07', NULL, NULL, 'approved');
-
--- --------------------------------------------------------
-
--- 
+--
 -- Table structure for table `suppliers`
--- 
+--
 
-CREATE TABLE `suppliers` (
-  `id` int(15) NOT NULL auto_increment,
+CREATE TABLE IF NOT EXISTS `suppliers` (
+  `id` int(15) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `address` text NOT NULL,
   `contact_person` varchar(100) NOT NULL,
   `contact` varchar(20) NOT NULL,
   `info` text,
-  `image_url` varchar(1000) default NULL,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+  `image_url` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
--- 
+--
 -- Dumping data for table `suppliers`
--- 
+--
 
-INSERT INTO `suppliers` (`id`, `name`, `address`, `contact_person`, `contact`, `info`, `image_url`) VALUES (1, 'Mahen Sdn Bhd', 'Mahen Sdn Bhd, Jalan Barat, Timur Industrial Area, 99999 North Port, Selangor', 'Mahendran a/l Balakrishnan', '+6012-2222222', 'owned by Mahendran Balakrishnan', NULL),
+INSERT INTO `suppliers` (`id`, `name`, `address`, `contact_person`, `contact`, `info`, `image_url`) VALUES
+(1, 'Mahen Sdn Bhd', 'Mahen Sdn Bhd, Jalan Barat, Timur Industrial Area, 99999 North Port, Selangor', 'Mahendran a/l Balakrishnan', '+6012-2222222', 'owned by Mahendran Balakrishnan', NULL),
 (2, 'Mahen Holdings', 'Alor Setar', 'Mahen', '0120120120', 'owned by Mahendran', NULL),
 (5, 'Utama Offshore Sdn Bhd', 'Lot 36, Block E, Rancha Rancha Ind. Warehouse Centre, 87023, W.P Labuan, Malaysia', 'Frederick yeo', '087-420399', '-', NULL);
 
 -- --------------------------------------------------------
 
--- 
+--
 -- Table structure for table `users`
--- 
+--
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `username` varchar(20) NOT NULL,
   `password` varchar(100) NOT NULL,
   `name` varchar(20) NOT NULL,
   `email` varchar(20) NOT NULL,
   `branch_id` varchar(20) NOT NULL,
   `level` varchar(20) NOT NULL,
-  PRIMARY KEY  (`username`)
+  PRIMARY KEY (`username`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
--- 
+--
 -- Dumping data for table `users`
--- 
+--
 
-INSERT INTO `users` (`username`, `password`, `name`, `email`, `branch_id`, `level`) VALUES ('Administrator', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Administrator', 'admin@admin.com', 'HQKL', 'admin'),
+INSERT INTO `users` (`username`, `password`, `name`, `email`, `branch_id`, `level`) VALUES
+('Administrator', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Administrator', 'admin@admin.com', 'HQKL', 'admin'),
 ('User', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'User', 'user@user.com', 'KDSP', 'user'),
 ('Guest', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Guest', 'guest@user.com', 'HQKL', 'user'),
 ('Boss', '5baa61e4c9b93f3f0682250b6cf8331b7ee68fd8', 'Boss', 'boss@admin.com', 'HQKL', 'admin'),
