@@ -41,6 +41,7 @@ $(function (){
 					.result(function(e, item) {
 						$("#supplier").val(item.to)});
 	$(".datepicker").datepicker();
+	$(".datepicker").datepicker('setDate', Date.today() );
 	$(".datepicker").blur(function (){ getRunningNumber(); });
 	$("#branch_id").change(function (){ getRunningNumber(); });
 	$("#doc_type").change(function (){ getRunningNumber(); });
@@ -151,7 +152,7 @@ function getRunningNumber()
 {
 	$.post("parser/Good_receipt_note.php",{type:"count"},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val("GRN"+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 

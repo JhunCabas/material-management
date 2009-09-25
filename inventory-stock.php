@@ -14,6 +14,11 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuInventory'); ?>
 	<div id="main" class="span-24 last">
 		<h2>Stock</h2>
+		<div class="span-23 last">
+					<a class="exporter" href="./report/export.php?op=stock&type=doc">Export to Word</a>
+					<a class="exporter" href="./report/export.php?op=stock&type=xls">Export to Excel</a>
+		</div>
+		<br />
 		<form action = "inventory-stock.php" method = "get">
 			<label for="branch">Choose Branch: </label>
 			<span id="branch">

@@ -79,6 +79,7 @@ $(function (){
 				});
 			}
 	});
+	$("#doc_date").datepicker('setDate', Date.today() );
 	$("#branch_id").change(function (){ getRunningNumber(); });
 	$("#doc_type").change(function (){ getRunningNumber(); });
 	$("#doc_num").attr("readonly","true");

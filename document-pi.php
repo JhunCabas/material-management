@@ -18,8 +18,12 @@ $tmpl->place('menu');
 		<input type="hidden" name="run_num" value="" id="run_num"/>
 		<label for="doc_num">Document Number </label><input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label><input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
-		<label for="doc_type">Document Type </label><select type="text" name="doc_type" value="" id="doc_type">
-			<?php Document_type::findAllOption();?></select><br />
+		<label for="doc_type">Document Type </label>
+			<select type="text" name="doc_type" value="" id="doc_type">
+				<option value="PI1">PI1 - Asset Disposal</option>
+				<option value="PI2">PI2 - Material Issue</option>
+				<option value="PI3">PI3 - Not required</option>
+			</select><br />
 		<label for="branch_id">Branch </label>
 				<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
 		<table id="formContent">

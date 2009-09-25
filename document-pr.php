@@ -60,8 +60,8 @@ $tmpl->place('menu');
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"></td></tr>
 			</tfoot>
 		</table>
-		<div class="span-11"><label>Payment Terms</label><br /><textarea id="payment" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
-		<div class="span-11"><label>Delivery Terms</label><br /><textarea id="delivery" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
+		<div class="pdbox span-11"><label>Payment Terms</label><br /><textarea id="payment" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
+		<div class="pdbox span-11"><label>Delivery Terms</label><br /><textarea id="delivery" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>

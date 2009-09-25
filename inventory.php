@@ -15,7 +15,14 @@ $tmpl->place('menu');
 	<div id="main" class="span-24 last">
 		<div id="categories span-24 last">
 			<h2>Inventory</h2>
-				<a href="#addTable">Add Item</a>
+				<div class="span-16">
+					<a href="#addTable">Add Item</a>
+				</div>
+				<div class="span-7 last">
+					<a class="exporter" href="./report/export.php?op=inventory&type=doc">Export to Word</a>
+					<a class="exporter" href="./report/export.php?op=inventory&type=xls">Export to Excel</a>
+				</div>
+				<br />
 				<form action = "inventory.php" method = "get">
 					<label for="maincc">Choose Main Category: </label>
 					<span id="maincc">

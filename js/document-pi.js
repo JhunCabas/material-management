@@ -10,6 +10,7 @@ $(function (){
 		autoOpen: false
 	});
 	$(".datepicker").datepicker();
+	$(".datepicker").datepicker('setDate', Date.today() );
 	$(".datepicker").blur(function (){ getRunningNumber(); });
 	$("#branch_id").change(function (){ getRunningNumber(); });
 	$("#doc_type").change(function (){ getRunningNumber(); });
