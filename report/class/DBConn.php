@@ -13,8 +13,8 @@
 function connectToDB() {
     // These four parameters must be changed dependent on your MySQL settings
     $hostdb = 'localhost';   // MySQl host
-    $userdb = 'useradmin';    // MySQL username
-    $passdb = 'test0';    // MySQL password
+    $userdb = 'root';    // MySQL username
+    $passdb = '';    // MySQL password
     $namedb = 'umw_mms'; // MySQL database name
 
     //$link = mysql_connect ("localhost:3306", "username", "password");
