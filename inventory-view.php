@@ -80,7 +80,7 @@ $tmpl->place('header');
 				</tr>
 				<tr>
 					<td class="caption">Purchase Year</td>
-					<td><span id="pury" class="varInput"><?php echo $inv_item->preparePurchaseYear(); ?></td>
+					<td><span id="pury" class="varInput"><?php printf("%4d",$inv_item->getPurchaseYear()); ?></td>
 				</tr>
 				<tr>
 					<td class="caption">Detailed Description</td>
