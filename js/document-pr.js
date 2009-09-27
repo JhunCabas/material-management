@@ -72,14 +72,15 @@ $(function (){
 	$("#doc_date").datepicker({
 			onSelect: function(dateText, inst){
 				getRunningNumber();
-				var month = Date.parseExact(dateText, "M/d/yyyy").toString("MM")
-				var year = Date.parseExact(dateText, "M/d/yyyy").toString("yyyy")
+				var month = Date.parseExact(dateText, "M/d/yyyy").toString("MM");
+				var year = Date.parseExact(dateText, "M/d/yyyy").toString("yyyy");
 				$.post("parser/Currency.php",{type: "option", month: month, year: year}, function (data){
 					$("#currency_id").html(data);
 				});
 			}
 	});
 	$("#doc_date").datepicker('setDate', Date.today() );
+	getCurrency();
 	$("#branch_id").change(function (){ getRunningNumber(); });
 	$("#doc_type").change(function (){ getRunningNumber(); });
 	$("#doc_num").attr("readonly","true");
@@ -215,6 +216,15 @@ function getRunningNumber()
 	$.post("parser/Purchase.php",{type:"countPR"},function (data){
 		$("#run_num").val(data);
 		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
+	});
+}
+
+function getCurrency()
+{
+	var month = Date.today().toString("MM");
+	var year = Date.today().toString("yyyy");
+	$.post("parser/Currency.php",{type: "option", month: month, year: year}, function (data){
+		$("#currency_id").html(data);
 	});
 }
 
