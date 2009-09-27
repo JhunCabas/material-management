@@ -71,7 +71,33 @@ session_start();
          return $table;
       }		
  
+
+###################################
+###### export Branch Stocks to Excel######
+#### id, branch_id, item_id, quantity ####
+###################################
+    	function exportStock()
+    		{
+    		$count='1';
+        $sql ="	SELECT * FROM umw_mms.inv_stocks A";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['branch_id']."</td>
+              <td>".$row['item_id']."</td>
+              <td>".$row['quantity']."</td>";
+          
+    	   $count++;
+         }
+         return $table;
+      }		
  
+  
 ###################################
 ##### Category Values #####
 ###################################
