@@ -53,7 +53,7 @@ $tmpl->place('menu');
 				}
 				echo "</tbody></table>";
 			} catch (fExpectedException $e) {
-				echo $e->printMessage();
+				echo $e->printMessage().$inv_stock->getItemId();
 			}
 		}else if(isSet($_GET['item']))
 		{
