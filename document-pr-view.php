@@ -23,7 +23,7 @@ $tmpl->place('menu');
 				$purchase = new Purchase($_GET['id']);
 				$purchase_details = Purchase_detail::findDetail($_GET['id']);
 	?>
-	<h2>Purchase Request</h2>
+	<h2>Purchase Request</h2><a href=report/savefile.php?POnum=<?=$_GET['id']?>><b>Download as Word</b></a><br>
 	<div class="form-frame span-23 last">
 		<h3>Purchase Request</h3><br />
 		<label for="doc_num">Document Number </label>
