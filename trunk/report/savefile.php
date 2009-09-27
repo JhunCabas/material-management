@@ -140,8 +140,8 @@ while ( $row = mysql_fetch_array($getData))
 <p><u>Special Instructions and Terms</u></p>
 <p>Internal Ref : </p>
 <p><u>Payment Term :</u></p>
-<br><?php echo $payment; ?></br>
+<br><?php echo $payment; ?>
 <p>Deliver Date : </p>
-<br><?php echo $delivery; ?></br>
+<br><?php echo $delivery; ?>
 </body>
 </html>
