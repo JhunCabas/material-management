@@ -38,6 +38,7 @@ $(function (){
 			doc_number: doc_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
+			status: "pending",
 			branch_id: branch_id,
 			jsonForm: jsonForm(),
 			requester: requester,
@@ -56,7 +57,7 @@ $(function (){
 					 $("#dialogBox").dialog('option', 'title', 'Success');
 					 $("#dialogBox").dialog('open');
 					 $("#dialogBox").bind('dialogclose', function(event, ui) {
-						window.location = tellDir() + "list-mtr.php";
+						history.back();
 					 });
 				 }
 			});

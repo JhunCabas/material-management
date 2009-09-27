@@ -8,7 +8,8 @@
 			try{
 				$grn = new Good_receipt_note();
 				$grn->populate();
-				$jsonForm = fJSON::decode($_POST['jsonForm']);
+				$json_form = fRequest::get('jsonForm');
+				$jsonForm = fJSON::decode($json_form);
 				if(!$error)
 					$grn->store();
 				foreach($jsonForm as $row)
@@ -65,7 +66,8 @@
 					$grn->store();
 				if($_POST['jsonForm'] != "")
 				{
-					$jsonForm = fJSON::decode($_POST['jsonForm']);
+					$json_form = fRequest::get('jsonForm');
+					$jsonForm = fJSON::decode($json_form);
 					foreach($jsonForm as $row)
 					{
 						try{

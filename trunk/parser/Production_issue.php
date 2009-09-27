@@ -8,7 +8,8 @@
 			try{
 				$production = new Production_issue();
 				$production->populate();
-				$jsonForm = fJSON::decode($_POST['jsonForm']);
+				$json_form = fRequest::get('jsonForm');
+				$jsonForm = fJSON::decode($json_form);
 				if(!$error)
 					$production->store();
 				foreach($jsonForm as $row)

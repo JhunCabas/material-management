@@ -23,7 +23,7 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Material Request Form</h3><br />
 		<label for="doc_num">Document Number </label>
-			<?php echo $mattrans->prepareDocNumber(); ?><br />
+			<?php echo $mattrans->prepareDocNumber(); ?><input id="doc_num" type="hidden" value="<?php echo $mattrans->prepareDocNumber(); ?>"></input><br />
 		<label for="doc_date">Document Date </label>
 			<?php echo $mattrans->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>

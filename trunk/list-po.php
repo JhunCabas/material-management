@@ -5,7 +5,7 @@ $tmpl->place('header');
 <script type="text/javascript" charset="utf-8">
 	$(function (){
 		$("tr.linkable").click(function (){
-			window.open("document-po-view.php?"+"id="+$(this).children(".docNumber").text());
+			window.location = "document-po-view.php?"+"id="+$(this).children(".docNumber").text();
 		});
 	});
 </script>

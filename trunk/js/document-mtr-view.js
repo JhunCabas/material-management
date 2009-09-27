@@ -5,9 +5,26 @@ $(function (){
 	$(".datepicker").datepicker();
 	$("#submitBTN").click(function (){
 		if(confirm("Continue?"))
-		$.post("parser/Inv_stock.php",{type: "transfer",jsonForm: jsonForm(), branch: $("#branchId").text()}, function()
+		$.post("parser/Inv_stock.php",{
+			type: "transfer",
+			doc_num: $("#doc_num").val(),
+			jsonForm: jsonForm(), 
+			branch: $("#branchId").text()}, function(data)
 		{
-			
+			if(data != "")
+			{
+			 	 $("#dialogBox").html(data);
+				 $("#dialogBox").dialog('option', 'title', 'Error');
+				 $("#dialogBox").dialog('open');
+			}
+			else{
+			 	$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Added");
+				 $("#dialogBox").dialog('option', 'title', 'Success');
+				 $("#dialogBox").dialog('open');
+				 $("#dialogBox").bind('dialogclose', function(event, ui) {
+					history.back();
+				 });
+			}
 		});
 	});
 });
