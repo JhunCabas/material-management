@@ -77,7 +77,7 @@ $(function (){
 	$("#idInput").blur(function (){
 		$("#idSpan").text($("#addclassific").val() + $("#idInput").val());
 	});
-	$("#addclassific").click(function (){
+	$("#addclassific").blur(function (){
 		if($(this).val() != "")
 		{
 			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
