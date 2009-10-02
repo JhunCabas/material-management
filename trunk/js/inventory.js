@@ -82,8 +82,8 @@ $(function (){
 		{
 			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
 				$("#idInput").val(data);
+				$("#idSpan").text($("#addclassific").val()+$("#idInput").val());
 			})
-			$("#idSpan").text($("#addclassific").val()+$("#idInput").val());
 		}
 	});
 	$("#addBTN").click(function (){
