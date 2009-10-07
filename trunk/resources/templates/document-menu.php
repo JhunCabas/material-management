@@ -9,7 +9,7 @@
 		<a href="list-grn.php">Good Receipt Note</a>
 	</div>
 	<div class="tool-inventory ui-corner-all span-4">
-		<a href="list-mtr.php">Material Transfer Note</a>
+		<a href="list-mtr.php">Material Transfer</a>
 	</div>
 	<div class="tool-inventory ui-corner-all span-4">
 		<a href="list-pi.php">Production Issue</a>
