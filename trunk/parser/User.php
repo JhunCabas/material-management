@@ -35,7 +35,7 @@
 		{
 			try{
 				$user = new User($_POST['key']);
-				$user->setPassword(sha1('password'));
+				$user->setPassword(sha1($_POST['pass']));
 				$user->store();
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();

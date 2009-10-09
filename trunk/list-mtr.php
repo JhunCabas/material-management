@@ -14,8 +14,8 @@ $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
-	<h2>Material Transfer Note</h2>
-	<h3>Add Material Transfer Request : <a href="document-mtr.php">Form</a></h3>
+	<h2>Material Transfer</h2>
+	<h3>Add Material Transfer Form : <a href="document-mtr.php">Form</a></h3>
 	<h3>List</h3>
 	<table>
 		<thead>

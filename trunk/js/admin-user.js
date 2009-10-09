@@ -1,4 +1,6 @@
 var tempText = "";
+var tempUser = "";
+var tempPassword = "";
 
 $(function (){
 	 $("#dialogBox").dialog({
@@ -79,19 +81,25 @@ $(function (){
 		 });
 	 });
 	 $(".uPassword").click(function (){
-		$.post("parser/User.php",{type: "reset", key: $(this).attr("user")},function (data){
-			if(data != "")
-			 {
-				 $("#dialogBox").html(data);
-				 $("#dialogBox").dialog('option', 'title', 'Error');
-				 $("#dialogBox").dialog('open');
-			 }
-			 else{
-			 	 $("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Password Changed");
-				 $("#dialogBox").dialog('option', 'title', 'Success');
-				 $("#dialogBox").dialog('open');
-			};
-		});
+			tempUser = $(this).attr("user");
+			$("#dialogBox").html("Password: <input id=\"rePassword\"></input><br /><input type=\"button\" id=\"resButt\" value=\"Reset\"></input>");
+			$("#dialogBox").dialog('option', 'title', 'Input Password');
+			$("#dialogBox").dialog('open');
+			$("#resButt").bind("click",function (){
+				$.post("parser/User.php",{type: "reset", key: tempUser, pass: $("#rePassword").val()},function (data){
+					if(data != "")
+					 {
+						 $("#dialogBox").html(data);
+						 $("#dialogBox").dialog('option', 'title', 'Error');
+						 $("#dialogBox").dialog('open');
+					 }
+					 else{
+					 	 $("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Password Changed");
+						 $("#dialogBox").dialog('option', 'title', 'Success');
+						 $("#dialogBox").dialog('open');
+					};
+				});
+			});
 	 });
 	 $("li#add").click(function (){
 		 var username = $("#nuUser").val();

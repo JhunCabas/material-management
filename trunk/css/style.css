@@ -94,7 +94,7 @@ ul#icons {
 	#newItem table{
 	 	padding-left: 25px;
 	}
-
+	
 .form-frame{
  	border: 1px solid #999;
  	padding: 10px;
@@ -193,6 +193,7 @@ tr.linkable{
 
 .view-frame{
 	border: 1px solid #999;
+	margin-top: 10px;
 	padding: 10px;
 }
 

@@ -19,9 +19,9 @@ $tmpl->place('menu');
 				$mattrans = new Material_transfer($_GET['id']);
 				$mattrans_details = Material_transfer_detail::findDetail($_GET['id']);
 	?>
-	<h2>Material Transfer Note</h2>
+	<h2>Material Transfer</h2>
 	<div class="form-frame span-23 last">
-		<h3>Material Request Form</h3><br />
+		<h3>Material Transfer Form</h3><br />
 		<label for="doc_num">Document Number </label>
 			<?php echo $mattrans->prepareDocNumber(); ?><input id="doc_num" type="hidden" value="<?php echo $mattrans->prepareDocNumber(); ?>"></input><br />
 		<label for="doc_date">Document Date </label>
