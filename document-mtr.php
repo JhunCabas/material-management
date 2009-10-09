@@ -12,9 +12,9 @@ $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
-	<h2>Material Transfer Note</h2>
+	<h2>Material Transfer</h2>
 	<div class="form-frame span-23 last">
-		<h3>Material Request Form</h3><br />
+		<h3>Material Transfer Form</h3><br />
 		<input type="hidden" name="run_num" value="" id="run_num"/>
 		<label for="doc_num">Document Number </label><input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label><input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
