@@ -156,7 +156,6 @@ $(function (){
 
 function addingRow()
 {
-	
 	var itemCodeInner = $("<input size=\"7\" class=\"itemCode\"></input>")
 						.autocomplete("parser/autocomplete/Inv_item.php",{
 											width: 300,
@@ -179,21 +178,56 @@ function addingRow()
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 
-	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input class=\"itemUnitP\"/></td>";
-	var extendedInner = $("<input></input>").addClass("itemExtP")
-						.bind("blur",function (){
-							var total = 0;
-							$(".itemExtP").each(function (){
-								total = total + parseFloat($(this).val());
-							});
-							total = total - $("#discountRate").val();
-							$("#purchaseTotal").text(formatAsMoney(total));
+	var descCell = "<td id=\"descAuto\"></td>";
+	var uomCell = $("<td></td>").attr("id","uomAuto");
+	var quantityCell = $("<td></td>").attr("id","itemQuan").html(
+							$("<input></input>").addClass("itemQuan").attr("size",5).val(0)
+								.bind("blur", function (){
+									var unitValue = $(this).parent().parent().find(".itemUnitP").val();
+									$(this).parent().parent().find(".itemExtP").val(formatAsMoney(parseFloat(unitValue)*$(this).val()));
+									calculateTotal();
+								})
+						);
+	
+	var priceCell = $("<td></td>").html(
+							$("<input></input>").addClass("itemUnitP").val("0.00")
+								.bind("blur", function (){
+									var quanValue = $(this).parent().parent().find(".itemQuan").val();
+									$(this).parent().parent().find(".itemExtP").val(formatAsMoney(parseInt(quanValue)*$(this).val()));
+									calculateTotal();
+								})
+						);
+	var extendedCell = $("<td></td>").html(
+							$("<input></input>").addClass("itemExtP").attr("readonly",true)
+						);
+	var counterCell = $("<td></td>").text(++counter)
+						.bind("dblclick", function (){
+							if(confirm("Confirm delete row?"))
+							{
+								counter--;
+								$(this).parent().removeClass("jsonRow").text("");
+							}
 						});
-	var extendedCell = $("<td></td>").html(extendedInner);
-	var counterCell = $("<td></td>").text(++counter);
 	var itemCode = $("<td></td>").html(itemCodeInner);
-	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").addClass("emptyRow").append(counterCell).append(itemCode).append(addRow).append(extendedCell);
+	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").addClass("emptyRow")
+					.append(counterCell)
+					.append(itemCode)
+					.append(descCell)
+					.append(quantityCell)
+					.append(uomCell)
+					.append(priceCell)
+					.append(extendedCell);
 	$("#formContent tbody").append(wholeRow);
+}
+
+function calculateTotal()
+{
+	var total = 0;
+	$(".itemExtP").each(function (){
+		total = total + parseFloat($(this).val());
+	});
+	total = total - $("#discountRate").val();
+	$("#purchaseTotal").text(formatAsMoney(total));
 }
 
 function jsonForm()
