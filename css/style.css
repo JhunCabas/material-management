@@ -169,6 +169,13 @@ tr.linkable{
  	cursor:pointer;
 }
 
+td.caption{
+	text-align: center;
+	font-size: 110%;
+	margin-top: 2px;
+	padding: 3px;
+}
+
 .highlight{
  	background-color: #FFEF8F;
 }
