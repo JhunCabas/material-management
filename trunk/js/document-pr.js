@@ -205,7 +205,7 @@ function addingRow()
 							if(confirm("Confirm delete row?"))
 							{
 								counter--;
-								$(this).parent().removeClass("jsonRow").text("");
+								$(this).parent().remove();
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
