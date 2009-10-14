@@ -21,6 +21,11 @@
 			} catch (fExpectedException $e) {
 				echo $e->printMessage();
 			}
+		}else if($_POST['type'] == "option")
+		{
+			echo "<select>";
+			Status::printOption('1');
+			echo "</select>";
 		}
 	}
 ?>

@@ -204,6 +204,10 @@ td.caption{
 	padding: 10px;
 }
 
+.supplierRow{
+	cursor: pointer;
+}
+
 .exporter{
 	text-align: right;
 }

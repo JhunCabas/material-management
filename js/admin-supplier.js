@@ -4,6 +4,11 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
+	$(".supplierRow").click(function (){
+		var currentId = $(this).find("#sId").text();
+		window.location = "admin-supplier-view.php?"+"id="+currentId; 
+	});
+	/*
 	$(".supplierRow").mouseenter(function () {
 			$(this).addClass("highlight");
 		}).mouseleave(function (){
@@ -54,6 +59,7 @@ $(function (){
 			 }
 		 });
 	 });
+	*/
 	$("li#add").click(function (){
 		 var name = $("#supName").val();
 		 var address = $("#supAddress").val();
