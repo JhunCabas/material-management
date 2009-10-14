@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.1.3.1
+-- version 3.2.0.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Sep 27, 2009 at 12:02 PM
--- Server version: 5.1.33
--- PHP Version: 5.2.9
+-- Generation Time: Oct 14, 2009 at 04:01 AM
+-- Server version: 5.1.37
+-- PHP Version: 5.3.0
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `currencies` (
   `month` date NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
 
 -- --------------------------------------------------------
 
@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
   `remark` varchar(500) DEFAULT NULL,
   `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=9 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
 
 -- --------------------------------------------------------
 
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `inv_items` (
   `sub_category_code` varchar(20) NOT NULL,
   `classification_code` varchar(20) NOT NULL,
   `item_code` varchar(20) NOT NULL,
-  `description` varchar(50) DEFAULT NULL,
+  `description` varchar(1000) DEFAULT NULL,
   `weight` int(9) DEFAULT NULL,
   `dimension` int(9) DEFAULT NULL,
   `part_number` varchar(30) DEFAULT NULL,
@@ -164,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4113 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8221 ;
 
 -- --------------------------------------------------------
 
@@ -213,7 +213,7 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
@@ -249,7 +249,7 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
   `remark` varchar(500) DEFAULT NULL,
   `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
@@ -270,10 +270,10 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `supplier_1` varchar(20) NOT NULL,
   `supplier_2` varchar(20) DEFAULT NULL,
   `supplier_3` varchar(20) DEFAULT NULL,
-  `supplier_1_contact` varchar(50) NOT NULL,
+  `supplier_1_contact` varchar(50) DEFAULT NULL,
   `supplier_2_contact` varchar(50) DEFAULT NULL,
   `supplier_3_contact` varchar(50) DEFAULT NULL,
-  `supplier_1_tel` varchar(30) NOT NULL,
+  `supplier_1_tel` varchar(30) DEFAULT NULL,
   `supplier_2_tel` varchar(30) DEFAULT NULL,
   `supplier_3_tel` varchar(30) DEFAULT NULL,
   `requester` varchar(20) NOT NULL,
@@ -300,7 +300,7 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `unit_price` float NOT NULL DEFAULT '0',
   `extended_price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=21 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
 
 -- --------------------------------------------------------
 
@@ -312,12 +312,16 @@ CREATE TABLE IF NOT EXISTS `suppliers` (
   `id` int(15) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
   `address` text NOT NULL,
+  `line_1` text,
+  `line_2` text,
+  `line_3` text,
   `contact_person` varchar(100) NOT NULL,
   `contact` varchar(20) NOT NULL,
   `info` text,
-  `image_url` varchar(1000) DEFAULT NULL,
+  `fax_no` varchar(20) DEFAULT NULL,
+  `status` int(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=22 ;
 
 -- --------------------------------------------------------
 
