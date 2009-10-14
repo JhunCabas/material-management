@@ -32,7 +32,7 @@ $tmpl->place('menu');
 			<label for="currency_id">Currency </label>
 				<select type="text" name="currency_id" id="currency_id">
 				</select><br />
-		<p>
+		<!--
 		<table>
 			<tr><td><label>Supplier 1 </label><input type="text" id="sup1auto"></input><input type="hidden" id="sup1"></input></td>
 				<td><label>Contact Person </label><input type="text" id="con1"></input></td>
@@ -47,7 +47,30 @@ $tmpl->place('menu');
 				<td><label>Tel No </label><input type="text" id="tel3"></input></td>
 			</tr>
 		</table>
-		</p>
+		-->
+		<div class="supplierBox span-23 last">
+			<div id="box1" class="boxes span-7">
+				<b>Supplier 1</b><br />
+				<input type="text" id="sup1auto"></input><input type="hidden" id="sup1"></input>
+				<br />
+				<div class="boxBody">
+				</div>
+			</div>
+			<div id="box2" class="boxes span-7">
+				<b>Supplier 2</b><br />
+				<input type="text" id="sup2auto"></input><input type="hidden" id="sup2"></input>
+				<br />
+				<div class="boxBody">
+				</div>
+			</div>
+			<div id="box3" class="boxes span-7 last">
+				<b>Supplier 3</b><br />
+				<input type="text" id="sup3auto"></input><input type="hidden" id="sup3"></input>
+				<br />
+				<div class="boxBody">
+				</div>
+			</div>
+		</div>
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>

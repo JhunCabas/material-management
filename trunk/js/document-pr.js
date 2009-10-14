@@ -27,7 +27,11 @@ $(function (){
 						}
 					})
 					.result(function(e, item) {
-						$("#sup1").val(item.to)});
+						$("#sup1").val(item.to);
+						$.post("parser/Supplier.php",{type: "generate", key: item.to}, function (data){
+							$("#box1 .boxBody").hide().html(data).slideDown();
+						})
+					});
 	$("#sup2auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
@@ -43,7 +47,11 @@ $(function (){
 						}
 					})
 					.result(function(e, item) {
-						$("#sup2").val(item.to)});
+						$("#sup2").val(item.to);
+						$.post("parser/Supplier.php",{type: "generate", key: item.to}, function (data){
+							$("#box2 .boxBody").hide().html(data).slideDown();
+						})
+					});
 	$("#sup3auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
@@ -59,7 +67,11 @@ $(function (){
 						}
 					})
 					.result(function(e, item) {
-						$("#sup3").val(item.to)});
+						$("#sup3").val(item.to);
+						$.post("parser/Supplier.php",{type: "generate", key: item.to}, function (data){
+							$("#box3 .boxBody").hide().html(data).slideDown();
+						})
+					});
 	$("#discountRate").blur(function (){
 		var total = 0;
 		$(".itemExtP").each(function (){

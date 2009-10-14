@@ -208,6 +208,21 @@ td.caption{
 	cursor: pointer;
 }
 
+.supplierBox{
+	margin-bottom: 10px;
+}
+
+	.supplierBox .boxes{
+		padding: 5px;
+		cursor: pointer;
+		height: 150px;
+	}
+	
+	.supplierBox .boxBody{
+		margin-left: 6px;
+		font-size: 90%;
+	}
+
 .exporter{
 	text-align: right;
 }
