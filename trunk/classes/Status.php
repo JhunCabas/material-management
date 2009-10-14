@@ -20,14 +20,15 @@
 			return $output;
 		}
 		
-		static function printOption()
+		static function printOption($default=null)
 		{
-			//$optionString = "";
 			for($i=0;$i<2;$i++)
 			{
-				echo '<option value="'.$i.'">'.self::convert($i).'</option>';
+				if($default!=null && $default==$i)
+					echo '<option value="'.$i.'" selected="'.$i.'">'.self::convert($i).'</option>';
+				else
+					echo '<option value="'.$i.'">'.self::convert($i).'</option>';
 			}
-			//echo $optionString;
 		}
 	}
 ?>
