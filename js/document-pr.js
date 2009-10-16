@@ -30,7 +30,7 @@ $(function (){
 						$("#sup1").val(item.to);
 						$.post("parser/Supplier.php",{type: "generate", key: item.to}, function (data){
 							$("#box1 .boxBody").hide().html(data).slideDown();
-						})
+						})	
 					});
 	$("#sup2auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
@@ -110,14 +110,9 @@ $(function (){
 		var total = $("#purchaseTotal").text();
 		var branch_id = $("#branch_id").val();
 		var supplier_1 = $("#sup1").val();
-		var supplier_1_contact = $("#con1").val();
-		var supplier_1_tel = $("#tel1").val();
 		var supplier_2 = $("#sup2").val();
-		var supplier_2_contact = $("#con2").val();
-		var supplier_2_tel = $("#tel2").val();
 		var supplier_3 = $("#sup3").val();
-		var supplier_3_contact = $("#con3").val();
-		var supplier_3_tel = $("#tel3").val();
+		var special = $("#special").val();
 		var requester = $("#requester").text();
 		var requester_date = $("#reqDate").val();
 		var payment = $("#payment").val();
@@ -135,18 +130,69 @@ $(function (){
 			branch_id: branch_id,
 			jsonForm: jsonForm(),
 			supplier_1: supplier_1,
-			supplier_1_contact: supplier_1_contact,
-			supplier_1_tel: supplier_1_tel,
 			supplier_2: supplier_2,
-			supplier_2_contact: supplier_2_contact,
-			supplier_2_tel: supplier_2_tel,
 			supplier_3: supplier_3,
-			supplier_3_contact: supplier_3_contact,
-			supplier_3_tel: supplier_3_tel,
 			requester: requester,
 			requester_date: requester_date,
 			payment: payment,
-			delivery: delivery
+			delivery: delivery,
+			special_instruction: special
+			}, function (data){
+		 		if(data != "")
+				 {
+				 	 $("#dialogBox").html(data);
+					 $("#dialogBox").dialog('option', 'title', 'Error');
+					 $("#dialogBox").dialog('open');
+				 }
+				 else{
+				 	$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Added");
+					 $("#dialogBox").dialog('option', 'title', 'Success');
+					 $("#dialogBox").dialog('open');
+					 $("#dialogBox").bind('dialogclose', function(event, ui) {
+						window.location = tellDir() + "list-pr.php";
+					 });
+				 }
+			});
+	});
+	$("#submitPOBTN").click(function (){
+		var running_number = $("#run_num").val();
+		var doc_number = $("#doc_num").val();
+		var doc_date = $("#doc_date").val();
+		var doc_type = $("#doc_type").val();
+		var discount = $("#discountRate").val();
+		var currency = $("#currency_id").val();
+		var total = $("#purchaseTotal").text();
+		var branch_id = $("#branch_id").val();
+		var supplier_1 = $("#sup1").val();
+		var supplier_2 = $("#sup2").val();
+		var supplier_3 = $("#sup3").val();
+		var special = $("#special").val();
+		var requester = $("#requester").text();
+		var requester_date = $("#reqDate").val();
+		var payment = $("#payment").val();
+		var delivery = $("#delivery").val();
+		if(confirm("Continue?"))
+		$.post("parser/Purchase.php",{
+			type: "approve",
+			doc_number: doc_number,
+			doc_date: doc_date,
+			doc_type: doc_type,
+			currency: currency,
+			discount: discount,
+			running_number: running_number,
+			total: total,
+			branch_id: branch_id,
+			jsonForm: jsonForm(),
+			supplier_1: supplier_1,
+			supplier_2: supplier_2,
+			supplier_3: supplier_3,
+			requester: requester,
+			requester_date: requester_date,
+			approver_1: requester,
+			approver_1_date: requester_date,
+			payment: payment,
+			delivery: delivery,
+			special_instruction: special
 			}, function (data){
 		 		if(data != "")
 				 {
@@ -186,11 +232,13 @@ function addingRow()
 										})
 										.result(function(e, item) {
 											$(this).parent().parent().removeClass("emptyRow");
-											$(this).parent().parent().find("#descAuto").text(item.desc);
+											$(this).parent().parent().find("#descAuto input").val(item.desc);
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 
-	var descCell = "<td id=\"descAuto\"></td>";
+	var descCell = $("<td></td>").attr("id","descAuto").html(
+						$("<input></input>").addClass("itemDesc").attr("size",40)
+						);
 	var uomCell = $("<td></td>").attr("id","uomAuto");
 	var quantityCell = $("<td></td>").attr("id","itemQuan").html(
 							$("<input></input>").addClass("itemQuan").attr("size",5).val(0)
@@ -249,6 +297,7 @@ function jsonForm()
 					if(!$(this).hasClass("emptyRow"))
 					jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
 								+$(this).find(".itemCode").val()+"\","
+								+"\"itemDesc\":\""+$(this).find(".itemDesc").val()+"\","
 								+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
 								+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
 								+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";

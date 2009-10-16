@@ -79,5 +79,16 @@
 				echo $e->printMessage();
 			}
 		}
+	}else if(isSet($_GET['type']))
+	{
+		if($_GET['type'] == "uom")
+		{
+			try{
+				$inv_item = new Inv_item($_GET['key']);
+				echo $inv_item->prepareUnitOfMeasure();
+			}catch (fExpectedException $e) {
+				echo $e->printMessage();
+			}
+		}
 	}
 ?>

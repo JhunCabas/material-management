@@ -16,6 +16,10 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Good Receipt Note</h2>
 	<h3>Add Good Receipt Note : <a href="document-grn.php">Form</a></h3>
+	<?php 
+		if(fAuthorization::checkAuthLevel('admin'))
+		{
+	?>
 	<h3>List</h3>
 	<table>
 		<thead>
@@ -39,5 +43,6 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
+	<?php }?>
 </div>
 <?php $tmpl->place('footer'); ?>

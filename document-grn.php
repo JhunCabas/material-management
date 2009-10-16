@@ -13,6 +13,19 @@ $tmpl->place('menu');
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Goods Receipt Note</h2>
+	<?php 
+		if(!isSet($_GET['id']))
+		{
+	?>
+		<form action="document-grn.php" method="get" accept-charset="utf-8">
+			<label for="id">Purchase Order No: </label><input type="text" name="id" id="poInput" />
+			<p><input type="submit" value="Continue &rarr;"></p>
+		</form>
+	<?php
+		}else{
+			try{
+				$purchase = new Purchase($_GET['id']);
+	?>
 	<div class="form-frame span-23 last">
 		<h3>Goods Receipt Note</h3><br />
 		<input type="hidden" name="run_num" value="" id="run_num"/>
@@ -21,18 +34,29 @@ $tmpl->place('menu');
 		<label for="doc_type">Document Type </label>GRN <input id="doc_type" type="hidden" value="GRN"></input><br />
 		<label for="branch_id">Branch </label>
 					<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
-		<p>
-		<table>
-			<tr><td><label>Supplier </label></td>
-				<td><label>DO No </label></td>
-				<td><label>PO No </label></td>
-			</tr>
-			<tr><td><input type="text" id="supplierAuto"></input><input type="hidden" id="supplier"/></td>
-				<td><input type="text" id="doNo"></input></td>
-				<td><input type="text" id="poNo"></input></td>
-			</tr>
-		</table>
-		</p>
+		<div class="supplierBox span-23 last">
+			<div id="box1" class="boxes span-7">
+				<b>Supplier</b><br />
+					<?php $supplier = new Supplier($purchase->getSupplier1()); echo $supplier->prepareName(); ?>
+					<input type="hidden" id="supplierID" value="<?php echo $purchase->prepareSupplier1(); ?>"></input>
+				<br />
+				<div class="boxBody">
+					<?php Supplier::generateInfo($purchase->getSupplier1()); ?>
+				</div>
+			</div>
+			<div class="span-14 last">
+			<table>
+				<tr>
+					<td><label>PO No </label></td>
+					<td><label>DO No </label></td>
+				</tr>
+				<tr>
+					<td><input type="text" id="poNo" value="<?php echo $_GET['id']; ?>" readonly="true"></input></td>
+					<td><input type="text" id="doNo"></input></td>
+				</tr>
+			</table>
+			</div>
+		</div>
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
@@ -41,7 +65,7 @@ $tmpl->place('menu');
 			<tbody>
 			</tbody>
 			<tfoot>
-				<tr><td colspan="7" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
+				<!--<tr><td colspan="7" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>-->
 				<tr><td colspan="7">
 					<p>
 						<label>Assesment Of Condition (A)</label><br />
@@ -57,15 +81,20 @@ $tmpl->place('menu');
 		<table id="approveContent">
 			<tbody>
 				<tr>
-					<td><label>Inspected By </label></td><td id="inspector"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="insDate" class="datepicker"></input></td>
-				</tr>
-				<tr>
-					<td><label>Received By </label></td><td id="receiver"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="recDate" class="datepicker"></input></td>
+					<td><label>Inspected & Received By </label></td><td id="inspector">
+						<?php echo fAuthorization::getUserToken();?><input type="hidden" id="inspectorID" value="<?php echo fAuthorization::getUserToken();?>">
+					</td><td><label>Date </label><input type="text" id="insDate" class="datepicker"></input></td>
 				</tr>
 			</tbody>
 		</table>
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
-		<?php $me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>"?>
+		<?php 
+				$me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
+				}catch	(fExpectedException $e) {
+					echo $e->printMessage();
+				}
+			}
+		?>
 	</div>
 </div>
 <?php $tmpl->place('footer'); ?>

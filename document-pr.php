@@ -32,22 +32,6 @@ $tmpl->place('menu');
 			<label for="currency_id">Currency </label>
 				<select type="text" name="currency_id" id="currency_id">
 				</select><br />
-		<!--
-		<table>
-			<tr><td><label>Supplier 1 </label><input type="text" id="sup1auto"></input><input type="hidden" id="sup1"></input></td>
-				<td><label>Contact Person </label><input type="text" id="con1"></input></td>
-				<td><label>Tel No </label><input type="text" id="tel1"></input></td>
-			</tr>
-			<tr><td><label>Supplier 2 </label><input type="text" id="sup2auto"><input type="hidden" id="sup2"></input></input></td>
-				<td><label>Contact Person </label><input type="text" id="con2"></input></td>
-				<td><label>Tel No </label><input type="text" id="tel2"></input></td>
-			</tr>
-			<tr><td><label>Supplier 3 </label><input type="text" id="sup3auto"><input type="hidden" id="sup3"></input></input></td>
-				<td><label>Contact Person </label><input type="text" id="con3"></input></td>
-				<td><label>Tel No </label><input type="text" id="tel3"></input></td>
-			</tr>
-		</table>
-		-->
 		<div class="supplierBox span-23 last">
 			<div id="box1" class="boxes span-7">
 				<b>Supplier 1</b><br />
@@ -85,6 +69,7 @@ $tmpl->place('menu');
 		</table>
 		<div class="pdbox span-11"><label>Payment Terms</label><br /><textarea id="payment" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
 		<div class="pdbox span-11"><label>Delivery Terms</label><br /><textarea id="delivery" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
+		<div class="pdbox span-11"><label>Special Instructions</label><br /><textarea id="special" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>
@@ -95,6 +80,7 @@ $tmpl->place('menu');
 				</tr>
 			</tbody>
 		</table>
+		<input type="button" id="submitPOBTN" value="Submit to PO" style="float: left;">
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 	</div>
 </div>
