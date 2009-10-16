@@ -16,10 +16,14 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Production Issue</h2>
 	<h3>Add Production Issue : <a href="document-pi.php">Form</a></h3>
+	<?php 
+		if(fAuthorization::checkAuthLevel('admin'))
+		{
+	?>
 	<h3>List</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>Issuer</th><th>Receiver</th></tr>
+			<tr><th>Document Number</th><th>Document Date</th><th>Issuer and Receiver</th></tr>
 		</thead>
 		<tbody>
 			<?php
@@ -29,8 +33,7 @@ $tmpl->place('menu');
 					{
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
-						echo "<td>".$productionEntry->prepareIssuer()."</td>";
-						echo "<td>".$productionEntry->prepareReceiver()."</td></tr>";
+						echo "<td>".$productionEntry->prepareIssuer()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
@@ -38,5 +41,6 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
+	<?php }?>
 </div>
 <?php $tmpl->place('footer'); ?>

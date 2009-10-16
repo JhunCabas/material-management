@@ -15,7 +15,11 @@
 		return fRecordSet::build('Good_receipt_note_detail',
 			array('doc_number=' => $key));
 	}
-
+	
+	protected function configure()
+	{
+		fORMJSON::extend();
+	}
  }
 
 ?>

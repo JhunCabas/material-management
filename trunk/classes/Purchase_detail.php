@@ -16,6 +16,11 @@
 		return fRecordSet::build('Purchase_detail',
 			array('doc_number=' => $key));
 	}
+	
+	protected function configure()
+	{
+		fORMJSON::extend();
+	}
  }
 
 ?>

@@ -33,43 +33,35 @@ $tmpl->place('menu');
 			<?php echo $purchase->prepareDocType(); ?><br />
 		<label for="branch_id">Branch </label>
 			<?php $branch = new Branch($purchase->getBranchId()); echo $branch->prepareName() . " / " . $purchase->prepareBranchId();?><br />
-		<p>
-		<table>
-			<tr><td>
-					<label>Supplier 1 </label>
-					<?php $supplier = new Supplier($purchase->getSupplier1()); echo $supplier->prepareName(); ?>
-				</td>
-				<td><label>Contact Person </label><?php echo $purchase->prepareSupplier1Contact(); ?></td>
-				<td><label>Tel No </label><?php echo $purchase->prepareSupplier1Tel(); ?></td>
-			</tr>
-			<tr><td>
-					<label>Supplier 2 </label>
-					<?php 
-						if($purchase->getSupplier2() != null)
-						{
-							$supplier = new Supplier($purchase->getSupplier2()); 
-							echo $supplier->prepareName();
-						} 
-					?>
-				</td>
-				<td><label>Contact Person </label><?php echo $purchase->prepareSupplier2Contact(); ?></td>
-				<td><label>Tel No </label><?php echo $purchase->prepareSupplier2Tel(); ?></td>
-			</tr>
-			<tr><td>
-					<label>Supplier 3 </label>
-					<?php 
-						if($purchase->getSupplier3() != null)
-						{
-							$supplier = new Supplier($purchase->getSupplier3()); 
-							echo $supplier->prepareName(); 
-						}
-					?>
-				</td>
-				<td><label>Contact Person </label><?php echo $purchase->prepareSupplier3Contact(); ?></td>
-				<td><label>Tel No </label><?php echo $purchase->prepareSupplier3Tel(); ?></td>
-			</tr>
-		</table>
-		</p>
+		<label for="currency_id">Currency </label>
+			<?php $currency = new Currency($purchase->getCurrency()); echo $currency->prepareCountry()." [".$currency->prepareExchange(2)."]"; ?>
+			<div class="supplierBox span-23 last">
+				<div id="box1" class="boxes span-7">
+					<b>Supplier 1</b><br />
+						<?php $supplier = new Supplier($purchase->getSupplier1()); echo $supplier->prepareName(); ?>
+					<br />
+					<div class="boxBody">
+						<?php Supplier::generateInfo($purchase->getSupplier1()); ?>
+					</div>
+				</div>
+				<?php if($purchase->getSupplier2()!=null) {?>
+				<div id="box2" class="boxes span-7">
+					<b>Supplier 2</b><br />
+					<br />
+					<div class="boxBody">
+						<?php Supplier::generateInfo($purchase->getSupplier3()); ?>
+					</div>
+				</div>
+				<?php } if($purchase->getSupplier3()!=null) {?>
+				<div id="box3" class="boxes span-7 last">
+					<b>Supplier 3</b><br />
+					<br />
+					<div class="boxBody">
+						<?php Supplier::generateInfo($purchase->getSupplier3()); ?>
+					</div>
+				</div>
+				<?php } ?>
+			</div>
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
@@ -96,6 +88,7 @@ $tmpl->place('menu');
 		</table>
 		<div class="pdbox span-11"><label>Payment Terms</label><br /><?php echo $purchase->preparePayment(); ?></div>
 		<div class="pdbox span-11"><label>Delivery Terms</label><br /><?php echo $purchase->prepareDelivery(); ?></div>
+		<div class="pdbox span-11"><label>Special Instructions</label><br /><?php echo $purchase->prepareSpecialInstruction(); ?></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>

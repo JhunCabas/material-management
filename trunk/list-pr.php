@@ -5,8 +5,11 @@ $tmpl->place('header');
 ?>
 <script type="text/javascript" charset="utf-8">
 	$(function (){
-		$("tr.linkable").click(function (){
+		$("tr.linkable#PR").click(function (){
 			window.location = "document-pr-view.php?"+"id="+$(this).children(".docNumber").text();
+		});
+		$("tr.linkable#PO").click(function (){
+			window.location = "document-po-view.php?"+"id="+$(this).children(".docNumber").text();
 		});
 	});
 </script>
@@ -32,7 +35,31 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPR();
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable\" id=\"PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
+						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
+					}
+				}catch (fExpectedException $e) {
+					echo $e->printMessage();
+				}
+				
+			?>
+		</tbody>
+	</table>
+	<h3>Approved List</h3>
+	<table>
+		<thead>
+			<tr><th>Purchase Request No</th><th>Purchase Order No</th><th>Document Date</th><th>Requester</th><th>Status</th></tr>
+		</thead>
+		<tbody>
+			<?php
+				try{
+					$purchaseEntries = Purchase::findAllPO();
+					foreach($purchaseEntries as $purchaseEntry)
+					{
+						$newDocNumber = substr_replace($purchaseEntry->getDocNumber(), 'PR', 0, 2);
+						echo "<tr class=\"linkable\" id=\"PO\"><td>$newDocNumber</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
 						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";

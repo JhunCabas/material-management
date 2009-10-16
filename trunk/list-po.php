@@ -15,6 +15,10 @@ $tmpl->place('menu');
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Purchase Order</h2>
+	<?php 
+		if(fAuthorization::checkAuthLevel('admin'))
+		{
+	?>
 	<h3>List</h3>
 	<table>
 		<thead>
@@ -37,5 +41,6 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
+	<?php }?>
 </div>
 <?php $tmpl->place('footer'); ?>

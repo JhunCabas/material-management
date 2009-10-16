@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 14, 2009 at 04:01 AM
+-- Generation Time: Oct 16, 2009 at 05:38 PM
 -- Server version: 5.1.37
 -- PHP Version: 5.3.0
 
@@ -92,11 +92,12 @@ CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
   `id` int(15) NOT NULL AUTO_INCREMENT,
   `doc_number` varchar(50) NOT NULL,
   `item_id` varchar(20) NOT NULL,
+  `description` text NOT NULL,
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) DEFAULT NULL,
   `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=31 ;
 
 -- --------------------------------------------------------
 
@@ -164,7 +165,7 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8221 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8224 ;
 
 -- --------------------------------------------------------
 
@@ -249,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
   `remark` varchar(500) DEFAULT NULL,
   `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 -- --------------------------------------------------------
 
@@ -282,7 +283,8 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `approver_1_date` date DEFAULT NULL,
   `payment` text,
   `delivery` text,
-  `status` enum('approved','rejected','unapproved','completed') NOT NULL DEFAULT 'unapproved',
+  `special_instruction` text,
+  `status` enum('approved','rejected','unapproved','completed','grn') NOT NULL DEFAULT 'unapproved',
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -296,11 +298,12 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `id` int(15) NOT NULL AUTO_INCREMENT,
   `doc_number` varchar(50) NOT NULL,
   `item_id` varchar(20) NOT NULL,
+  `description` text NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
   `unit_price` float NOT NULL DEFAULT '0',
   `extended_price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=24 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=29 ;
 
 -- --------------------------------------------------------
 

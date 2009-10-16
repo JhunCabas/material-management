@@ -10,7 +10,7 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
-	$("#poNo").autocomplete("parser/autocomplete/Purchase.php",{
+	$("#poInput").autocomplete("parser/autocomplete/Purchase.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
 								return {
@@ -47,10 +47,20 @@ $(function (){
 	$("#doc_type").change(function (){ getRunningNumber(); });
 	$("#doc_num").attr("readonly","true");
 	getRunningNumber();
-		addingRow();
+	//Get form body from JSON
+	$.ajax({type:"post",url:"parser/Purchase.php",data:{type:"json",key:$("#poNo").val()},dataType:"json", success: function(data){
+		$.each(data, function(i,item){
+			$.get("parser/Inv_item.php",{type:"uom",key:item.item_id},function (data){
+				fillingRow(item.item_id,item.description,item.quantity,data);
+			});
+		});
+	}})
+	/*
+	addingRow();
 	$("#addRowBTN").click(function (){
 		addingRow();
 	});
+	*/
 	$(".signHere").click(function (){
 		if($(this).parent().next().children("input").val() == "")
 			alert("Input Date first");
@@ -58,29 +68,24 @@ $(function (){
 			$(this).parent().html($("#whoami").val());
 	});
 	$("#submitBTN").click(function (){
-		if(inspector!="" && receiver!="")
-		{
-			$(".assess").each(function (){
-				if($(this).val()!= "OK")
+		$(".assess").each(function (){
+			if($(this).val()!= "OK")
+			{
+				if(confirm("System will create a new GRN as there are items that do not meet the PO requirement."))
 				{
-					if(confirm("System will create a new GRN as there are items that do not meet the PO requirement."))
-					{
-						cloneNew = "yes";
-					}
+					cloneNew = "yes";
 				}
-			});
-		}
+			}
+		});
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
 		var branch_id = $("#branch_id").val();
-		var supplier = $("#supplier").val();
+		var supplier = $("#supplierID").val();
 		var do_no = $("#doNo").val();
 		var po_no = $("#poNo").val();
-		var inspector = $("#inspector").text();
-		var inspector_date = $("#insDate").val();
-		var receiver = $("#receiver").text();
-		var receiver_date = $("#recDate").val();
+		var inspector = $("#inspectorID").val();
+		var inspector_date = $("#insDate").val()
 		if(confirm("Continue?"))
 		$.post("parser/Good_receipt_note.php",{
 			type: "add",
@@ -94,9 +99,7 @@ $(function (){
 			do_no: do_no,
 			po_no: po_no,
 			inspector: inspector,
-			inspector_date: inspector_date,
-			receiver: receiver,
-			receiver_date: receiver_date
+			inspector_date: inspector_date
 			},function (data){
 				if(data != "")
 				 {
@@ -116,35 +119,28 @@ $(function (){
 	});
 });
 
-function addingRow()
+function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM)
 {
-	var itemCodeInner = $("<input size=\"7\" class=\"itemCode\"></input>")
-						.autocomplete("parser/autocomplete/Inv_item.php",{
-											width: 300,
-											parse: function(data) {
-												return $.map(eval(data), function(row) {
-													return {
-														data: row,
-														value: row.name,
-														result: row.name
-													}
-												});
-											},
-											formatItem: function(item) {
-												return formatInvItem(item);
-											}
-										})
-										.result(function(e, item) {
-											$(this).parent().parent().find("#descAuto").text(item.desc);
-											$(this).parent().parent().find("#uomAuto").text(item.uom);
-										});
-	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input size=\"20\" class=\"remarks\"/></td>";
+	var itemCodeInner = $("<input></input>").attr("readonly","true").attr("size",7).addClass("itemCode").val(itemCode);
+	var addRow = "<td id=\"descAuto\">"+itemDesc+"</td><td><input class=\"itemQuan\" size=\"5\" value=\""+itemQuantity+"\"/></td><td id=\"uomAuto\">"+itemUOM+"</td><td><input size=\"20\" class=\"remarks\"/></td>";
+	var descCell = $("<td></td>").html($("<input></input>").addClass("itemDesc").attr("size",40).val(itemDesc));
+	var quanCell = $("<td></td>").html($("<input></input>").addClass("itemQuan").attr("size",5).val(itemQuantity));
+	var uomCell = $("<td></td>").attr("id","uomAuto").text(itemUOM);
+	var remarkCell = $("<td></td>").html($("<input></input>").addClass("remarks").attr("size",20));
 	var counterCell = $("<td></td>").text(++counter);
 	var itemCode = $("<td></td>").html(itemCodeInner);
 	var assess = $("<td></td>").html(
 					$("<select class=\"assess\"></select>")
 						.html("<option value=\"OK\">OK</option><option value=\"NG\">NG</option><option value=\"Q\">Q</option><option value=\"X\">X</option>"));
-	var wholeRow = $("<tr class=\"jsonRow\"id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow).append(assess);
+	var wholeRow = $("<tr class=\"jsonRow\"id=\"rowNo"+ counter +"\"></tr>")
+					.append(counterCell)
+					.append(itemCode)
+					//.append(addRow)
+					.append(descCell)
+					.append(quanCell)
+					.append(uomCell)
+					.append(remarkCell)
+					.append(assess);
 	$("#formContent tbody").append(wholeRow);
 }
 
@@ -160,9 +156,10 @@ function jsonForm()
 {
 	var jsonString = "{";
 		$(".jsonRow").each(function (){
-		jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
-					+$(this).find(".itemCode").val()+"\","
+		jsonString = jsonString + "\""+$(this).attr("id")+"\":{"
+					+"\"itemCode\":\""+$(this).find(".itemCode").val()+"\","
 					+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
+					+"\"itemDesc\":\""+$(this).find(".itemDesc").val()+"\","
 					+"\"assess\":\""+$(this).find(".assess").val()+"\","
 					+"\"remarks\":\""+$(this).find(".remarks").val()+"\"},";
 					});

@@ -16,6 +16,10 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Material Transfer</h2>
 	<h3>Add Material Transfer Form : <a href="document-mtr.php">Form</a></h3>
+	<?php 
+		if(fAuthorization::checkAuthLevel('admin'))
+		{
+	?>
 	<h3>List</h3>
 	<table>
 		<thead>
@@ -40,5 +44,6 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
+	<?php }?>
 </div>
 <?php $tmpl->place('footer'); ?>

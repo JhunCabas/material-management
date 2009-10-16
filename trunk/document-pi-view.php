@@ -55,7 +55,7 @@ $tmpl->place('menu');
 		<table id="approveContent">
 			<tbody>
 				<tr>
-					<td><label>Issued by </label></td>
+					<td><label>Issued and Received by </label></td>
 						<?php 
 							if($production->getIssuer()!=null)
 								echo "<td>".$production->prepareIssuer()."</td>";
@@ -67,20 +67,8 @@ $tmpl->place('menu');
 								echo $production->prepareIssuer_date("j F Y");
 							else
 								echo "<input type=\"text\" id=\"issDate\" class=\"datepicker\"></input>";
-						?></td>
-					<td><label>Received by </label></td>
-						<?php
-							if($production->getReceiver()!=null)
-								echo "<td>".$production->prepareReceiver()."</td>";
-							else
-								echo "<td id=\"receiver\"><input type=\"button\" value=\"Sign Here\" class=\"signHere\" /></td>";
-						?></td><td><label>Date </label>
-						<?php
-							if($production->getReceiverDate()!=null)
-								echo $production->prepareReceiverDate("j F Y");
-							else
-								echo "<input type=\"text\" id=\"recDate\" class=\"datepicker\"></input>";
-						?></td>
+						?>
+					</td>
 				</tr>
 		</table>
 		<?php 
