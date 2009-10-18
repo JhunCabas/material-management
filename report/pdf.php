@@ -33,6 +33,7 @@ $pdf->Text(167,63,'UNIT PRICE');
 $pdf->Text(187,63,'EXTENDED');
 $pdf->Text(187,66,'PRICE');
 $pdf->Text(167,165,'TOTAL');
+$pdf->Text(100,155,'DISCOUNT');
 
 
 $starting = 73;
@@ -43,11 +44,11 @@ $starting = 73;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery,
+            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`description`, D.`unit_of_measure`,
-            A.supplier_1, A.supplier_1_contact as supplierContact, E.contact as supplierNum, E.name as supplierName, E.address as supplierAddress
-            FROM umw_mms.purchases A, umw_mms.purchase_details B, umw_mms.branches C, umw_mms.inv_items D, umw_mms.suppliers E
+            A.supplier_1, A.supplier_1_contact as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
+            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
             WHERE A.doc_number='$POnum'
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id
@@ -66,6 +67,9 @@ $starting = 73;
             			$unitmeasure = $row['unit_of_measure'];
             			$unitprice = $row['unit_price'];
             		  $extendedprice = $row['extended_price'];
+            		  
+            			$total = $row['total'];
+            			$discount = $row['discount'];
             			
       $pdf->Text(12,$starting,$count);
       $pdf->Text(22,$starting,$item_id);
@@ -77,8 +81,6 @@ $starting = 73;
       
     $starting = $starting + 5;
             			
-            		 $total += $extendedprice;
-            			
             		$doc_date = $row['doc_date'];
             			
             			$branchName =$row['branchName'];
@@ -88,15 +90,21 @@ $starting = 73;
                   
                   $supplierName =$row['supplierName'];
                   $supplierContact =$row['supplierContact'];
-                  //$supplierAddress = $row['supplierAddress'];
+                  $supplierAddress = $row['supplierAddress'];
                   $supplierNum=$row['supplierNum'];
+                  $supplierFax=$row['fax_no'];
                   
-                  $supplierAddress = explode(",", $row['supplierAddress']);
+                  //$supplierAddress = explode(",", $row['supplierAddress']);
+                  
+            		  $supp_add1 = $row['add1'];
+            		  $supp_add2 = $row['add2'];
+            		  $supp_add3 = $row['add3'];
                   //Must add Branch Address
                   //$supplierAddress = explode(",", $row['supplierAddress']);
                   
                   $payment = $row['payment'];
                   $delivery = $row['delivery'];
+                  $special_instruction = $row['special_instruction'];
                   
                   			}
 
@@ -142,16 +150,16 @@ $date = $doc_date;
 
 
             $pdf->Text(22,56,"Tel: ".$supplierNum);
-            $pdf->Text(52,56,"Fax: ".$fax);
-            $pdf->Text(22,48,$supplierAddress[3]);
-            $pdf->Text(22,44,$supplierAddress[1].", ".$supplierAddress[2]);
-            $pdf->Text(22,40,$supplierAddress[0]);
+            $pdf->Text(52,56,"Fax: ".$supplierFax);
+            $pdf->Text(22,48,$supp_add3);
+            $pdf->Text(22,44,$supp_add2);
+            $pdf->Text(22,40,$supp_add1);
             $pdf->Text(22,36,$supplierName);
             $pdf->Text(22,32,$supplierContact);
             $pdf->Text(12,32,"To: ");
 
 $pdf->Text(125,56,"Tel: ".$branchNo);
-$pdf->Text(155,56,"Fax: ".$branchFax);
+//$pdf->Text(155,56,"Fax: ".$branchFax);
 $pdf->Text(125,44,$sad3);
 $pdf->Text(125,40,$sad2);
 $pdf->Text(125,36,$branchLocation);
@@ -162,16 +170,19 @@ $pdf->Text(130,20,"Date: ".$date);
 $pdf->Text(130,24,"Purchase Order No: ".$POnum);
 
 $pdf->Text(12,180,"SPECIAL INSTRUCTIONS AND TERMS");
+$pdf->Text(12,183,$special_instruction);
 $pdf->Text(160,180,"PAGE 1 OF 1");
-$pdf->Text(12,190,"Delivery Terms:");
-$pdf->Text(12,192,"-----------------------");
-$pdf->Text(12,196,$delivery);
-$pdf->Text(130,190,"Payment Terms:");
-$pdf->Text(130,192,"-----------------------");
-$pdf->Text(130,196,$payment);
+$pdf->Text(12,193,"Delivery Terms:");
+$pdf->Text(12,195,"-----------------------");
+$pdf->Text(12,199,$delivery);
+$pdf->Text(130,193,"Payment Terms:");
+$pdf->Text(130,195,"-----------------------");
+$pdf->Text(130,199,$payment);
 
 
 $pdf->Text(187,165,$total);
+
+$pdf->Text(187,155,"($discount)");
 
 $pdf->Output("".$POnum.".pdf", "I");
 ?>
