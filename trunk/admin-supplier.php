@@ -12,7 +12,7 @@ $tmpl->place('menu');
 	<h2>Administration</h2><h3>Supplier</h3>
 	<table>
 		<thead>
-			<tr><th>Name</th><th width="400">Address</th><th>Contact Person</th><th>Contact</th><th>Fax</th><th>Information</th><th>Icon</th></tr>
+			<tr><th>Name</th><th width="400">Location</th><th>Contact Person</th><th>Contact</th><th>Fax</th><th>Information</th><th>Icon</th></tr>
 		</thead>
 		<tbody>
 			<?php
@@ -39,7 +39,7 @@ $tmpl->place('menu');
 			?>
 			<tr id="newItem">
 				<td><input id="supName" value="Input Name"></input></td>
-				<td><input id="supAddress" value="Input Address"></input></td>
+				<td><input id="supAddress" value="Input Location"></input></td>
 				<td><input id="supPerson" value="Input Contact Person"></input></td>
 				<td><input id="supContact" value="Input Contact"></input></td>
 				<td><input id="supFax" value="Input Fax"></input></td>
