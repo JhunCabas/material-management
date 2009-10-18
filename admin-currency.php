@@ -1,5 +1,6 @@
 <?php
 include './resources/init.php';
+fAuthorization::requireAuthLevel('admin');
 $tmpl->place('header');
 ?>
 <script type="text/javascript" src="./js/admin-currency.js"></script>
