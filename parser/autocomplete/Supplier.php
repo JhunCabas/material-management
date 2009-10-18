@@ -2,7 +2,7 @@
 include '../../resources/init.php';
 $q = strtolower($_GET["q"]);
 if (!$q) return;
-$suppliers = Supplier::findAll();
+$suppliers = Supplier::findActive();
 $jsonString = "[";
 foreach($suppliers as $supplier)
 {

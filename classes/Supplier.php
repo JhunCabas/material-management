@@ -12,8 +12,16 @@
      */
     static function findAll()
     {
-        return fRecordSet::build('Supplier');    
+        return fRecordSet::build('Supplier',
+			array('status>='=>0),
+			array('name'=>'asc')
+		);    
     }
+	
+	static function findActive()
+	{
+		return fRecordSet::build('Supplier',array('status='=>1));
+	}
 
 	static function generateInfo($key)
 	{
