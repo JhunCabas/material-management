@@ -28,6 +28,9 @@ $tmpl->place('menu');
 			</thead>
 			<tbody>
 			</tbody>
+			<tfoot>
+				<tr><td colspan="7" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
+			</tfoot>
 		</table>
 		<table id="approveContent">
 			<tbody>
