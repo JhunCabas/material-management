@@ -21,7 +21,7 @@ $tmpl->place('menu');
 				$purchase = new Purchase($_GET['id']);
 				$purchase_details = Purchase_detail::findDetail($_GET['id']);
 	?>
-	<h2>Purchase Order</h2> <div align=left> <a href=report/savefile.php?POnum=<?=$_GET['id']?>><b>Download as Word</b></a></div>
+	<h2>Purchase Order</h2> 
   <div align=left> <a href=report/pdf.php?POnum=<?=$_GET['id']?>><b>Download PDF</b></a></div><br>
 	<div class="form-frame span-23 last">
 		<h3>Purchase Order</h3><br />
