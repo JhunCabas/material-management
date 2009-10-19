@@ -27,7 +27,7 @@ $tmpl->place('menu');
 				<option value="PR3">PR3 – Purchase Request (Service)</option>
 				<option value="PR4">PR4 – Purchase Request (3rd Party)</option>
 			</select><br />
-		<label for="branch_id">Branch </label>
+		<label for="branch_id">Ship To Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
 			<label for="currency_id">Currency </label>
 				<select type="text" name="currency_id" id="currency_id">
