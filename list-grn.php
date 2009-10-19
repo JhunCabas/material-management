@@ -28,7 +28,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$grnEntries = Good_receipt_note::findAll();
+					$grnEntries = Good_receipt_note::findAll(20);
 					foreach($grnEntries as $grnEntry)
 					{
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$grnEntry->prepareDocNumber()."</td>";

@@ -28,7 +28,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$mattrans = Material_transfer::findAll();
+					$mattrans = Material_transfer::findAll(20);
 					foreach($mattrans as $mattran)
 					{
 						$branch = new Branch($mattran->getBranchId());
