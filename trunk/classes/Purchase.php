@@ -14,24 +14,30 @@
     {
         return fRecordSet::build('Purchase');    
     }
-
-	static function findAllPO()
+	
+	static function findAllPO($limit=null)
 	{
 		return fRecordSet::build('Purchase',
-			array('doc_tag=' => 'po'));
+			array('doc_tag=' => 'po'),
+			array('doc_date' => 'desc'),
+			$limit);
+	}
+
+	static function findUncompletePO($limit=null)
+	{
+		return fRecordSet::build('Purchase',
+			array('doc_tag=' => 'po', 'status!' => 'completed'),
+			array('doc_date' => 'desc'),
+			$limit);
+
 	}
 	
-	static function findAllUncompletePO()
+	static function findAllPR($limit=null)
 	{
 		return fRecordSet::build('Purchase',
-			array('doc_tag=' => 'po', 'status!' => 'completed'));
-
-	}
-	
-	static function findAllPR()
-	{
-		return fRecordSet::build('Purchase',
-			array('doc_tag=' => 'pr'));
+			array('doc_tag=' => 'pr'),
+			array('doc_date' => 'desc'),
+			$limit);
 	}
 	
 	static function findByDocType($key)

@@ -32,7 +32,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$purchaseEntries = Purchase::findAllPR();
+					$purchaseEntries = Purchase::findAllPR(20);
 					foreach($purchaseEntries as $purchaseEntry)
 					{
 						echo "<tr class=\"linkable\" id=\"PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
@@ -55,7 +55,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$purchaseEntries = Purchase::findAllPO();
+					$purchaseEntries = Purchase::findAllPO(20);
 					foreach($purchaseEntries as $purchaseEntry)
 					{
 						$newDocNumber = substr_replace($purchaseEntry->getDocNumber(), 'PR', 0, 2);

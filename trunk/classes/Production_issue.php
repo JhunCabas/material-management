@@ -10,10 +10,12 @@
      * 
      * @return fRecordSet  An object containing all entries
      */
-    static function findAll()
-    {
-        return fRecordSet::build('Production_issue');    
-    }
+	static function findAll($limit=null)
+	{
+		return fRecordSet::build('Production_issue',null,
+			array('doc_date' => 'desc'),
+			$limit); 
+	}
  }
 
 ?>

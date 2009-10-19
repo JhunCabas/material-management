@@ -28,7 +28,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$productionEntries = Production_issue::findAll();
+					$productionEntries = Production_issue::findAll(20);
 					foreach($productionEntries as $productionEntry)
 					{
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
