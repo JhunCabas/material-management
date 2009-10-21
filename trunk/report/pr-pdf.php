@@ -46,7 +46,7 @@ $starting = 73;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,
+            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
