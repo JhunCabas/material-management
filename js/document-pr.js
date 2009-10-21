@@ -310,7 +310,7 @@ function getRunningNumber()
 {
 	$.post("parser/Purchase.php",{type:"countPR"},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 

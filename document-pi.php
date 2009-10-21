@@ -26,6 +26,7 @@ $tmpl->place('menu');
 			</select><br />
 		<label for="branch_id">Branch </label>
 				<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
+				<input type="hidden" id="hiddenBranch" value="<?php echo $user->prepareBranchId();?>" />
 		<table id="formContent">
 			<thead>
 				<tr><td>No</td>

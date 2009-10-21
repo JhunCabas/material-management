@@ -101,7 +101,7 @@ function getRunningNumber()
 {
 	$.post("parser/Production_issue.php",{type:"count"},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val($("#doc_type").val()+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val($("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 

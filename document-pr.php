@@ -29,6 +29,7 @@ $tmpl->place('menu');
 			</select><br />
 		<label for="branch_id">Ship To Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
+			<input type="hidden" id="hiddenBranch" value="<?php echo $user->prepareBranchId();?>" />
 			<label for="currency_id">Currency </label>
 				<select type="text" name="currency_id" id="currency_id">
 				</select><br />
