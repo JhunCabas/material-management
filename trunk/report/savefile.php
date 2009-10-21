@@ -72,9 +72,6 @@ while ( $row = mysql_fetch_array($getData))
 
 <body>
 <p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
 <table width="700" height="150" border="0">
   <tr>
     <td width="5%" rowspan="2">&nbsp;</td>
@@ -105,15 +102,15 @@ while ( $row = mysql_fetch_array($getData))
   </tr>
 </table>
 <br/>
-<table width="700" height="" border="1">
+<table width="700" height="" border="1" bordercolor="#000000">
   <tr>
-    <td width="5" height="59">No</td>
-    <td width="10%">ITEM CODE</td>
-    <td width="35%">DESCRIPTION</td>
-    <td width="10%">QTY</td>
-    <td width="10%">UOM</td>
-    <td width="15%">UNIT PRICE</td>
-    <td width="15%">EXTENDED PRICE</td>
+    <td width="23" height="59">No</td>
+    <td width="55">ITEM CODE</td>
+    <td width="273">DESCRIPTION</td>
+    <td width="55">QTY</td>
+    <td width="41">UOM</td>
+    <td width="71">UNIT PRICE</td>
+    <td width="146">EXTENDED PRICE</td>
   </tr>
   <tr>
     <td height="" colspan="7">
@@ -121,12 +118,12 @@ while ( $row = mysql_fetch_array($getData))
     <table width="700" height="" border="0">
   <tr>
     <td width="5%" align="center" valign="top" ><?php echo $numbering; ?></td>
-    <td width="10%" align="center" valign="top"><?php echo $item_ids; ?></td>
-    <td width="35%" valign="top"><?php echo $descriptions; ?></td>
-    <td width="10%" align="center" valign="top"><?php echo $quantitys; ?></td>
-    <td width="10%" align="center" valign="top"><?php echo $unitmeasures; ?></td>
-    <td width="15%" align="right" valign="top"><?php echo $unitprices; ?></td>
-    <td width="15%" align="right" valign="top"><?php echo $extendedprices; ?></td>
+    <td width="8%" align="center" valign="top"><?php echo $item_ids; ?></td>
+    <td width="40%" valign="top"><?php echo $descriptions; ?></td>
+    <td width="8%" align="center" valign="top"><?php echo $quantitys; ?></td>
+    <td width="7%" align="center" valign="top"><?php echo $unitmeasures; ?></td>
+    <td width="11%" align="right" valign="top"><?php echo $unitprices; ?></td>
+    <td width="21%" align="right" valign="top"><?php echo $extendedprices; ?></td>
   </tr>
 	</table>    </td>
   </tr>
@@ -139,9 +136,9 @@ while ( $row = mysql_fetch_array($getData))
 </table>
 <p><u>Special Instructions and Terms</u></p>
 <p>Internal Ref : </p>
-<p><u>Payment Term :</u></p>
-<br><?php echo $payment; ?>
-<p>Deliver Date : </p>
-<br><?php echo $delivery; ?>
+<p><u>Payment Term :</u><br>
+  <?php echo $payment; ?></p>
+<p><u>Deliver Date :</u><br>
+<?php echo $delivery; ?></p>
 </body>
 </html>
