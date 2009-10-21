@@ -46,12 +46,12 @@ $starting = 73;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
             FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
-            WHERE A.doc_number='$POnum'
+            WHERE A.doc_number='$PRnum'
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
@@ -89,6 +89,7 @@ $starting = 73;
     $starting = $starting + 5;
             			
             		$doc_date = $row['doc_date'];
+            		$requester = $row['requester'];
             			
             			$branchName =$row['branchName'];
                   $branchLocation = $row['branchLocation'];
@@ -174,7 +175,7 @@ $pdf->Text(125,32,$branchName);
 $pdf->Text(110,32,"Ship To:");
 
 $pdf->Text(130,20,"Date: ".$date);
-$pdf->Text(130,24,"Purchase Order No: ".$POnum);
+$pdf->Text(130,24,"Purchase Request No: ".$PRnum);
 
 $pdf->Text(12,190,"SPECIAL INSTRUCTIONS AND TERMS");
 $pdf->Text(12,193,$special_instruction);
@@ -185,11 +186,14 @@ $pdf->Text(12,209,$delivery);
 $pdf->Text(130,203,"Payment Terms:");
 $pdf->Text(130,205,"-----------------------");
 $pdf->Text(130,209,$payment);
+$pdf->Text(12,230,"Prepared By : ".$requester);
+$pdf->Text(12,237,"Endorsed By : Karthigeyan Nallasamy / Chew Kwong Chee");
+$pdf->Text(12,244,"Approved By : Pendin Saragih");
 
 
 $pdf->Text(187,175,$total);
 
 $pdf->Text(187,165,"($discount)");
 
-$pdf->Output("".$POnum.".pdf", "I");
+$pdf->Output("".$PRnum.".pdf", "I");
 ?>
