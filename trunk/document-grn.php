@@ -33,7 +33,8 @@ $tmpl->place('menu');
 		<label for="doc_date">Document Date </label><input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
 		<label for="doc_type">Document Type </label>GRN <input id="doc_type" type="hidden" value="GRN"></input><br />
 		<label for="branch_id">Branch </label>
-					<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
+			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
+			<input type="hidden" id="hiddenBranch" value="<?php echo $user->prepareBranchId();?>" />
 		<div class="supplierBox span-23 last">
 			<div id="box1" class="boxes span-7">
 				<b>Supplier</b><br />

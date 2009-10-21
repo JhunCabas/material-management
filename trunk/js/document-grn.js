@@ -148,7 +148,7 @@ function getRunningNumber()
 {
 	$.post("parser/Good_receipt_note.php",{type:"count"},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val("GRN"+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val("GRN"+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 
