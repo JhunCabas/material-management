@@ -5,10 +5,10 @@ $tmpl->place('header');
 ?>
 <script type="text/javascript" charset="utf-8">
 	$(function (){
-		$("tr.linkable#PR").click(function (){
+		$("tr.linkable.PR").click(function (){
 			window.location = "document-pr-view.php?"+"id="+$(this).children(".docNumber").text();
 		});
-		$("tr.linkable#PO").click(function (){
+		$("tr.linkable.PO").click(function (){
 			window.location = "document-po-view.php?"+"id="+$(this).children(".docNumber").text();
 		});
 	});
@@ -35,7 +35,7 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPR(20);
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						echo "<tr class=\"linkable\" id=\"PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
 						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
@@ -59,7 +59,7 @@ $tmpl->place('menu');
 					foreach($purchaseEntries as $purchaseEntry)
 					{
 						$newDocNumber = substr_replace($purchaseEntry->getDocNumber(), 'PR', 0, 2);
-						echo "<tr class=\"linkable\" id=\"PO\"><td>$newDocNumber</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<tr class=\"linkable PO\"><td>$newDocNumber</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
 						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
