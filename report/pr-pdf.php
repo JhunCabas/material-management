@@ -6,6 +6,7 @@ include_once('class/DBConn.php');
 $pdf=new FPDF();
 $pdf->AddPage('P','Letter');
 $pdf->SetFont('Arial','B',10);
+$pdf->Image('UMW.jpeg',10,3,140,15); 
 
 //draw line
 $pdf->Line(10,60,10,180); //outer
@@ -49,7 +50,7 @@ $starting = 73;
             A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
-            A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
+            A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
             FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
             WHERE A.doc_number='$PRnum'
             AND B.doc_number = A.doc_number
@@ -78,13 +79,24 @@ $starting = 73;
                   $extendedprice = sprintf("%.2f",$extendedprice);
                   $discount = sprintf("%.2f",$discount);
             			
+     
+     
+      $desc = str_split($description, 52);
+     
+     
       $pdf->Text(12,$starting,$count);
       $pdf->Text(22,$starting,$item_id);
-      $pdf->Text(42,$starting,$description);
+      $pdf->Text(42,$starting,$desc[0]);
       $pdf->Text(137,$starting,$quantity);
       $pdf->Text(152,$starting,$unitmeasure);
       $pdf->Text(167,$starting,$unitprice);
       $pdf->Text(187,$starting,$extendedprice);
+      
+       if (strlen($description) > 52 )
+      {
+       $starting = $starting + 5;
+      $pdf->Text(42,$starting,$desc[1]);
+       }
       
     $starting = $starting + 5;
             			
@@ -119,6 +131,28 @@ $starting = 73;
 ////////////
 
 
+  
+  $sql2 ="SELECT  E.name
+            FROM purchases A, suppliers E
+            WHERE A.doc_number='$PRnum'
+            AND A.supplier_2 = E.id";
+                 
+             connectToDB();
+                     $getSup2 = mysql_query($sql2) or die ("Execution SQL; error");
+            $sup2 = mysql_fetch_array($getSup2);
+            $sup2name = $sup2['name'];
+            				
+ $sql3 ="SELECT  E.name
+            FROM purchases A, suppliers E
+            WHERE A.doc_number='$PRnum'
+            AND A.supplier_3 = E.id";
+                 
+             connectToDB();
+                     $getSup3 = mysql_query($sql3) or die ("Execution SQL; error");
+            $sup3 = mysql_fetch_array($getSup3);
+            $sup3name = $sup3['name'];
+  
+    
 //this is sample data, change this code and replace the data from mysql
 /*
 $no2 = "2";
@@ -157,22 +191,27 @@ $sfax = "09-8273452";
 $date = $doc_date;
 
 
-            $pdf->Text(22,56,"Tel: ".$supplierNum);
-            $pdf->Text(52,56,"Fax: ".$supplierFax);
-            $pdf->Text(22,48,$supp_add3);
-            $pdf->Text(22,44,$supp_add2);
-            $pdf->Text(22,40,$supp_add1);
-            $pdf->Text(22,36,$supplierName);
-            $pdf->Text(22,32,$supplierContact);
-            $pdf->Text(12,32,"To: ");
+           // $pdf->Text(22,56,"Tel: ".$supplierNum);
+           // $pdf->Text(52,56,"Fax: ".$supplierFax);
+           // $pdf->Text(22,48,$supp_add3);
+           // $pdf->Text(22,44,$supp_add2);
+           // $pdf->Text(22,40,$supp_add1);
+            $pdf->Text(22,33,"Recommended Supplier : ".$supplierName);
+            //$pdf->Text(22,32,$supplierContact);
+            //$pdf->Text(12,32,"To: ");
+            
+            
+           $pdf->Text(22,37," / Supplier 2: ".$sup2name);
+           $pdf->Text(22,41," / Supplier 3: ".$sup3name);
+           //$pdf->Text(22,40,$supp_add1);
 
-$pdf->Text(125,56,"Tel: ".$branchNo);
+//$pdf->Text(125,56,"Tel: ".$branchNo);
 //$pdf->Text(155,56,"Fax: ".$branchFax);
-$pdf->Text(125,44,$sad3);
-$pdf->Text(125,40,$sad2);
-$pdf->Text(125,36,$branchLocation);
-$pdf->Text(125,32,$branchName);
-$pdf->Text(110,32,"Ship To:");
+//$pdf->Text(125,44,$sad3);
+//$pdf->Text(125,40,$sad2);
+//$pdf->Text(125,36,$branchLocation);
+//$pdf->Text(22,24,$branchName);
+$pdf->Text(22,24,"Ship To: ".$branchName);
 
 $pdf->Text(130,20,"Date: ".$date);
 $pdf->Text(130,24,"Purchase Request No: ".$PRnum);
