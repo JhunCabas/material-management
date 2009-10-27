@@ -167,7 +167,8 @@
 			}
 		}else if($_POST['type'] == "countPR")
 		{
-			$countPR = Purchase::findAll();
+			//$countPR = Purchase::findAll();
+			$countPR = Purchase::findByBranch(fRequest::get('branch','string'));
 			echo sprintf("%04d",$countPR->count() + 1);
 		}else if($_POST['type'] == "json")
 		{
