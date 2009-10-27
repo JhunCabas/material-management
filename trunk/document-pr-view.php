@@ -51,7 +51,7 @@ $tmpl->place('menu');
 				<b>Supplier 2</b><br />
 				<br />
 				<div class="boxBody">
-					<?php Supplier::generateInfo($purchase->getSupplier3()); ?>
+					<?php Supplier::generateInfo($purchase->getSupplier2()); ?>
 				</div>
 			</div>
 			<?php } if($purchase->getSupplier3()!=null) {?>
