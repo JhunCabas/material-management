@@ -32,6 +32,12 @@
 
 	}
 	
+	static function findByBranch($branch)
+	{
+		return fRecordSet::build('Purchase',
+			array('branch_id=' => $branch));
+	}
+	
 	static function findAllPR($limit=null)
 	{
 		return fRecordSet::build('Purchase',
