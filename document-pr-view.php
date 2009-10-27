@@ -49,6 +49,7 @@ $tmpl->place('menu');
 			<?php if($purchase->getSupplier2()!=null) {?>
 			<div id="box2" class="boxes span-7">
 				<b>Supplier 2</b><br />
+					<?php $supplier2 = new Supplier($purchase->getSupplier2()); echo $supplier2->prepareName(); ?>
 				<br />
 				<div class="boxBody">
 					<?php Supplier::generateInfo($purchase->getSupplier2()); ?>
@@ -57,6 +58,7 @@ $tmpl->place('menu');
 			<?php } if($purchase->getSupplier3()!=null) {?>
 			<div id="box3" class="boxes span-7 last">
 				<b>Supplier 3</b><br />
+					<?php $supplier3 = new Supplier($purchase->getSupplier3()); echo $supplier3->prepareName(); ?>
 				<br />
 				<div class="boxBody">
 					<?php Supplier::generateInfo($purchase->getSupplier3()); ?>
