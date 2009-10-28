@@ -34,8 +34,13 @@
 	
 	static function findByBranch($branch)
 	{
-		return fRecordSet::build('Purchase',
-			array('branch_id=' => $branch));
+		return fRecordSet::buildFromSQL('Purchase',
+				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = 'HQKL') AS tbl WHERE purchases.requester = tbl.username",
+				"SELECT count(*) FROM users"
+			);
+		//return fRecordSet::build('Purchase',
+		//	array('branch_id=' => $branch));
+		
 	}
 	
 	static function findAllPR($limit=null)
