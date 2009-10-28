@@ -6,7 +6,7 @@ include_once('class/DBConn.php');
 $pdf=new FPDF();
 $pdf->AddPage('P','Letter');
 $pdf->SetFont('Arial','B',10);
-$pdf->Image('UMW.jpeg',10,3,140,15); 
+$pdf->Image('UMW.jpeg',10,3,180,22); 
 
 //draw line
 $pdf->Line(10,60,10,180); //outer
@@ -21,7 +21,7 @@ $pdf->Line(150,60,150,170); //4-uom
 $pdf->Line(165,60,165,180); //5
 $pdf->Line(185,60,185,180); //6
 
-$pdf->Line(10,70,205,70);
+$pdf->Line(10,74,205,74);
 $pdf->Line(10,170,205,170);
 
 //table title
@@ -39,7 +39,7 @@ $pdf->Text(167,175,'TOTAL');
 $pdf->Text(100,165,'DISCOUNT');
 
 
-$starting = 73;
+$starting = 78;
 ////////////
 
             $count = '0';
@@ -47,15 +47,17 @@ $starting = 73;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,
+            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,A.requester_date,A.currency,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
-            A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
-            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
+            A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no,
+            F.country AS currency
+            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E, currencies F
             WHERE A.doc_number='$PRnum'
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
+            AND A.currency = F.id
             AND B.item_id = D.id";
                  
              connectToDB();
@@ -71,8 +73,11 @@ $starting = 73;
             			$unitprice = $row['unit_price'];
             		  $extendedprice = $row['extended_price'];
             		  
+            		  $currency = $row['currency'];
             			$total = $row['total'];
             			$discount = $row['discount'];
+            			
+            			$req_date = $row['requester_date'];
             			
                   $unitprice = sprintf("%.2f",$unitprice);
                   $total = sprintf("%.2f",$total);
@@ -196,13 +201,13 @@ $date = $doc_date;
            // $pdf->Text(22,48,$supp_add3);
            // $pdf->Text(22,44,$supp_add2);
            // $pdf->Text(22,40,$supp_add1);
-            $pdf->Text(22,33,"Recommended Supplier : ".$supplierName);
+            $pdf->Text(22,42,"Supplier 1 : ".$supplierName);
             //$pdf->Text(22,32,$supplierContact);
             //$pdf->Text(12,32,"To: ");
             
             
-           $pdf->Text(22,37," / Supplier 2: ".$sup2name);
-           $pdf->Text(22,41," / Supplier 3: ".$sup3name);
+           $pdf->Text(22,46,"Supplier 2 : ".$sup2name);
+           $pdf->Text(22,50,"Supplier 3 : ".$sup3name);
            //$pdf->Text(22,40,$supp_add1);
 
 //$pdf->Text(125,56,"Tel: ".$branchNo);
@@ -211,14 +216,18 @@ $date = $doc_date;
 //$pdf->Text(125,40,$sad2);
 //$pdf->Text(125,36,$branchLocation);
 //$pdf->Text(22,24,$branchName);
-$pdf->Text(22,24,"Ship To: ".$branchName);
+$pdf->Text(22,32,"Ship To: ".$branchName);
 
-$pdf->Text(130,20,"Date: ".$date);
-$pdf->Text(130,24,"Purchase Request No: ".$PRnum);
+$pdf->Text(130,36,"Date: ".$date);
+$pdf->Text(130,32,"P.R Number: ".$PRnum);
+
+
+$pdf->Text(167,71,"( ".$currency." )");
+$pdf->Text(187,71,"( ".$currency." )");
 
 $pdf->Text(12,190,"SPECIAL INSTRUCTIONS AND TERMS");
 $pdf->Text(12,193,$special_instruction);
-$pdf->Text(160,190,"PAGE 1 OF 1");
+$pdf->Text(170,270,"PAGE 1 OF 1");
 $pdf->Text(12,203,"Delivery Terms:");
 $pdf->Text(12,205,"-----------------------");
 $pdf->Text(12,209,$delivery);
@@ -229,6 +238,10 @@ $pdf->Text(12,230,"Prepared By : ".$requester);
 $pdf->Text(12,237,"Endorsed By : Karthigeyan Nallasamy / Chew Kwong Chee");
 $pdf->Text(12,244,"Approved By : Pendin Saragih");
 
+
+$pdf->Text(130,230,"Date : ".$req_date);
+$pdf->Text(130,237,"Date : ");
+$pdf->Text(130,244,"Date : ");
 
 $pdf->Text(187,175,$total);
 
