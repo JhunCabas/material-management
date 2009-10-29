@@ -32,10 +32,10 @@
 
 	}
 	
-	static function findByBranch($branch)
+	static function findByBranch($branch,$doctype)
 	{
 		return fRecordSet::buildFromSQL('Purchase',
-				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = '$branch') AS tbl WHERE purchases.requester = tbl.username",
+				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = '$branch') AS tbl WHERE purchases.requester = tbl.username AND purchases.doc_type = '$doctype'",
 				"SELECT count(*) FROM users"
 			);
 		//return fRecordSet::build('Purchase',

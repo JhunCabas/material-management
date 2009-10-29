@@ -16,8 +16,8 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Purchase Request</h3><br />
 			<input type="hidden" name="run_num" value="" id="run_num"/>
-		<label for="doc_num">Document Number </label>
-			<input type="text" name="doc_num" value="" id="doc_num"/><br />
+		<label for="doc_num">Document Number </label> 
+			<input type="text" name="doc_num" size="30" id="doc_num"/> <span id="loaderBar"><img src="img/layout/ajax-loaderBar.gif"/> Loading </span><br />
 		<label for="doc_date">Document Date </label>
 			<input type="text" name="doc_date" value="" id="doc_date" /><br />
 		<label for="doc_type">Document Type </label>

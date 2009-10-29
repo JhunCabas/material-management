@@ -157,6 +157,10 @@ ul#icons {
 	text-align: right;
 }
 
+#loaderBar{
+	padding: 1px 5px 1px 5px;
+}
+
 #purchaseTotal{
 	text-align: right;
 }
