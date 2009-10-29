@@ -9,6 +9,7 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
+	$("#loaderBar").hide();
 	$(".datepicker").datepicker();
 	$(".datepicker").datepicker('setDate', Date.today() );
 	$(".datepicker").blur(function (){ getRunningNumber(); });
@@ -99,9 +100,11 @@ function addingRow()
 
 function getRunningNumber()
 {
-	$.post("parser/Production_issue.php",{type:"count"},function (data){
+	$("#loaderBar").show();
+	$.post("parser/Production_issue.php",{type:"count",branch:$("#hiddenBranch").val(), doctype:$("#doc_type").val()},function (data){
 		$("#run_num").val(data);
 		$("#doc_num").val($("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#loaderBar").hide();
 	});
 }
 
