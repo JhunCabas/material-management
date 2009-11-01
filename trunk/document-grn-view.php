@@ -23,6 +23,7 @@ $tmpl->place('menu');
 				$grn_details = Good_receipt_note_detail::findDetail($_GET['id']);
 	?>
 	<h2>Goods Receipt Note</h2>
+  <div align=left> <a href=report/grn-pdf.php?GRNnum=<?=$_GET['id']?>><b>Download PDF</b></a></div><br>
 	<div class="form-frame span-23 last">
 		<h3>Goods Receipt Note</h3><br />
 		<label for="doc_num">Document Number </label>
