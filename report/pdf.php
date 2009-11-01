@@ -5,7 +5,7 @@ include_once('class/DBConn.php');
 
 $pdf=new FPDF();
 $pdf->AddPage('P','Letter');
-$pdf->SetFont('Arial','B',10);
+$pdf->SetFont('Arial','',10);
 
 //draw line
 $pdf->Line(10,60,10,180); //outer
@@ -28,7 +28,7 @@ $pdf->Text(12,64,'NO');
 $pdf->Text(22,64,'ITEM');
 $pdf->Text(22,67,'CODE');
 $pdf->Text(42,64,'DESCRIPTION');
-$pdf->Text(137,64,'QTTY');
+$pdf->Text(137,64,'QTY');
 $pdf->Text(152,64,'UOM');
 $pdf->Text(167,64,'UNIT');
 $pdf->Text(167,67,'PRICE');
@@ -46,7 +46,7 @@ $starting = 73;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
@@ -177,14 +177,14 @@ $pdf->Text(130,20,"Date: ".$date);
 $pdf->Text(130,24,"Purchase Order No: ".$POnum);
 
 $pdf->Text(12,190,"SPECIAL INSTRUCTIONS AND TERMS");
-$pdf->Text(12,193,$special_instruction);
+$pdf->Text(12,194,$special_instruction);
 $pdf->Text(160,190,"PAGE 1 OF 1");
-$pdf->Text(12,203,"Delivery Terms:");
-$pdf->Text(12,205,"-----------------------");
-$pdf->Text(12,209,$delivery);
-$pdf->Text(130,203,"Payment Terms:");
-$pdf->Text(130,205,"-----------------------");
-$pdf->Text(130,209,$payment);
+$pdf->Text(12,206,"Delivery Terms:");
+$pdf->Text(12,208,"-----------------------");
+$pdf->Text(12,212,$delivery);
+$pdf->Text(130,206,"Payment Terms:");
+$pdf->Text(130,208,"-----------------------");
+$pdf->Text(130,212,$payment);
 
 
 $pdf->Text(187,175,$total);
