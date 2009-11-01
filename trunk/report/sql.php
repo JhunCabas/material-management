@@ -45,7 +45,7 @@ session_start();
     	function exportInv()
     		{
     		$count='1';
-        $sql ="	SELECT * FROM umw_mms.inv_items A";
+        $sql ="	SELECT * FROM umw_mms.inv_items A order by id";
     			 connectToDB();
             $result = mysql_query($sql) or die ("error");
     		while ( $row = mysql_fetch_array($result))
@@ -79,7 +79,7 @@ session_start();
     	function exportStock()
     		{
     		$count='1';
-        $sql ="	SELECT * FROM umw_mms.inv_stocks A";
+        $sql ="	SELECT * FROM umw_mms.inv_stocks A order by branch_id";
     			 connectToDB();
             $result = mysql_query($sql) or die ("error");
     		while ( $row = mysql_fetch_array($result))

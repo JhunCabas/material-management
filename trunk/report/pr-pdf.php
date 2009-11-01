@@ -5,8 +5,8 @@ include_once('class/DBConn.php');
 
 $pdf=new FPDF();
 $pdf->AddPage('P','Letter');
-$pdf->SetFont('Arial','B',10);
-$pdf->Image('UMW.jpeg',10,3,180,22); 
+$pdf->SetFont('Arial','',10);
+$pdf->Image('UMW.jpeg',10,3,180,23); 
 
 //draw line
 $pdf->Line(10,60,10,180); //outer
@@ -29,7 +29,7 @@ $pdf->Text(12,64,'NO');
 $pdf->Text(22,64,'ITEM');
 $pdf->Text(22,67,'CODE');
 $pdf->Text(42,64,'DESCRIPTION');
-$pdf->Text(137,64,'QTTY');
+$pdf->Text(137,64,'QTY');
 $pdf->Text(152,64,'UOM');
 $pdf->Text(167,64,'UNIT');
 $pdf->Text(167,67,'PRICE');
@@ -201,13 +201,13 @@ $date = $doc_date;
            // $pdf->Text(22,48,$supp_add3);
            // $pdf->Text(22,44,$supp_add2);
            // $pdf->Text(22,40,$supp_add1);
-            $pdf->Text(22,42,"Supplier 1 : ".$supplierName);
+            $pdf->Text(12,42,"Supplier 1 : ".$supplierName);
             //$pdf->Text(22,32,$supplierContact);
             //$pdf->Text(12,32,"To: ");
             
             
-           $pdf->Text(22,46,"Supplier 2 : ".$sup2name);
-           $pdf->Text(22,50,"Supplier 3 : ".$sup3name);
+           $pdf->Text(12,46,"Supplier 2 : ".$sup2name);
+           $pdf->Text(12,50,"Supplier 3 : ".$sup3name);
            //$pdf->Text(22,40,$supp_add1);
 
 //$pdf->Text(125,56,"Tel: ".$branchNo);
@@ -216,32 +216,33 @@ $date = $doc_date;
 //$pdf->Text(125,40,$sad2);
 //$pdf->Text(125,36,$branchLocation);
 //$pdf->Text(22,24,$branchName);
-$pdf->Text(22,32,"Ship To: ".$branchName);
+$pdf->Text(12,32,"Ship To: ".$branchName);
+$pdf->Text(130,32,"PURCHASE REQUEST");
 
-$pdf->Text(130,36,"Date: ".$date);
-$pdf->Text(130,32,"P.R Number: ".$PRnum);
+$pdf->Text(130,40,"Date: ".$date);
+$pdf->Text(130,36,"P.R Number: ".$PRnum);
 
 
 $pdf->Text(167,71,"( ".$currency." )");
 $pdf->Text(187,71,"( ".$currency." )");
 
 $pdf->Text(12,190,"SPECIAL INSTRUCTIONS AND TERMS");
-$pdf->Text(12,193,$special_instruction);
-$pdf->Text(170,270,"PAGE 1 OF 1");
-$pdf->Text(12,203,"Delivery Terms:");
-$pdf->Text(12,205,"-----------------------");
-$pdf->Text(12,209,$delivery);
-$pdf->Text(130,203,"Payment Terms:");
-$pdf->Text(130,205,"-----------------------");
-$pdf->Text(130,209,$payment);
-$pdf->Text(12,230,"Prepared By : ".$requester);
-$pdf->Text(12,237,"Endorsed By : Karthigeyan Nallasamy / Chew Kwong Chee");
-$pdf->Text(12,244,"Approved By : Pendin Saragih");
+$pdf->Text(12,194,$special_instruction);
+$pdf->Text(170,275,"PAGE 1 OF 1");
+$pdf->Text(12,208,"Delivery Terms:");
+$pdf->Text(12,210,"-----------------------");
+$pdf->Text(12,214,$delivery);
+$pdf->Text(130,208,"Payment Terms:");
+$pdf->Text(130,210,"-----------------------");
+$pdf->Text(130,214,$payment);
+$pdf->Text(12,235,"Prepared By : ".$requester);
+$pdf->Text(12,243,"Endorsed By : Karthigeyan Nallasamy / Chew Kwong Chee");
+$pdf->Text(12,251,"Approved By : Pendin Saragih");
 
 
-$pdf->Text(130,230,"Date : ".$req_date);
-$pdf->Text(130,237,"Date : ");
-$pdf->Text(130,244,"Date : ");
+$pdf->Text(130,235,"Date : ".$req_date);
+$pdf->Text(130,243,"Date : ");
+$pdf->Text(130,251,"Date : ");
 
 $pdf->Text(187,175,$total);
 
