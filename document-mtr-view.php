@@ -28,7 +28,7 @@ $tmpl->place('menu');
 			<?php echo $mattrans->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
 			<?php echo $mattrans->prepareDocType(); ?><br />
-		<label for="branch_id">Branch </label>
+		<label for="branch_id">To Branch </label>
 			<?php $branch = new Branch($mattrans->getBranchId()); echo $branch->prepareName() . " / <span id=\"branchId\">" . $mattrans->prepareBranchId()."</span>";?><br />
 		<table id="formContent">
 			<thead>
