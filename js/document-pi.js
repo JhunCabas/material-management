@@ -35,8 +35,6 @@ $(function (){
 		var notes = $("#notes").val();
 		var issuer = $("#issuer").text();
 		var issuer_date = $("#issDate").val();
-		var receiver = $("#receiver").text();
-		var receiver_date = $("#recDate").val();
 		if(confirm("Continue?"))
 		$.post("parser/Production_issue.php",{
 			type: "add",
@@ -47,9 +45,7 @@ $(function (){
 			jsonForm: jsonForm(),
 			notes: notes,
 			issuer: issuer,
-			issuer_date: issuer_date,
-			receiver: receiver,
-			receiver_date: receiver_date
+			issuer_date: issuer_date
 			},function(data){
 				if(data != "")
 				 {

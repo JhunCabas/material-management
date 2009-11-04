@@ -52,7 +52,7 @@ $tmpl->place('menu');
 							fHTML::printOption($branch->prepareName().
 								"[".$tempRecord->prepareQuantity()."]",$tempRecord->prepareBranchId());
 						}
-						echo "</select></td></tr>";
+						echo "</select><input class=\"itemId\" type=\"hidden\" value=\"".$mattrans_detail->prepareId()."\"></input></td></tr>";
 						$counter++;
 					}
 				?>
