@@ -19,7 +19,7 @@ $tmpl->place('menu');
 		<label for="doc_num">Document Number </label><input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label><input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
 		<label for="doc_type">Document Type </label>MTF <input id="doc_type" type="hidden" value="MTF"></input><br />
-		<label for="branch_id">Branch </label>
+		<label for="branch_id">To Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
 			<input type="hidden" id="hiddenBranch" value="<?php echo $user->prepareBranchId();?>" />
 		<table id="formContent">
