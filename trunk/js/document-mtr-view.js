@@ -37,6 +37,7 @@ function jsonForm()
 		jsonString = jsonString + "\""+counter+"\":{"
 			+"\"itemCode\":\""+$(this).find(".itemCode").text()+"\","
 			+"\"quantity\":"+$(this).find(".itemQuan").text()+","
+			+"\"id\":"+$(this).find(".itemId").val()+","
 			+"\"branch\":\""+$(this).find("#fromBranch").val()+"\"},"
 		counter++;
 	});

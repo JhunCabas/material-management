@@ -14,6 +14,9 @@
 					$mattrans = new Material_transfer($_POST['doc_num']);
 					$mattrans->setStatus("completed");
 					$mattrans->store();
+					$mattrans_detail = new Material_transfer_detail($row->{'id'});
+					$mattrans_detail->setFromBranch($row->{'branch'});
+					$mattrans_detail->store();
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
 				}
