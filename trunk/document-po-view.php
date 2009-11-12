@@ -26,7 +26,10 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Purchase Order</h3><br />
 		<label for="doc_num">Document Number </label>
-			<?php echo $purchase->prepareDocNumber(); ?><br />
+			<?php 
+				echo $purchase->preparePoNumber(); 
+				echo "<input id=\"PrNumber\" type=\"hidden\" value=\"".$purchase->prepareDocNumber()."\" />";
+			?><br />
 		<label for="doc_date">Document Date </label>
 			<?php echo $purchase->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
@@ -102,6 +105,7 @@ $tmpl->place('menu');
 				</tr>
 			</tbody>
 		</table>
+		<input type="button" style="float:right;" id="cancelBTN" value="Cancel" />
 		<?php 
 					$me = fAuthorization::getUserToken(); 
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";

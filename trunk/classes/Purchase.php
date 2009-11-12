@@ -22,6 +22,14 @@
 			array('approver_1_date' => 'desc'),
 			$limit);
 	}
+	
+	static function findOpenPO($limit=null)
+	{
+		return fRecordSet::build('Purchase',
+			array('doc_tag=' => 'po','status!' => 'cancelled'),
+			array('approver_1_date' => 'desc'),
+			$limit);
+	}
 
 	static function findAllUncompletePO($limit=null)
 	{

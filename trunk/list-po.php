@@ -22,16 +22,16 @@ $tmpl->place('menu');
 	<h3>List</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>Requester</th><th>Status</th></tr>
+			<tr><th>Purchase Order Number</th><th>Purchase Request Number</th><th>Document Date</th><th>Requester</th><th>Status</th></tr>
 		</thead>
 		<tbody>
 			<?php
 				try{
-					$purchaseEntries = Purchase::findAllPO(20);
+					$purchaseEntries = Purchase::findOpenPO(20);
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
-						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
+						echo "<tr class=\"linkable\"><td>".$purchaseEntry->preparePoNumber()."</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<td>".$purchaseEntry->prepareApprover1Date("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
 					}
