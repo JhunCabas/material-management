@@ -35,7 +35,7 @@
 		}else if($_POST['type'] == "count")
 		{
 			$records = Material_transfer::findAll();
-			echo sprintf("%04d",$records->count() + 1);
+			echo sprintf("%03d",$records->count() + 1);
 		}
 	}
 ?>

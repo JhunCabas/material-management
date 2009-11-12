@@ -48,7 +48,7 @@ $(function (){
 	$("#doc_num").attr("readonly","true");
 	getRunningNumber();
 	//Get form body from JSON
-	$.ajax({type:"post",url:"parser/Purchase.php",data:{type:"json",key:$("#poNo").val()},dataType:"json", success: function(data){
+	$.ajax({type:"post",url:"parser/Purchase.php",data:{type:"json",key:$("#prNum").val()},dataType:"json", success: function(data){
 		$.each(data, function(i,item){
 			$.get("parser/Inv_item.php",{type:"uom",key:item.item_id},function (data){
 				fillingRow(item.item_id,item.description,item.quantity,data);

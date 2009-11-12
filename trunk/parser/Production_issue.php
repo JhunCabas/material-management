@@ -73,7 +73,7 @@
 		{
 			//$records = Production_issue::findAll();
 			$records = Production_issue::findByBranch(fRequest::get('branch','string'),fRequest::get('doctype','string'));
-			echo sprintf("%04d",$records->count() + 1);
+			echo sprintf("%03d",$records->count() + 1);
 		}
 	}
 ?>
