@@ -181,6 +181,11 @@
 		{
 			$purchasedetails = Purchase_detail::findDetail($_POST['key']);
 			echo $purchasedetails->toJSON();
+		}else if($_POST['type'] == "cancelPO")
+		{
+			$purchase = new Purchase($_POST['key']);
+			$purchase->setStatus('cancelled');
+			$purchase->store();
 		}
 	}
 ?>
