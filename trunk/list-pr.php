@@ -50,7 +50,7 @@ $tmpl->place('menu');
 	<h3>Approved List</h3>
 	<table>
 		<thead>
-			<tr><th>Purchase Request No</th><th>Purchase Order No</th><th>Document Date</th><th>Requester</th><th>Status</th></tr>
+			<tr><th>Purchase Order No</th><th>Purchase Request No</th><th>Approved Date</th><th>Requester</th><th>Status</th></tr>
 		</thead>
 		<tbody>
 			<?php
@@ -58,9 +58,9 @@ $tmpl->place('menu');
 					$purchaseEntries = Purchase::findAllPO(20);
 					foreach($purchaseEntries as $purchaseEntry)
 					{
-						$newDocNumber = substr_replace($purchaseEntry->getDocNumber(), 'PR', 0, 2);
-						echo "<tr class=\"linkable PO\"><td>$newDocNumber</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
-						echo "<td>".$purchaseEntry->prepareDocDate("j F Y")."</td>";
+						//$newDocNumber = substr_replace($purchaseEntry->getDocNumber(), 'PR', 0, 2);
+						echo "<tr class=\"linkable PO\"><td>".$purchaseEntry->preparePoNumber()."</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
+						echo "<td>".$purchaseEntry->prepareApprover1Date("j F Y")."</td>";
 						echo "<td>".$purchaseEntry->prepareRequester()."</td>";
 						echo "<td>".$purchaseEntry->prepareStatus()."</td></tr>";
 					}

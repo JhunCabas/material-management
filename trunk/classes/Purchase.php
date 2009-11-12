@@ -19,7 +19,7 @@
 	{
 		return fRecordSet::build('Purchase',
 			array('doc_tag=' => 'po'),
-			array('doc_date' => 'desc'),
+			array('approver_1_date' => 'desc'),
 			$limit);
 	}
 
@@ -38,9 +38,6 @@
 				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = '$branch') AS tbl WHERE purchases.requester = tbl.username AND purchases.doc_type = '$doctype' AND YEAR( purchases.doc_date ) = YEAR( CURDATE( ) ) AND MONTH( purchases.doc_date ) = MONTH( CURDATE( ) )",
 				"SELECT count(*) FROM purchases"
 			);
-		//return fRecordSet::build('Purchase',
-		//	array('branch_id=' => $branch));
-		
 	}
 	
 	static function findAllPR($limit=null)
