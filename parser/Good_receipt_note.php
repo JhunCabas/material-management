@@ -79,7 +79,7 @@
 		}else if($_POST['type'] == "count")
 		{
 			$records = Good_receipt_note::findAll();
-			echo sprintf("%04d",$records->count() + 1);
+			echo sprintf("%03d",$records->count() + 1);
 		}else if($_POST['type'] == "json")
 		{
 			$grn_details = Good_receipt_note_detail::findDetail($_POST['key']);

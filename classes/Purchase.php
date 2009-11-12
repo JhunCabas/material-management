@@ -23,7 +23,7 @@
 			$limit);
 	}
 
-	static function findUncompletePO($limit=null)
+	static function findAllUncompletePO($limit=null)
 	{
 		return fRecordSet::build('Purchase',
 			array('doc_tag=' => 'po', 'status!' => 'completed'),
@@ -52,6 +52,24 @@
 	{
 		return fRecordSet::build('Purchase',
 			array('doc_type=' => $key));
+	}
+	
+	static function getByPoNumber($key)
+	{
+		$records = fRecordSet::build('Purchase',
+			array('po_number=' => $key));
+		if($records->count())
+		{
+			$i = 0;
+			foreach ($records as $record) {
+				if ( $i == 1 )
+				break;
+				return $record->getDocNumber();
+				$i++;
+			}
+		}
+		else
+			return 0;
 	}
  }
 

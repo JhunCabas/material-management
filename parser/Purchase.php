@@ -176,7 +176,7 @@
 		}else if($_POST['type'] == "countPR")
 		{
 			$countPR = Purchase::findByBranch(fRequest::get('branch','string'),fRequest::get('doctype','string'));
-			echo sprintf("%04d",$countPR->count() + 1);
+			echo sprintf("%03d",$countPR->count() + 1);
 		}else if($_POST['type'] == "json")
 		{
 			$purchasedetails = Purchase_detail::findDetail($_POST['key']);

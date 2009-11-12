@@ -24,7 +24,8 @@ $tmpl->place('menu');
 	<?php
 		}else{
 			try{
-				$purchase = new Purchase($_GET['id']);
+				echo "<input type=\"hidden\" id=\"prNum\" value=\"".Purchase::getByPoNumber($_GET['id'])."\" />";
+				$purchase = new Purchase(Purchase::getByPoNumber($_GET['id']));
 	?>
 	<div class="form-frame span-23 last">
 		<h3>Goods Receipt Note</h3><br />
