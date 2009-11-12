@@ -110,7 +110,7 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM,itemPrice,itemExtend,
 										});
 
 	var descCell = $("<td></td>").attr("id","descAuto").html(
-						$("<input></input>").addClass("itemDesc").attr("size",40).val(itemDesc)
+						$("<input></input>").addClass("itemDesc").attr("size",40).val($('<div/>').html(itemDesc).text())
 					);
 	var uomCell = $("<td></td>").attr("id","uomAuto").text(itemUOM);
 	var quantityCell = $("<td></td>").attr("id","itemQuan").html(
