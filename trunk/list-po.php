@@ -27,7 +27,7 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$purchaseEntries = Purchase::findOpenPO(20);
+					$purchaseEntries = Purchase::findAllPO();
 					foreach($purchaseEntries as $purchaseEntry)
 					{
 						echo "<tr class=\"linkable\"><td>".$purchaseEntry->preparePoNumber()."</td><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
