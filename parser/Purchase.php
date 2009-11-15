@@ -115,7 +115,7 @@
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO1')->count() + 1);
-							$newPONumber = "PO1/".$branch."/".$newRunningNumber."/".date("j/y");
+							$newPONumber = "PO1/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
 						case "PR2";
@@ -123,7 +123,7 @@
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO2')->count() + 1);
-							$newPONumber = "PO2/".$branch."/".$newRunningNumber."/".date("j/y");
+							$newPONumber = "PO2/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
 						case "PR3";
@@ -131,7 +131,7 @@
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO3')->count() + 1);
-							$newPONumber = "PO3/".$branch."/".$newRunningNumber."/".date("j/y");
+							$newPONumber = "PO3/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
 						case "PR4";
@@ -139,7 +139,7 @@
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO4')->count() + 1);
-							$newPONumber = "PO4/".$branch."/".$newRunningNumber."/".date("j/y");
+							$newPONumber = "PO4/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
 					}
