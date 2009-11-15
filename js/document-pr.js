@@ -312,7 +312,7 @@ function getRunningNumber()
 	$("#loaderBar").show();
 	$.post("parser/Purchase.php",{type:"countPR", branch:$("#hiddenBranch").val(), doctype:$("#doc_type").val()},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val($("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val("PR"+$("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($("#doc_date").val(), "M/d/yyyy").toString("MM/yyyy"));
 		$("#loaderBar").hide();
 	});
 }
