@@ -45,41 +45,49 @@
 				$currentDocType = $_POST['doc_type'];
 				switch($currentDocType)
 				{
-					case "PR1":
-						$purchase->setDocType('PO1');
-						$newDocNumber = substr_replace($purchase->getDocNumber(), 'PO1', 0, 3);
-						$key = $newDocNumber;
-						$purchase->setDocNumber($newDocNumber);
-						break;
-					case "PR2";
-						$purchase->setDocType('PO2');
-						$newDocNumber = substr_replace($purchase->getDocNumber(), 'PO2', 0, 3);
-						$key = $newDocNumber;
-						$purchase->setDocNumber($newDocNumber);
-						break;
-					case "PR3";
-						$purchase->setDocType('PO3');
-						$newDocNumber = substr_replace($purchase->getDocNumber(), 'PO3', 0, 3);
-						$key = $newDocNumber;
-						$purchase->setDocNumber($newDocNumber);
-						break;
-					case "PR4";
-						$purchase->setDocType('PO4');
-						$newDocNumber = substr_replace($purchase->getDocNumber(), 'PO4', 0, 3);
-						$key = $newDocNumber;
-						$purchase->setDocNumber($newDocNumber);
-						break;
+					case "1":
+							//$purchase->setDocType('PO1');
+							$user = new User($purchase->getRequester());
+							$branch = $user->getBranchId();
+							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO1')->count() + 1);
+							$newPONumber = "PO1/".$branch."/".$newRunningNumber."/".date("m/y");
+							$purchase->setPoNumber($newPONumber);
+							break;
+						case "2";
+							//$purchase->setDocType('PO2');
+							$user = new User($purchase->getRequester());
+							$branch = $user->getBranchId();
+							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO2')->count() + 1);
+							$newPONumber = "PO2/".$branch."/".$newRunningNumber."/".date("m/y");
+							$purchase->setPoNumber($newPONumber);
+							break;
+						case "3";
+							//$purchase->setDocType('PO3');
+							$user = new User($purchase->getRequester());
+							$branch = $user->getBranchId();
+							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO3')->count() + 1);
+							$newPONumber = "PO3/".$branch."/".$newRunningNumber."/".date("m/y");
+							$purchase->setPoNumber($newPONumber);
+							break;
+						case "4";
+							//$purchase->setDocType('PO4');
+							$user = new User($purchase->getRequester());
+							$branch = $user->getBranchId();
+							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO4')->count() + 1);
+							$newPONumber = "PO4/".$branch."/".$newRunningNumber."/".date("m/y");
+							$purchase->setPoNumber($newPONumber);
+							break;
 				}
 				$purchase->setStatus('approved');
 				$purchase->setDocTag('po');
-				$purchase->setDocNumber($key);
+				//$purchase->setDocNumber($key);
 				if(!$error)
 					$purchase->store();
 				foreach($jsonForm as $row)
 				{
 					try{
 						$purchase_detail = new Purchase_detail();
-						$purchase_detail->setDocNumber($key);
+						$purchase_detail->setDocNumber($_POST['doc_number']);
 						$purchase_detail->setItemId($row->{'itemCode'});
 						$purchase_detail->setDescription($row->{'itemDesc'});
 						$purchase_detail->setQuantity($row->{'itemQuan'});
@@ -110,32 +118,32 @@
 					$currentDocType = $purchase->getDocType();
 					switch($currentDocType)
 					{
-						case "PR1":
-							$purchase->setDocType('PO1');
+						case "1":
+							//$purchase->setDocType('PO1');
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO1')->count() + 1);
 							$newPONumber = "PO1/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
-						case "PR2";
-							$purchase->setDocType('PO2');
+						case "2";
+							//$purchase->setDocType('PO2');
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO2')->count() + 1);
 							$newPONumber = "PO2/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
-						case "PR3";
-							$purchase->setDocType('PO3');
+						case "3";
+							//$purchase->setDocType('PO3');
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO3')->count() + 1);
 							$newPONumber = "PO3/".$branch."/".$newRunningNumber."/".date("m/y");
 							$purchase->setPoNumber($newPONumber);
 							break;
-						case "PR4";
-							$purchase->setDocType('PO4');
+						case "4";
+							//$purchase->setDocType('PO4');
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
 							$newRunningNumber = sprintf("%03d",Purchase::findByBranch($branch,'PO4')->count() + 1);

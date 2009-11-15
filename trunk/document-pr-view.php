@@ -32,7 +32,7 @@ $tmpl->place('menu');
 		<label for="doc_date">Document Date </label>
 			<?php echo $purchase->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
-			<?php echo $purchase->prepareDocType(); ?><br />
+			<?php echo strtoupper($purchase->prepareDocTag()).$purchase->prepareDocType(); ?><br />
 		<label for="branch_id">Branch </label>
 			<?php $branch = new Branch($purchase->getBranchId()); echo $branch->prepareName() . " / " . $purchase->prepareBranchId();?><br />
 		<label for="currency_id">Currency </label>
