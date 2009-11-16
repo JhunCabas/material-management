@@ -21,6 +21,7 @@ $tmpl->place('menu');
 				$production_details = Production_issue_detail::findDetail($_GET['id']);
 	?>
 	<h2>Production Issue Form</h2>
+  <div align=left> <a href=report/pi-pdf.php?PInum=<?=$_GET['id']?>><b>Download PDF</b></a></div><br>
 	<div class="form-frame span-23 last">
 		<h3>Production Issue Form</h3><br />
 		<label for="doc_num">Document Number </label><span id="docNum"><?php echo $production->prepareDocNumber(); ?></span><br />
