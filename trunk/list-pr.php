@@ -33,6 +33,8 @@ $tmpl->place('menu');
 			<?php
 				try{
 					$purchaseEntries = Purchase::findAllPR();
+					$numPurchases = $purchaseEntries->count();
+					//echo "Number of Purchases queries: ".$numPurchases;
 					foreach($purchaseEntries as $purchaseEntry)
 					{
 						echo "<tr class=\"linkable PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
