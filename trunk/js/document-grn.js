@@ -83,7 +83,7 @@ $(function (){
 		var branch_id = $("#branch_id").val();
 		var supplier = $("#supplierID").val();
 		var do_no = $("#doNo").val();
-		var po_no = $("#poNo").val();
+		var po_no = $("#prNum").val();
 		var inspector = $("#inspectorID").val();
 		var inspector_date = $("#insDate").val()
 		if(confirm("Continue?"))
