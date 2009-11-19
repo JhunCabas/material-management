@@ -213,6 +213,16 @@ $(function (){
 	});
 });
 
+function decodeHTML(encodedString)
+{
+	return $("<div />").html(encodedString).text();
+}
+
+function encodeHTML(decodedString)
+{
+	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
+}
+
 function addingRow()
 {
 	var itemCodeInner = $("<input size=\"7\" class=\"itemCode\"></input>")
@@ -233,7 +243,7 @@ function addingRow()
 										})
 										.result(function(e, item) {
 											$(this).parent().parent().removeClass("emptyRow");
-											$(this).parent().parent().find("#descAuto input").val(item.desc);
+											$(this).parent().parent().find("#descAuto input").val(decodeHTML(item.desc));
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 
@@ -296,10 +306,10 @@ function jsonForm()
 	var jsonString = "{";
 		$(".jsonRow").each(function (){
 					if(!$(this).hasClass("emptyRow"))
-					var descEncode = $("<div/>").text($(this).find(".itemDesc").val()).html().replace(/"/g,'&quot;');
+					//var descEncode = $("<div/>").text($(this).find(".itemDesc").val()).html().replace(/"/g,'&quot;');
 					jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
 								+$(this).find(".itemCode").val()+"\","
-								+"\"itemDesc\":\""+descEncode+"\","
+								+"\"itemDesc\":\""+encodeHTML($(this).find(".itemDesc").val())+"\","
 								+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
 								+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
 								+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";
