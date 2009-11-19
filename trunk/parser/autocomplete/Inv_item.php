@@ -7,7 +7,7 @@ $jsonString = "[";
 foreach($items as $item)
 {
 	if(strpos(strtolower($item->getId()),$q) !== false){
-		$jsonString = $jsonString . "{ name: \"".$item->prepareId()."\", desc: \"".$item->prepareDescription()."\", uom:\"".$item->prepareUnitOfMeasure()."\" },";
+		$jsonString = $jsonString . "{ name: \"".$item->prepareId()."\", desc: \"".htmlentities($item->getDescription())."\", uom:\"".$item->prepareUnitOfMeasure()."\" },";
 	}
 }
 $jsonString = substr($jsonString,0,strlen($jsonString)-1) . "]";
