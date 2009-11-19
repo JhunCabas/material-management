@@ -296,9 +296,10 @@ function jsonForm()
 	var jsonString = "{";
 		$(".jsonRow").each(function (){
 					if(!$(this).hasClass("emptyRow"))
+					var descEncode = $("<div/>").text($(this).find(".itemDesc").val()).html().replace(/"/g,'&quot;');
 					jsonString = jsonString + "\""+$(this).attr("id")+"\":{\"itemCode\":\""
 								+$(this).find(".itemCode").val()+"\","
-								+"\"itemDesc\":\""+$(this).find(".itemDesc").val()+"\","
+								+"\"itemDesc\":\""+descEncode+"\","
 								+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
 								+"\"itemUnitP\":\""+$(this).find(".itemUnitP").val()+"\","
 								+"\"itemExtP\":\""+$(this).find(".itemExtP").val()+"\"},";
