@@ -19,7 +19,7 @@
 	{
 		return fRecordSet::build('Purchase',
 			array('doc_tag=' => 'po'),
-			array('approver_1_date' => 'desc'),
+			array('po_number' => 'desc'),
 			$limit);
 	}
 	
