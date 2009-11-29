@@ -80,6 +80,7 @@
 				}
 				$purchase->setStatus('approved');
 				$purchase->setDocTag('po');
+				$purchase->setPoDate(date("m/d/Y"));
 				//$purchase->setDocNumber($key);
 				if(!$error)
 					$purchase->store();
@@ -153,6 +154,7 @@
 					}
 					$purchase->setStatus('approved');
 					$purchase->setDocTag('po');
+					$purchase->setPoDate(date("m/d/Y"));
 				}
 				if(!$error)
 					$purchase->store();
