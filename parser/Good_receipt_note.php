@@ -8,7 +8,7 @@
 			try{
 				$grn = new Good_receipt_note();
 				$grn->populate();
-				$purchase = new Purchase($_POST['po_no']);
+				$purchase = new Purchase($_POST['pr_no']);
 				$purchase->setStatus('completed');
 				$json_form = fRequest::get('jsonForm');
 				$jsonForm = fJSON::decode($json_form);
