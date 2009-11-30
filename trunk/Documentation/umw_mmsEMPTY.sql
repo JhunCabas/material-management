@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 29, 2009 at 02:58 AM
+-- Generation Time: Nov 30, 2009 at 03:32 PM
 -- Server version: 5.1.33
 -- PHP Version: 5.2.9
 
@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS `good_receipt_notes` (
   `branch_id` varchar(10) NOT NULL,
   `supplier` varchar(20) NOT NULL,
   `do_no` varchar(30) NOT NULL,
+  `pr_no` varchar(50) NOT NULL,
   `po_no` varchar(50) NOT NULL,
   `inspector` varchar(20) DEFAULT NULL,
   `inspector_date` date DEFAULT NULL,
@@ -97,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
   `remark` varchar(500) DEFAULT NULL,
   `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
@@ -165,7 +166,7 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8237 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8238 ;
 
 -- --------------------------------------------------------
 
@@ -215,7 +216,7 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `remark` varchar(500) DEFAULT NULL,
   `from_branch` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -306,7 +307,7 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `unit_price` float NOT NULL DEFAULT '0',
   `extended_price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=265 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
 -- --------------------------------------------------------
 
