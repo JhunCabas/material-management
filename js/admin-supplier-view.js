@@ -29,6 +29,7 @@ $(function (){
 		$.post("parser/Supplier.php",{
 			type: "edit", 
 			key: $("#key").val(),
+			name: $("#supName input").val(),
 			address: $("#address input").val(), 
 			line_1: $("#line1 input").val(),
 			line_2: $("#line2 input").val(),
@@ -50,7 +51,8 @@ $(function (){
 			});
 		$(this).fadeOut(function (){
 			$("#editBTN").fadeIn();
-		});		
+		});	
+		$("span#titleName").text($("#supName input").val());		
 		$.each($("span.varInput"), function (){
 			var tempText = $(this).children("input").val();
 			$(this).text(tempText);

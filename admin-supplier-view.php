@@ -18,9 +18,13 @@ $tmpl->place('header');
 				try{
 					$supplier = new Supplier($_GET['id']);
 		?>
-		<h2><?php echo $supplier->prepareName(); ?></h2>
+		<h2><span id="titleName"><?php echo $supplier->prepareName(); ?></span></h2>
 		<input id="key" type="hidden" value="<?php echo $supplier->prepareId(); ?>" />
 		<table>
+			<tr>
+				<td width="100"><b>Name</b></td>
+				<td><span id="supName" class="varInput"><?php echo $supplier->prepareName(); ?></span></td>
+			</tr>
 			<tr>
 				<td class="caption" width="100">Address</td>
 			</tr>
