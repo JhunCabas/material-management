@@ -22,7 +22,7 @@ $(function (){
 	$.ajax({type:"post",url:"parser/Good_receipt_note.php",data:{type:"json",key:$("#grnNo").val()},dataType:"json", success: function(data){
 		$.each(data, function(i,item){
 			$.get("parser/Inv_item.php",{type:"uom",key:item.item_id},function (data){
-				fillingRow(item.item_id,item.description,0,data);
+				fillingRow(item.item_id,item.description,item.quantity,data);
 			});
 		});
 	}})
