@@ -63,7 +63,6 @@ $(function (){
 			}, function (data){
 		 		if(data != "")
 				 {
-					console.log(jsonForm());
 				 	 $("#dialogBox").html(data);
 					 $("#dialogBox").dialog('option', 'title', 'Error');
 					 $("#dialogBox").dialog('open');

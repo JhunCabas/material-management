@@ -139,7 +139,7 @@
 							//$purchase->setDocType('PO3');
 							$user = new User($purchase->getRequester());
 							$branch = $user->getBranchId();
-							$newRunningNumber = sprintf("%03d",Purchase::findByPOBranch($branch,'3')->count() + 1);
+							$newRunningNumber = sprintf("%03d",Purchase::findPOByBranch($branch,'3')->count() + 1);
 							$newPONumber = "PO3/".$branch."/".$newRunningNumber."/".date("m/Y");
 							$purchase->setPoNumber($newPONumber);
 							break;
