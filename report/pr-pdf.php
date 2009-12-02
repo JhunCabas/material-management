@@ -92,14 +92,16 @@ $starting = 82;
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             F.name as requester,
+            G.country AS currency,
             A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
-            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E, users F
+            FROM purchases A, currencies G, purchase_details B, branches C, inv_items D, suppliers E, users F
             WHERE A.doc_number='$doc_num'
             AND B.doc_number = A.doc_number
+            AND F.username = A.requester
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
             AND B.item_id = D.id
-            AND F.username = A.requester
+            AND A.currency = G.id
             LIMIT 0,$limit";
                  
              connectToDB();
@@ -327,18 +329,20 @@ if ($items > 1){
             
             unset($desc);
           $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,A.requester,A.requester_date,
+            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
-            A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no,
-            F.country AS currency
-            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E, currencies F
+            F.name as requester,
+            G.country AS currency,
+            A.supplier_1, A.supplier_2, A.supplier_3, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
+            FROM purchases A, currencies G, purchase_details B, branches C, inv_items D, suppliers E, users F
             WHERE A.doc_number='$doc_num'
             AND B.doc_number = A.doc_number
+            AND F.username = A.requester
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
-            AND A.currency = F.id
             AND B.item_id = D.id
+            AND A.currency = G.id
             LIMIT $start,$limit";
                  
              connectToDB();
