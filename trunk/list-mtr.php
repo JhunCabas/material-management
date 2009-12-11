@@ -20,22 +20,58 @@ $tmpl->place('menu');
 		if(fAuthorization::checkAuthLevel('admin'))
 		{
 	?>
-	<h3>List</h3>
+	<h3>List - Uncomplete</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>Requester</th><th>Department</th><th>Status</th></tr>
+			<tr>
+				<th>Document Number</th><th>Document Date</th><th>Requester</th>
+				<th>from Department</th><th>to Department</th><th>Status</th>
+			</tr>
 		</thead>
 		<tbody>
 			<?php
 				try{
-					$mattrans = Material_transfer::findAll(20);
+					$mattrans = Material_transfer::findAllUncomplete(20);
 					foreach($mattrans as $mattran)
 					{
-						$branch = new Branch($mattran->getBranchId());
+						//$branch = new Branch($mattran->getBranchId());
+						$toBranch = new Branch($mattran->getBranchTo());
+						$fromBranch = new Branch($mattran->getBranchFrom());
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
 						echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$mattran->prepareRequester()."</td>";
-						echo "<td>".$branch->prepareName()."</td>";
+						echo "<td>".$fromBranch->prepareName()."</td>";
+						echo "<td>".$toBranch->prepareName()."</td>";
+						echo "<td>".$mattran->prepareStatus()."</td></tr>";
+					}
+				}catch (fExpectedException $e) {
+					echo $e->printMessage();
+				}
+			?>
+		</tbody>
+	</table>
+	<h3>List - Completed</h3>
+	<table>
+		<thead>
+			<tr>
+				<th>Document Number</th><th>Document Date</th><th>Requester</th>
+				<th>from Department</th><th>to Department</th><th>Status</th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+				try{
+					$mattrans = Material_transfer::findAllComplete(20);
+					foreach($mattrans as $mattran)
+					{
+						//$branch = new Branch($mattran->getBranchId());
+						$toBranch = new Branch($mattran->getBranchTo());
+						$fromBranch = new Branch($mattran->getBranchFrom());
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
+						echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$mattran->prepareRequester()."</td>";
+						echo "<td>".$fromBranch->prepareName()."</td>";
+						echo "<td>".$toBranch->prepareName()."</td>";
 						echo "<td>".$mattran->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {

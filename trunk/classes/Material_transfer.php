@@ -16,6 +16,23 @@
 			array('doc_date' => 'desc'),
 			$limit);       
     }
+
+	static function findAllUncomplete($limit=null)
+	{
+		return fRecordSet::build('Material_transfer',
+			array('status!' => 'completed'),
+			array('doc_date' => 'desc'),
+			$limit);
+	}
+	
+	static function findAllComplete($limit=null)
+	{
+		return fRecordSet::build('Material_transfer',
+			array('status=' => 'completed'),
+			array('doc_date' => 'desc'),
+			$limit);
+	}
+	
  }
 
 ?>
