@@ -28,8 +28,10 @@ $tmpl->place('menu');
 			<?php echo $mattrans->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
 			<?php echo $mattrans->prepareDocType(); ?><br />
-		<label for="branch_id">To Branch </label>
-			<?php $branch = new Branch($mattrans->getBranchId()); echo $branch->prepareName() . " / <span id=\"branchId\">" . $mattrans->prepareBranchId()."</span>";?><br />
+		<label for="branch_id">From Branch </label>
+				<?php $branch = new Branch($mattrans->getBranchFrom()); echo $branch->prepareName();?>
+		<label for="branch_id"> To Branch </label>
+			<?php $branch = new Branch($mattrans->getBranchTo()); echo $branch->prepareName();?><br />
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
