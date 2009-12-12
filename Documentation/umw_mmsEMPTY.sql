@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 3.1.3.1
+-- version 3.2.0.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Nov 30, 2009 at 03:32 PM
--- Server version: 5.1.33
--- PHP Version: 5.2.9
+-- Generation Time: Dec 12, 2009 at 01:29 PM
+-- Server version: 5.1.37
+-- PHP Version: 5.3.0
 
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 
@@ -165,6 +165,7 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `branch_id` varchar(20) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
+  `pending` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8238 ;
 
@@ -193,7 +194,9 @@ CREATE TABLE IF NOT EXISTS `material_transfers` (
   `doc_number` varchar(30) NOT NULL,
   `doc_date` date NOT NULL,
   `doc_type` varchar(20) NOT NULL,
-  `branch_id` varchar(10) NOT NULL,
+  `branch_id` varchar(10) DEFAULT NULL,
+  `branch_from` varchar(10) NOT NULL,
+  `branch_to` varchar(10) NOT NULL,
   `approver` varchar(20) DEFAULT NULL,
   `approver_date` date DEFAULT NULL,
   `requester` varchar(20) NOT NULL,
@@ -216,7 +219,7 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `remark` varchar(500) DEFAULT NULL,
   `from_branch` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -252,7 +255,7 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
   `remark` varchar(500) DEFAULT NULL,
   `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
 
 -- --------------------------------------------------------
 
@@ -307,7 +310,7 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `unit_price` float NOT NULL DEFAULT '0',
   `extended_price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
 
 -- --------------------------------------------------------
 
