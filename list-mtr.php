@@ -35,6 +35,13 @@ $tmpl->place('menu');
 					$mattrans = Material_transfer::findAllUncomplete(20);
 					foreach($mattrans as $mattran)
 					{
+						$mattrans_details = Material_transfer_detail::findDetail($mattran->getDocNumber());
+						$statusAll = "completed";
+						foreach($mattrans_details as $mattrans_detail)
+						{
+							if($mattrans_detail->getStatus() != "completed")
+								$statusAll = "pending";
+						}
 						$toBranch = new Branch($mattran->getBranchTo());
 						$fromBranch = new Branch($mattran->getBranchFrom());
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
@@ -42,7 +49,8 @@ $tmpl->place('menu');
 						echo "<td>".$mattran->prepareRequester()."</td>";
 						echo "<td>".$fromBranch->prepareName()."</td>";
 						echo "<td>".$toBranch->prepareName()."</td>";
-						echo "<td>".$mattran->prepareStatus()."</td></tr>";
+						//echo "<td>".$mattran->prepareStatus()."</td></tr>";
+						echo "<td>".$statusAll."</td>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();

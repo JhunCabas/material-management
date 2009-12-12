@@ -29,23 +29,25 @@ $tmpl->place('menu');
 		<label for="doc_type">Document Type </label>
 			<?php echo $mattrans->prepareDocType(); ?><br />
 		<label for="branch_id">From Branch </label>
-				<?php $branch = new Branch($mattrans->getBranchFrom()); echo $branch->prepareName();?>
+				<?php $fromBranch = new Branch($mattrans->getBranchFrom()); echo $fromBranch->prepareName();?>
 		<label for="branch_id"> To Branch </label>
-			<?php $branch = new Branch($mattrans->getBranchTo()); echo $branch->prepareName();?><br />
+			<?php $toBranch = new Branch($mattrans->getBranchTo()); echo $toBranch->prepareName();?><br />
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
-					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>From Branch</th></tr>
+					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th style="width: 120px;">Quantity in <?php echo $fromBranch->prepareName(); ?></th></tr>
 			</thead>
 			<tbody>
 				<?php
 					$counter = 1;
 					foreach($mattrans_details as $mattrans_detail)
 					{
-						echo "<tr class=\"jsonRow\"><td>".$counter."</td><td class=\"itemCode\">".$mattrans_detail->prepareItemId()."</td>";
+						echo "<tr class=\"jsonRow\"><td>".$counter."</td><td class=\"itemCode\">".$mattrans_detail->prepareItemId().
+							"<input class=\"itemId\" type=\"hidden\" value=\"".$mattrans_detail->prepareId()."\"></input></td>";
 						$item = new Inv_item($mattrans_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td class=\"itemQuan\">".$mattrans_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$mattrans_detail->prepareRemark()."</td>";
+						/*
 						echo "<td><select id=\"fromBranch\">";
 						$tempRecords = Inv_stock::findByStock($mattrans_detail->getItemId(),$mattrans_detail->getQuantity());
 						foreach($tempRecords as $tempRecord)
@@ -54,7 +56,14 @@ $tmpl->place('menu');
 							fHTML::printOption($branch->prepareName().
 								"[".$tempRecord->prepareQuantity()."]",$tempRecord->prepareBranchId());
 						}
-						echo "</select><input class=\"itemId\" type=\"hidden\" value=\"".$mattrans_detail->prepareId()."\"></input></td></tr>";
+						echo "</select></td>";
+						*/
+						$tempRecords = Inv_stock::findStockByBranch($mattrans_detail->getItemId(),$mattrans->getBranchFrom());
+						foreach($tempRecords as $tempRecord)
+						{
+							echo "<td>".$tempRecord->prepareQuantity()."</td>";
+						}
+						echo "</tr>";
 						$counter++;
 					}
 				?>
