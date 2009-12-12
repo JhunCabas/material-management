@@ -59,7 +59,7 @@
 	static function findAllPR($limit=null)
 	{
 		return fRecordSet::build('Purchase',
-			array('doc_tag=' => 'pr'),
+			array('doc_tag=' => 'pr', 'status!' => 'cancelled'),
 			array('doc_date' => 'desc'),
 			$limit);
 	}
