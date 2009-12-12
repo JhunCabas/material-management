@@ -23,7 +23,7 @@ $tmpl->place('menu');
 	<h3>List</h3>
 	<table>
 		<thead>
-			<tr><th>Document Number</th><th>Document Date</th><th>Issuer and Receiver</th></tr>
+			<tr><th>Document Number</th><th>Document Date</th><th>Issuer and Receiver</th><th style="width: 100px;">Status</th></tr>
 		</thead>
 		<tbody>
 			<?php
@@ -31,9 +31,17 @@ $tmpl->place('menu');
 					$productionEntries = Production_issue::findAll(20);
 					foreach($productionEntries as $productionEntry)
 					{
+						$productionDetails = Production_issue_detail::findDetail($productionEntry->getDocNumber());
+						$statusAll = "completed";
+						foreach($productionDetails as $productionDetail)
+						{
+							if($productionDetail->getStatus() == "pending")
+								$statusAll = "pending";
+						}
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
-						echo "<td>".$productionEntry->prepareIssuer()."</td></tr>";
+						echo "<td>".$productionEntry->prepareIssuer()."</td>";
+						echo "<td>".$statusAll."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();

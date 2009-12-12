@@ -78,6 +78,10 @@ ul#icons {
 	 	float:left;
 	 	margin:0 4px;
 	}
+	
+	ul#icons span.text-icon {
+		margin-right: 8px;
+	}
 
 #newItem{
  background-color: #99CCFF;
