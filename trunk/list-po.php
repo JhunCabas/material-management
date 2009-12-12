@@ -1,5 +1,6 @@
 <?php
 include './resources/init.php';
+fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
 <script type="text/javascript" charset="utf-8">

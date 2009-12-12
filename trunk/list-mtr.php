@@ -1,5 +1,6 @@
 <?php
 include './resources/init.php';
+fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
 <script type="text/javascript" charset="utf-8">
@@ -35,13 +36,6 @@ $tmpl->place('menu');
 					$mattrans = Material_transfer::findAllUncomplete(20);
 					foreach($mattrans as $mattran)
 					{
-						$mattrans_details = Material_transfer_detail::findDetail($mattran->getDocNumber());
-						$statusAll = "completed";
-						foreach($mattrans_details as $mattrans_detail)
-						{
-							if($mattrans_detail->getStatus() != "completed")
-								$statusAll = "pending";
-						}
 						$toBranch = new Branch($mattran->getBranchTo());
 						$fromBranch = new Branch($mattran->getBranchFrom());
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
@@ -49,8 +43,7 @@ $tmpl->place('menu');
 						echo "<td>".$mattran->prepareRequester()."</td>";
 						echo "<td>".$fromBranch->prepareName()."</td>";
 						echo "<td>".$toBranch->prepareName()."</td>";
-						//echo "<td>".$mattran->prepareStatus()."</td></tr>";
-						echo "<td>".$statusAll."</td>";
+						echo "<td>".$mattran->prepareStatus()."</td></tr>";
 					}
 				}catch (fExpectedException $e) {
 					echo $e->printMessage();
@@ -89,6 +82,68 @@ $tmpl->place('menu');
 	</table>
 	<?php 
 		} // End of Check Admin Status
-	?>
+		else{
+			$user = new User(fAuthorization::getUserToken());
+			?>
+			<h3>List - Attention</h3>
+			<table>
+				<thead>
+					<tr>
+						<th>Document Number</th><th>Document Date</th><th>Requester</th>
+						<th>from Department</th><th>to Department</th><th>Status</th>
+					</tr>
+				</thead>
+				<tbody>
+			<?php
+				try{
+					$mattrans = Material_transfer::findByBranchFrom(10,$user->getBranchId());
+					foreach($mattrans as $mattran)
+					{
+						$toBranch = new Branch($mattran->getBranchTo());
+						$fromBranch = new Branch($mattran->getBranchFrom());
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
+						echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$mattran->prepareRequester()."</td>";
+						echo "<td>".$fromBranch->prepareName()."</td>";
+						echo "<td>".$toBranch->prepareName()."</td>";
+						echo "<td>".$mattran->prepareStatus()."</td></tr>";
+					}
+				}catch (fExpectedException $e) {
+					echo $e->printMessage();
+				}
+			?>
+			</tbody>
+		</table>
+		
+		<h3>List - Pending</h3>
+		<table>
+			<thead>
+				<tr>
+					<th>Document Number</th><th>Document Date</th><th>Requester</th>
+					<th>from Department</th><th>to Department</th><th>Status</th>
+				</tr>
+			</thead>
+			<tbody>
+		<?php
+			try{
+				$mattrans = Material_transfer::findByBranchTo(10,$user->getBranchId());
+				foreach($mattrans as $mattran)
+				{
+					$toBranch = new Branch($mattran->getBranchTo());
+					$fromBranch = new Branch($mattran->getBranchFrom());
+					echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
+					echo "<td>".$mattran->prepareDocDate("j F Y")."</td>";
+					echo "<td>".$mattran->prepareRequester()."</td>";
+					echo "<td>".$fromBranch->prepareName()."</td>";
+					echo "<td>".$toBranch->prepareName()."</td>";
+					echo "<td>".$mattran->prepareStatus()."</td></tr>";
+				}
+			}catch (fExpectedException $e) {
+				echo $e->printMessage();
+			}
+		?>
+		</tbody>
+	</table>
+	<?php } ?>
 </div>
 <?php $tmpl->place('footer'); ?>

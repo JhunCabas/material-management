@@ -89,7 +89,14 @@ function addingRow()
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input class=\"remarks\"/></td>";
-	var counterCell = $("<td></td>").text(++counter);
+	var counterCell = $("<td></td>").text(++counter)
+						.bind("dblclick", function (){
+							if(confirm("Confirm delete row?"))
+							{
+								counter--;
+								$(this).parent().remove();
+							}
+						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
 	var wholeRow = $("<tr id=\"rowNo"+ counter +"\" class=\"jsonRow\"></tr>").append(counterCell).append(itemCode).append(addRow);
 	$("#formContent tbody").append(wholeRow);
