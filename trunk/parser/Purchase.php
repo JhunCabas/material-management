@@ -196,6 +196,11 @@
 			$purchase = new Purchase($_POST['key']);
 			$purchase->setStatus('cancelled');
 			$purchase->store();
+		}else if($_POST['type'] == "cancelPR")
+		{
+			$purchase = new Purchase($_POST['key']);
+			$purchase->setStatus('cancelled');
+			$purchase->store();
 		}
 	}
 ?>

@@ -110,6 +110,7 @@ $tmpl->place('menu');
 				</tr>
 			</tbody>
 		</table>
+		<input type="button" id="cancelBTN" value="Cancel" style="float: right;"/>
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
 					$me = fAuthorization::getUserToken(); 
