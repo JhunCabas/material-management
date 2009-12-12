@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2009 at 01:29 PM
+-- Generation Time: Dec 12, 2009 at 07:46 PM
 -- Server version: 5.1.37
 -- PHP Version: 5.3.0
 
@@ -165,9 +165,9 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `branch_id` varchar(20) NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
-  `pending` int(15) NOT NULL DEFAULT '0',
+  `transit` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8238 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8240 ;
 
 -- --------------------------------------------------------
 
@@ -201,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `material_transfers` (
   `approver_date` date DEFAULT NULL,
   `requester` varchar(20) NOT NULL,
   `requester_date` date NOT NULL,
-  `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','completed','cancelled') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -218,8 +218,9 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `quantity` int(15) NOT NULL,
   `remark` varchar(500) DEFAULT NULL,
   `from_branch` varchar(10) DEFAULT NULL,
+  `status` enum('transit','completed','pending') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
 
 -- --------------------------------------------------------
 
