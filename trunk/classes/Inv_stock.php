@@ -33,6 +33,12 @@
 			array('item_id=' => $item_id , 'quantity>=' => $quantity));
 	}
 	
+	static function findStockByBranch($item, $branch)
+	{
+		return fRecordSet::build('Inv_stock',
+			array('item_id=' => $item, 'branch_id=' => $branch));
+	}
+	
 	static function gotoStock($item_id, $branch)
 	{
 		return fRecordSet::build('Inv_stock',

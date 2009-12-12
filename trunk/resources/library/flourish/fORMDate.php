@@ -9,7 +9,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fORMDate
  * 
- * @version    1.0.0b3
+ * @version    1.0.0b6
+ * @changes    1.0.0b6  Fixed an issue with calling a non-existent method on fTimestamp instances [wb, 2009-11-03]
+ * @changes    1.0.0b5  Updated code for the new fORMDatabase and fORMSchema APIs [wb, 2009-10-28]
+ * @changes    1.0.0b4  Fixed setting up the inspect callback in ::configureTimezoneColumn() [wb, 2009-10-11]
  * @changes    1.0.0b3  Updated to use new fORM::registerInspectCallback() method [wb, 2009-07-13]
  * @changes    1.0.0b2  Updated code to use new fValidationException::formatField() method [wb, 2009-06-04]  
  * @changes    1.0.0b   The initial implementation [wb, 2008-09-05]
@@ -97,7 +100,8 @@ class fORMDate
 	{
 		$class     = fORM::getClass($class);
 		$table     = fORM::tablize($class);
-		$data_type = fORMSchema::retrieve()->getColumnInfo($table, $column, 'type');
+		$schema    = fORMSchema::retrieve($class);
+		$data_type = $schema->getColumnInfo($table, $column, 'type');
 		
 		$valid_data_types = array('date', 'time', 'timestamp');
 		if (!in_array($data_type, $valid_data_types)) {
@@ -135,7 +139,8 @@ class fORMDate
 	{
 		$class     = fORM::getClass($class);
 		$table     = fORM::tablize($class);
-		$data_type = fORMSchema::retrieve()->getColumnInfo($table, $column, 'type');
+		$schema    = fORMSchema::retrieve($class);
+		$data_type = $schema->getColumnInfo($table, $column, 'type');
 		
 		$valid_data_types = array('date', 'time', 'timestamp');
 		if (!in_array($data_type, $valid_data_types)) {
@@ -176,7 +181,8 @@ class fORMDate
 	{
 		$class               = fORM::getClass($class);
 		$table               = fORM::tablize($class);
-		$timestamp_data_type = fORMSchema::retrieve()->getColumnInfo($table, $timestamp_column, 'type');
+		$schema              = fORMSchema::retrieve($class);
+		$timestamp_data_type = $schema->getColumnInfo($table, $timestamp_column, 'type');
 		
 		if ($timestamp_data_type != 'timestamp') {
 			throw new fProgrammerException(
@@ -187,7 +193,7 @@ class fORMDate
 			);
 		}
 		
-		$timezone_column_data_type = fORMSchema::retrieve()->getColumnInfo($table, $timezone_column, 'type');
+		$timezone_column_data_type = $schema->getColumnInfo($table, $timezone_column, 'type');
 		$valid_timezone_column_data_types = array('varchar', 'char', 'text');
 		if (!in_array($timezone_column_data_type, $valid_timezone_column_data_types)) {
 			throw new fProgrammerException(
@@ -210,7 +216,7 @@ class fORMDate
 			fORM::registerHookCallback($class, 'pre::validate()', self::makeTimestampObjects);
 		}
 		
-		fORM::registerInspectCallback($class, $column, self::inspect);
+		fORM::registerInspectCallback($class, $timezone_column, self::inspect);
 		
 		fORM::registerActiveRecordMethod(
 			$class,
@@ -328,7 +334,7 @@ class fORMDate
 			}
 			
 			if ($values[$timezone_column] === NULL) {
-				fActiveRecord::assign($values, $old_values, $timezone_column, $value->getTimezone());
+				fActiveRecord::assign($values, $old_values, $timezone_column, $value->format('e'));
 			}
 			 
 		// If there was some error creating the timestamp object, we just leave all values alone
@@ -465,7 +471,7 @@ class fORMDate
 		self::objectifyTimestampWithTimezone($values, $old_values, $column, $timezone_column);
 		
 		if ($value instanceof fTimestamp) {
-			fActiveRecord::assign($values, $old_values, $timezone_column, $value->getTimezone());
+			fActiveRecord::assign($values, $old_values, $timezone_column, $value->format('e'));
 		}	
 	}
 	
