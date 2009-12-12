@@ -17,6 +17,7 @@ $tmpl->place('menu');
 	<h2>Material Transfer</h2>
 	<h3>Add Material Transfer Form : <a href="document-mtr.php">Form</a></h3>
 	<?php 
+		// Check Admin Status
 		if(fAuthorization::checkAuthLevel('admin'))
 		{
 	?>
@@ -34,7 +35,6 @@ $tmpl->place('menu');
 					$mattrans = Material_transfer::findAllUncomplete(20);
 					foreach($mattrans as $mattran)
 					{
-						//$branch = new Branch($mattran->getBranchId());
 						$toBranch = new Branch($mattran->getBranchTo());
 						$fromBranch = new Branch($mattran->getBranchFrom());
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
@@ -61,10 +61,9 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$mattrans = Material_transfer::findAllComplete(20);
+					$mattrans = Material_transfer::findAllComplete(10);
 					foreach($mattrans as $mattran)
 					{
-						//$branch = new Branch($mattran->getBranchId());
 						$toBranch = new Branch($mattran->getBranchTo());
 						$fromBranch = new Branch($mattran->getBranchFrom());
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$mattran->prepareDocNumber()."</td>";
@@ -80,6 +79,8 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
-	<?php }?>
+	<?php 
+		} // End of Check Admin Status
+	?>
 </div>
 <?php $tmpl->place('footer'); ?>

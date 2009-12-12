@@ -44,7 +44,14 @@ $tmpl->place('menu');
 						echo "<td>".$item->prepareDescription()."</td><td id=\"itemQuan\">".$production_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$production_detail->prepareRemark()."</td>";
 						if($production_detail->getStatus() == "pending")
-							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\"><li id=\"save\" title=\"Save\" class=\"ui-state-default ui-corner-all\"><span class=\"ui-icon ui-icon-disk\"></span></li><li title=\"Loading\" class=\"hideFirst ui-corner-all\"><img src=\"./img/layout/ajax-loader2.gif\" /></li></ul></td></tr>";
+							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\">
+								<li id=\"save\" title=\"Save\" class=\"ui-state-default ui-corner-all\">
+									<span class=\"ui-icon ui-icon-disk\"></span>
+									<span class=\"text-icon\">Save</span>
+								</li>
+								<li title=\"Loading\" class=\"hideFirst ui-corner-all\">
+									<img src=\"./img/layout/ajax-loader2.gif\" />
+								</li></ul></td></tr>";
 						else
 							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\"><li title=\"Complete\" class=\"ui-state-default ui-corner-all\"><span class=\"ui-icon ui-icon-check\"></span></li><li title=\"Loading\" class=\"hideFirst ui-corner-all\"><img src=\"./img/layout/ajax-loader2.gif\" /></li></ul></td></tr>";
 						$counter++;
