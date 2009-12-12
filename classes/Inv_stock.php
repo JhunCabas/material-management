@@ -45,6 +45,57 @@
 			array('item_id=' => $item_id, 'branch_id=' => $branch));
 	}
 	
+	static function transitStock($item, $branch, $quantity)
+	{
+		$records = fRecordSet::build('Inv_stock',
+			array('item_id=' => $item, 'branch_id=' => $branch));
+		if($records->count())
+		{
+			foreach($records as $record)
+			{
+				$record->setQuantity($record->getQuantity() - $quantity);
+				$record->setTransit($record->getTransit() + $quantity);
+				$record->store();
+			}
+		}else{
+			echo "Unexpected Error in Quantity";
+		}
+	}
+	
+	static function rejectTransit($item, $branch, $quantity)
+	{
+		$records = fRecordSet::build('Inv_stock',
+			array('item_id=' => $item, 'branch_id=' => $branch));
+		if($records->count())
+		{
+			foreach($records as $record)
+			{
+				$record->setQuantity($record->getQuantity() + $quantity);
+				$record->setTransit($record->getTransit() - $quantity);
+				$record->store();
+			}
+		}else{
+			echo "Unexpected Error in Quantity";
+		}
+	}
+	
+	static function moveTransit($item, $branchFrom, $branchTo, $quantity)
+	{
+		$records = fRecordSet::build('Inv_stock',
+			array('item_id=' => $item, 'branch_id=' => $branchFrom));
+		if($records->count())
+		{
+			foreach($records as $record)
+			{
+				$record->setTransit($record->getTransit() - $quantity);
+				self::addStock($item,$branchTo,$quantity);
+				$record->store();
+			}
+		}else{
+			echo "Unexpected Error in Quantity";
+		}
+	}
+	
 	static function addStock($item, $branch, $quantity)
 	{
 		$records = fRecordSet::build('Inv_stock',

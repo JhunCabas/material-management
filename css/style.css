@@ -249,3 +249,9 @@ div.tableContainer{
 form select{
 	width: 150px;
 }
+
+.error-not-enough{
+	padding-left: 4px;
+	padding-right: 4px;
+	cursor: pointer;
+}

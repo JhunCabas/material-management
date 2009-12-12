@@ -15,6 +15,9 @@ $tmpl->place('menu');
 					<span class=\"ui-icon ui-icon-alert\" style=\"float: left; margin-right: 30px;\"></span>
 					You arrived to this page in error</div>";
 		}else{
+			$me = fAuthorization::getUserToken(); 
+			$user = new User($me);
+			$myBranch = $user->getBranchId();
 			try{
 				$mattrans = new Material_transfer($_GET['id']);
 				$mattrans_details = Material_transfer_detail::findDetail($_GET['id']);
@@ -35,7 +38,7 @@ $tmpl->place('menu');
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
-					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th style="width: 120px;">Quantity in <?php echo $fromBranch->prepareName(); ?></th></tr>
+					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>In <?php echo $fromBranch->prepareId(); ?></th><th width="75px">Icons</th></tr>
 			</thead>
 			<tbody>
 				<?php
@@ -47,23 +50,66 @@ $tmpl->place('menu');
 						$item = new Inv_item($mattrans_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td class=\"itemQuan\">".$mattrans_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$mattrans_detail->prepareRemark()."</td>";
-						/*
-						echo "<td><select id=\"fromBranch\">";
-						$tempRecords = Inv_stock::findByStock($mattrans_detail->getItemId(),$mattrans_detail->getQuantity());
-						foreach($tempRecords as $tempRecord)
-						{
-							$branch = new Branch($tempRecord->getBranchId());
-							fHTML::printOption($branch->prepareName().
-								"[".$tempRecord->prepareQuantity()."]",$tempRecord->prepareBranchId());
-						}
-						echo "</select></td>";
-						*/
 						$tempRecords = Inv_stock::findStockByBranch($mattrans_detail->getItemId(),$mattrans->getBranchFrom());
+						$quanRow = 0;
+						
 						foreach($tempRecords as $tempRecord)
 						{
-							echo "<td>".$tempRecord->prepareQuantity()."</td>";
+							$quanRow = $tempRecord->getQuantity();
 						}
+						echo "<td>".$quanRow."</td>";
+						if(fAuthorization::checkAuthLevel('admin')){
+							echo "<td><span class=\"loader hideFirst\"><img src=\"./img/layout/ajax-loader2.gif\" /></span>";
+							if($mattrans_detail->getStatus() == "pending" && $quanRow >= $mattrans_detail->getQuantity())
+								echo "<input type=\"button\" value=\"Transit\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"transitBTN\"></input></td>";
+							else if($mattrans_detail->getStatus() == "transit")
+							{
+								echo "<input type=\"button\" value=\"Reject\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"rejectBTN\"></input>";
+								echo "<input type=\"button\" value=\"Accept\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"acceptBTN\"></input>";
+								echo "</td>";
+							}
+							else if($mattrans_detail->getStatus() == "completed")
+								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+							else
+								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
+						}else if($mattrans->getBranchFrom() == $myBranch)
+						{
+							echo "<td><span class=\"loader hideFirst\"><img src=\"./img/layout/ajax-loader2.gif\" /></span>";
+							if($mattrans_detail->getStatus() == "pending" && $quanRow >= $mattrans_detail->getQuantity())
+								echo "<input type=\"button\" value=\"Transit\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"transitBTN\"></input></td>";
+							else if($mattrans_detail->getStatus() == "pending" && $quanRow < $mattrans_detail->getQuantity())
+								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
+							else if($mattrans_detail->getStatus() == "completed")
+								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+							else
+								echo "<span class=\"ui-icon ui-icon-clock\"></span></td>";
+						}else if($mattrans->getBranchTo() == $myBranch)
+						{
+							echo "<td><span class=\"loader hideFirst\"><img src=\"./img/layout/ajax-loader2.gif\" /></span>";
+							if($mattrans_detail->getStatus() == "transit")
+							{
+								echo "<input type=\"button\" value=\"Reject\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"rejectBTN\"></input>";
+								echo "<input type=\"button\" value=\"Accept\" 
+										key=\"".$mattrans_detail->prepareId()."\" class=\"acceptBTN\"></input>";
+								echo "</td>";
+							}
+							else if($mattrans_detail->getStatus() == "pending")
+								echo "<span class=\"ui-icon ui-icon-clock\"></span></td>";
+							else if($mattrans_detail->getStatus() == "completed")
+								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+							else
+								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
+						}else{
+							echo "Unauthorized";
+						}
+						
 						echo "</tr>";
+						
 						$counter++;
 					}
 				?>
@@ -77,9 +123,8 @@ $tmpl->place('menu');
 			</tbody>
 		</table>
 		<?php 
-					if($mattrans->getStatus() == 'pending')
-						echo "<input type=\"button\" id=\"submitBTN\" value=\"Submit\" style=\"float: right;\"/>";
-					$me = fAuthorization::getUserToken(); 
+					if($mattrans->getStatus() != "completed")
+					echo "<input type=\"button\" id=\"cancelBTN\" value=\"Cancel\" style=\"float: right;\"/>";
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
 				} catch (fExpectedException $e) {
 					echo $e->printMessage();
