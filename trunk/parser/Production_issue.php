@@ -77,7 +77,7 @@
 				$production->store();
 			}catch (fExpectedException $e) {
 					echo $e->printMessage();
-			}$production - 
+			}
 		}
 		else if($_POST['type'] == "count")
 		{
