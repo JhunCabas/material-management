@@ -27,6 +27,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
+		var branch_id = $("#branch_id").val();
 		var branch_to = $("#branch_to").val();
 		var branch_from = $("#branch_from").val();
 		var requester = $("#requester").text();
@@ -40,6 +41,7 @@ $(function (){
 			doc_date: doc_date,
 			doc_type: doc_type,
 			status: "pending",
+			branch_id: branch_id,
 			branch_from: branch_from,
 			branch_to: branch_to,
 			jsonForm: jsonForm(),
@@ -104,7 +106,7 @@ function addingRow()
 
 function getRunningNumber()
 {
-	$.post("parser/Material_transfer.php",{type:"count"},function (data){
+	$.post("parser/Material_transfer.php",{type:"count",branch:$("#branch_id").val()},function (data){
 		$("#run_num").val(data);
 		$("#doc_num").val("MTF"+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});

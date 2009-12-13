@@ -78,7 +78,8 @@
 			}
 		}else if($_POST['type'] == "count")
 		{
-			$records = Good_receipt_note::findAll();
+			//$records = Good_receipt_note::findAll();
+			$records = Good_receipt_note::findCurrentMonth($_POST['branch']);
 			echo sprintf("%03d",$records->count() + 1);
 		}else if($_POST['type'] == "json")
 		{

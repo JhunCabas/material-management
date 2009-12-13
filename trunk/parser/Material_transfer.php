@@ -43,7 +43,8 @@
 			}
 		}else if($_POST['type'] == "count")
 		{
-			$records = Material_transfer::findAll();
+			//$records = Material_transfer::findAll();
+			$records = Material_transfer::findCurrentMonth($_POST['branch']);
 			echo sprintf("%03d",$records->count() + 1);
 		}else if($_POST['type'] == "transit")
 		{

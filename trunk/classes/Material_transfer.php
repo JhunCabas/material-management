@@ -17,6 +17,15 @@
 			$limit);       
     }
 
+	static function findCurrentMonth($branch)
+	{
+		return fRecordSet::buildFromSQL('Material_transfer',
+				"SELECT material_transfers.* FROM material_transfers WHERE material_transfers.branch_id = '$branch' 
+				AND YEAR( material_transfers.doc_date ) = YEAR( CURDATE( )) AND MONTH( material_transfers.doc_date ) = MONTH( CURDATE( ))",
+				"SELECT count(*) FROM material_transfers"
+			);
+	}
+
 	static function findAllUncomplete($limit=null)
 	{
 		return fRecordSet::build('Material_transfer',

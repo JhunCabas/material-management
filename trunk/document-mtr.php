@@ -19,7 +19,16 @@ $tmpl->place('menu');
 		<label for="doc_num">Document Number </label><input type="text" name="doc_num" value="" id="doc_num"/><br />
 		<label for="doc_date">Document Date </label><input type="text" name="doc_date" value="" id="doc_date" class="datepicker"/><br />
 		<label for="doc_type">Document Type </label>MTF <input id="doc_type" type="hidden" value="MTF"></input><br />
-		<label for="branch_id">From Branch </label>
+		<label for="branch_id">Branch </label><span>
+			<?php
+				$me = fAuthorization::getUserToken();
+				$user = new User($me);
+				$branchname = new Branch($user->getBranchId());
+				echo $branchname->prepareName();
+				echo "<input type=\"hidden\" id=\"branch_id\" value=\"".$user->getBranchId()."\"></input>";
+			?>
+			</span><br />
+		<label for="branch_from">From Branch </label>
 				<select type="text" name="branch_from" id="branch_from"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select> <span> -> </span>
 		<label for="branch_to">To Branch </label>
 			<select type="text" name="branch_to" id="branch_to"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select> <br />
@@ -46,7 +55,7 @@ $tmpl->place('menu');
 			</tbody>
 		</table>
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
-		<?php $me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>"?>
+		<?php echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>"?>
 	</div>
 </div>
 <?php $tmpl->place('footer'); ?>
