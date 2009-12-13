@@ -81,7 +81,10 @@ $tmpl->place('menu');
 		</table>
 		<?php 
 					if($production->getStatus() == 'pending')
+					{
+						echo "<input type=\"button\" id=\"cancelBTN\" value=\"Cancel\" style=\"float: right;\"/>";
 						echo "<input type=\"button\" id=\"submitBTN\" value=\"Submit\" style=\"float: right;\"/>";
+					}
 					$me = fAuthorization::getUserToken(); 
 					echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
 				} catch (fExpectedException $e) {
