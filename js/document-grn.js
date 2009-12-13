@@ -124,7 +124,7 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM)
 {
 	var itemCodeInner = $("<input></input>").attr("readonly","true").attr("size",7).addClass("itemCode").val(itemCode);
 	var addRow = "<td id=\"descAuto\">"+itemDesc+"</td><td><input class=\"itemQuan\" size=\"5\" value=\""+itemQuantity+"\"/></td><td id=\"uomAuto\">"+itemUOM+"</td><td><input size=\"20\" class=\"remarks\"/></td>";
-	var descCell = $("<td></td>").html($("<input></input>").addClass("itemDesc").attr("size",40).val(itemDesc));
+	var descCell = $("<td></td>").html($("<input></input>").addClass("itemDesc").attr("size",40).val(decodeHTML(itemDesc)));
 	var quanCell = $("<td></td>").html($("<input></input>").addClass("itemQuan").attr("size",5).val(itemQuantity));
 	var uomCell = $("<td></td>").attr("id","uomAuto").text(itemUOM);
 	var remarkCell = $("<td></td>").html($("<input></input>").addClass("remarks").attr("size",20));
@@ -145,6 +145,17 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM)
 	$("#formContent tbody").append(wholeRow);
 }
 
+function decodeHTML(encodedString)
+{
+	return $("<div />").html(encodedString).text();
+}
+
+function encodeHTML(decodedString)
+{
+	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
+}
+
+
 function getRunningNumber()
 {
 	$.post("parser/Good_receipt_note.php",{type:"count",branch:$("#branch_id").val()},function (data){
@@ -160,7 +171,7 @@ function jsonForm()
 		jsonString = jsonString + "\""+$(this).attr("id")+"\":{"
 					+"\"itemCode\":\""+$(this).find(".itemCode").val()+"\","
 					+"\"itemQuan\":\""+$(this).find(".itemQuan").val()+"\","
-					+"\"itemDesc\":\""+$(this).find(".itemDesc").val()+"\","
+					+"\"itemDesc\":\""+encodeHTML($(this).find(".itemDesc").val())+"\","
 					+"\"assess\":\""+$(this).find(".assess").val()+"\","
 					+"\"remarks\":\""+$(this).find(".remarks").val()+"\"},";
 					});
