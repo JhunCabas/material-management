@@ -90,7 +90,7 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM)
 {
 	var itemCodeInner = $("<input></input>").attr("readonly","true").attr("size",7).addClass("itemCode").val(itemCode);
 	var addRow = "<td id=\"descAuto\">"+itemDesc+"</td><td><input class=\"itemQuan\" size=\"5\" value=\""+itemQuantity+"\"/></td><td id=\"uomAuto\">"+itemUOM+"</td><td><input size=\"20\" class=\"remarks\"/></td>";
-	var descCell = $("<td></td>").html($("<input></input>").addClass("itemDesc").attr("size",40).val(itemDesc));
+	var descCell = $("<td></td>").html($("<input></input>").addClass("itemDesc").attr("size",40).val(decodeHTML(itemDesc)));
 	var quanCell = $("<td></td>").html($("<input></input>").addClass("itemQuan").attr("size",5).val(itemQuantity));
 	var uomCell = $("<td></td>").attr("id","uomAuto").text(itemUOM);
 	var remarkCell = $("<td></td>").html($("<input></input>").addClass("remarks").attr("size",20));
@@ -141,4 +141,14 @@ function addingRow()
 						.html("<option value=\"OK\">OK</option><option value=\"NG\">NG</option><option value=\"Q\">Q</option><option value=\"X\">X</option>"));
 	var wholeRow = $("<tr class=\"jsonRow\"id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow).append(assess);
 	$("#formContent tbody").append(wholeRow);
+}
+
+function decodeHTML(encodedString)
+{
+	return $("<div />").html(encodedString).text();
+}
+
+function encodeHTML(decodedString)
+{
+	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
 }
