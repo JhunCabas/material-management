@@ -47,6 +47,7 @@ $(function (){
 		});
 	}})
 	$("#cancelBTN").click(function (){
+		if(confirm("Continue?"))
 		$.post("parser/Purchase.php",{
 			type: "cancelPR",
 			key: $("#docNum").text(),

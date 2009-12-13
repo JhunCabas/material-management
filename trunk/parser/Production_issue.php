@@ -69,7 +69,17 @@
 			}catch (fExpectedException $e) {
 					echo $e->printMessage();
 			}
-		}else if($_POST['type'] == "count")
+		}else if($_POST['type'] == "cancel")
+		{
+			try{
+				$production = new Production_issue($_POST['key']);
+				$production->setStatus("cancelled");
+				$production->store();
+			}catch (fExpectedException $e) {
+					echo $e->printMessage();
+			}$production - 
+		}
+		else if($_POST['type'] == "count")
 		{
 			//$records = Production_issue::findAll();
 			$records = Production_issue::findByBranch(fRequest::get('branch','string'),fRequest::get('doctype','string'));

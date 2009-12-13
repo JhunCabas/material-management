@@ -39,6 +39,40 @@ $(function (){
 		var issuer_date = $("#issDate").val();
 		var receiver = $("#receiver").text();
 		var receiver_date = $("#recDate").val();
-		$.post("parser/Production_issue.php",{type: "save", key: $("#docNum").text(), issuer: issuer, issuer_date: issuer_date, receiver: receiver, receiver_date: receiver_date});
+		if(confirm("Continue?"))
+		$.post("parser/Production_issue.php",{type: "save", key: $("#docNum").text(), issuer: issuer, issuer_date: issuer_date, receiver: receiver, receiver_date: receiver_date}
+		,function (data){
+			if(data != "")
+			{
+				$("#dialogBox").html(data);
+				$("#dialogBox").dialog('option', 'title', 'Error');
+				$("#dialogBox").dialog('open');
+			}else{
+				$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Submitted");
+				$("#dialogBox").dialog('option', 'title', 'Success');
+				$("#dialogBox").dialog('open');
+				$("#dialogBox").bind('dialogclose', function(event, ui) {
+					history.go(-1);
+				});
+			}
+		});
+	});
+	$("#cancelBTN").click(function (){
+		if(confirm("Continue?"))
+		$.post("parser/Production_issue.php",{type: "cancel", key: $("#docNum").text()},function (data){
+			if(data != "")
+			{
+				$("#dialogBox").html(data);
+				$("#dialogBox").dialog('option', 'title', 'Error');
+				$("#dialogBox").dialog('open');
+			}else{
+				$("#dialogBox").html("<span class=\"ui-icon ui-icon-info\" style=\"float: left; margin-right: 0.3em;\"/>Cancelled");
+				$("#dialogBox").dialog('option', 'title', 'Success');
+				$("#dialogBox").dialog('open');
+				$("#dialogBox").bind('dialogclose', function(event, ui) {
+					history.go(-1);
+				});
+			}
+		});
 	});
 });
