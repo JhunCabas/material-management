@@ -126,7 +126,7 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM,itemPrice,itemExtend,
 										})
 										.result(function(e, item) {
 											$(this).parent().parent().removeClass("emptyRow");
-											$(this).parent().parent().find("#descAuto input").val(item.desc);
+											$(this).parent().parent().find("#descAuto input").val(decodeHTML(item.desc));
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 
