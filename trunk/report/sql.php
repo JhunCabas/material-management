@@ -249,7 +249,116 @@ session_start();
     			return $table;			
     			}
 
-			         
+
+###################################
+###### export Monthly Tracker to Excel######
+#  doc_number, po_number, doc_date, po_date, grn_number,grn_date, status
+###################################
+    	function exportTracker($month,$year)
+    		{
+    		$count='1';
+      $sql ="	select A.doc_number,A.po_number, A.doc_date, A.po_date, B.doc_number as grn_number,B.doc_date AS grn_date, A.status
+                from purchases A left join good_receipt_notes B on A.po_number=B.po_no
+                WHERE YEAR( A.doc_date ) = $year 
+                AND MONTH( A.doc_date ) = $month 
+                order by A.doc_date";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['doc_number']."</td>
+              <td>".$row['doc_date']."</td>
+              <td>".$row['po_number']."</td>
+              <td>".$row['po_date']."</td>
+              <td>".$row['grn_number']."</td>
+              <td>".$row['grn_date']."</td>
+              <td>".$row['status']."</td>";
+          
+    	   $count++;
+         }
+         return $table;
+      }		
+ 
+
+
+###################################
+###### export Monthly Tracker to Excel######
+#  doc_number, doc_date, doc_type, branch_id, branch_from, branch_to,
+#  approver, approver_date, requester, requester_date, status, id, name, 
+#  location, phone_no
+###################################
+
+    	function exportMTFTrack($month,$year)
+    		{
+    		$count='1';
+      $sql ="	select A.*,C.*
+              FROM material_transfers A,branches C
+              WHERE YEAR( A.doc_date ) = $year 
+                AND MONTH( A.doc_date ) = $month
+              AND A.branch_from = C.id
+              ORDER BY status";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['doc_number']."</td>
+              <td>".$row['doc_date']."</td>
+              <td>".$row['requester']."</td>
+              <td>".$row['approver']."</td>
+              <td>".$row['branch_from']."</td>
+              <td>".$row['branch_to']."</td>
+              <td>".$row['status']."</td>";
+          
+    	   $count++;
+         }
+         return $table;
+      }		
+      
+      
+###################################
+###### export Monthly Tracker to Excel######
+#  doc_number, doc_date, doc_type, branch_id, branch_from, branch_to,
+#  approver, approver_date, requester, requester_date, status, id, name, 
+#  location, phone_no
+###################################
+
+    	function exportPITrack($month,$year)
+    		{
+    		$count='1';
+      $sql ="	select A.*,C.*
+              FROM production_issues A,branches C
+              WHERE YEAR( A.doc_date ) = 2009
+                AND MONTH( A.doc_date ) = 11
+              AND A.branch_id = C.id
+              ORDER BY status";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['doc_number']."</td>
+              <td>".$row['doc_date']."</td>
+              <td>".$row['issuer']."</td>
+              <td>".$row['branch_id']."</td>
+              <td>".$row['status']."</td>";
+          
+    	   $count++;
+         }
+         return $table;
+      }		
+
+###################################			         
 //end get  
 ##############################################################
 ?>
