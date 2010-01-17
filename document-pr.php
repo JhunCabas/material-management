@@ -25,7 +25,11 @@ $tmpl->place('menu');
 				<option value="1">PR1 – Purchase Request (Assets)</option>
 				<option value="2">PR2 – Purchase Request (Stocks)</option>
 				<option value="3">PR3 – Purchase Request (Service)</option>
-				<option value="4">PR4 – Purchase Request (3rd Party)</option>
+				<option value="4">PR4 – Purchase Request (PCSB)</option>
+				<option value="5">PR5 - Purchase Request (3rd Party)</option>
+				<option value="6">PR6 - Purchase Request (GD9)</option>
+				<option value="7">PR7 - Purchase Request</option>
+				<option value="8">PR8 - Purchase Request</option>
 			</select><br />
 		<label for="branch_id">Ship To Branch </label>
 			<select type="text" name="branch_id" id="branch_id"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($user->getBranchId()); ?></select><br />
