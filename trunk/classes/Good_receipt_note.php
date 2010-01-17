@@ -20,10 +20,17 @@
 	static function findCurrentMonth($branch)
 	{		
 		return fRecordSet::buildFromSQL('Good_receipt_note',
-				"SELECT good_receipt_notes.* FROM good_receipt_notes WHERE good_receipt_notes.branch_id = '$branch' 
-				AND YEAR( good_receipt_notes.doc_date ) = YEAR( CURDATE( )) AND MONTH( good_receipt_notes.doc_date ) = MONTH( CURDATE( ))",
+				"SELECT good_receipt_notes.* FROM good_receipt_notes WHERE good_receipt_notes.branch_id = '$branch' AND good_receipt_notes.doc_type = 'GRN' AND YEAR( good_receipt_notes.doc_date ) = YEAR( CURDATE( )) AND MONTH( good_receipt_notes.doc_date ) = MONTH( CURDATE( ))",
 				"SELECT count(*) FROM good_receipt_notes"
 			);			
+	}
+	
+	static function findRev($po)
+	{
+		$records = fRecordSet::build('Good_receipt_note',
+			array('po_no=' => '$po'));
+		
+		return $records->count() + 1;
 	}
  }
 
