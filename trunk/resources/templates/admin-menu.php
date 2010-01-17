@@ -11,7 +11,4 @@
 	<div class="tool-inventory ui-corner-all span-3">
 		<a href="admin-supplier.php">Supplier</a>
 	</div>
-	<div class="tool-inventory ui-corner-all span-4">
-		<a href="admin-doctype.php">Document Type</a>
-	</div>
 </div>
