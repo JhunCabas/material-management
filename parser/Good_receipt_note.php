@@ -47,6 +47,7 @@
 				{
 					$newGRNNo = $grn->getDocNumber()."/rev";
 					$newGRN = $grn->replicate();
+					$newGRN->setDocType("GRNRev");
 					$newGRN->setDocNumber($newGRNNo);
 					$newGRN->setStatus('incomplete');
 					$newGRN->store();
@@ -124,9 +125,14 @@
 				$grn->store();
 				if($_POST['cloneNew'] == "yes")
 				{
-					$newGRNNo = $grn->getDocNumber()."/rev";
+					//if(substr($grn->getDocNumber(),-3) != "rev")
+						$newGRNNo = $grn->getDocNumber()."/rev";
+					//else{
+					//	$newGRNNo = $grn->getDocNumber().Good_receipt_note::findRev($grn->getPoNo());
+					//}
 					$newGRN = $grn->replicate();
 					$newGRN->setDocNumber($newGRNNo);
+					$newGRN->setDocType("GRNRev");
 					$newGRN->setStatus('incomplete');
 					$newGRN->store();
 					foreach($jsonForm as $row)
