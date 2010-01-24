@@ -49,7 +49,21 @@ $tmpl->place('menu');
 	
 	<h3>Total Purchase</h3>
 	
-          	    <li>Purchase Order Report Coming Soon</li>
+          	    <?php
+        // Get the month and year of the current month
+        list($m, $y) = explode('-', date('m-Y'));
+        $m = date('m');
+        $y = date('Y');
+        ////////////////////////
+        for ($i = -3; $i < 0; $i++) {
+          $ts = mktime(0,0,0,(date('m') + $i),1);
+          $mth = date('m', $ts);
+          $yr  = date('Y', $ts);
+         echo "
+        	    <li><a href='report/POReport.php?op=view&month=$mth&year=$yr' target='_blank'>Purchase Order for $mth/$yr</a></li>
+         "; // print out your option
+        }
+        ?>
 	<ol>
   	       <?php
           // Get the month and year of the current month
