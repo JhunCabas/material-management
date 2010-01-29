@@ -71,22 +71,6 @@ $tmpl->place('menu');
 				<tr><th>No</th>
 					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Unit Price</th><th>Extended Price</th></tr>
 			</thead>
-			<!--
-			<tbody>
-				<?php
-					$counter = 1;
-					foreach($purchase_details as $purchase_detail)
-					{
-						echo "<tr class=\"jsonRow\" id=\"rowNo".$counter."\"><td>".$counter."<input type=\"hidden\" class=\"detailId\" value=\"".$purchase_detail->prepareId()."\"></input></td><td><input class=\"itemCode\" value=\"".$purchase_detail->prepareItemId()."\"></input></td>";
-						$item = new Inv_item($purchase_detail->getItemId());
-						echo "<td class=\"descAuto\">".$item->prepareDescription()."</td><td><input class=\"itemQuan\" value=\"".$purchase_detail->prepareQuantity()."\"></input></td>
-							 	<td class=\"uomAuto\">".$item->prepareUnitOfMeasure()."</td><td><input class=\"itemUnitP\" value=\"".$purchase_detail->prepareUnitPrice()."\"></input></td>
-								<td><input class=\"itemExtP\" value=\"".$purchase_detail->prepareExtendedPrice()."\"></input></td></tr>";
-						$counter++;
-					}
-				?>
-			</tbody>
-			-->
 			<tbody>
 			</tbody>
 			<tfoot>
