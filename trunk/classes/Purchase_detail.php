@@ -17,6 +17,16 @@
 			array('doc_number=' => $key));
 	}
 	
+	static function deleteDetail($key)
+	{
+		try{
+			$detail = new Purchase_detail($key);
+			$detail->delete();
+		} catch (fValidationException $e) {
+		    echo $e->printMessage();
+		}
+	}
+	
 	protected function configure()
 	{
 		fORMJSON::extend();
