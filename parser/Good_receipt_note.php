@@ -82,6 +82,9 @@
 			//$records = Good_receipt_note::findAll();
 			$records = Good_receipt_note::findCurrentMonth($_POST['branch']);
 			echo sprintf("%03d",$records->count() + 1);
+		}else if($_POST['type'] == "deleteDetail")
+		{
+			Good_receipt_note_detail::deleteDetail($_POST['key']);
 		}else if($_POST['type'] == "json")
 		{
 			$grn_details = Good_receipt_note_detail::findDetail($_POST['key']);
