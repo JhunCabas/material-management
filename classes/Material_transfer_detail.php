@@ -15,6 +15,16 @@
 		return fRecordSet::build('Material_transfer_detail',
 			array('doc_number=' => $key));
 	}
+	
+	static function deleteDetail($key)
+	{
+		try{
+			$detail = new Material_transfer_detail($key);
+			$detail->delete();
+		} catch (fValidationException $e) {
+		    echo $e->printMessage();
+		}
+	}
 
  }
 
