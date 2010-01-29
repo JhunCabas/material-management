@@ -119,6 +119,9 @@
 			{
 				echo $e->printMessage();
 			}
+		}else if($_POST['type'] == "deleteDetail")
+		{
+			Material_transfer_detail::deleteDetail($_POST['key']);
 		}
 	}
 ?>
