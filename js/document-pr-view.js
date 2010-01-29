@@ -161,6 +161,10 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM,itemPrice,itemExtend,
 							{
 								counter--;
 								$(this).parent().remove();
+								$.post("parser/Purchase.php",{
+									type: "deleteDetail",
+									key: $(this).children(".detailId").val()
+								});
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
