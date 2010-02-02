@@ -13,6 +13,7 @@ $tmpl->place('menu');
 <div id="content" class="span-24 last">
 	<?php 
 		$tmpl->place('menuDocument');
+		$counter = 1;
 		if(!isSet($_GET['id']))
 		{
 			echo "<div class=\"span-24 ui-state-error ui-corner-all\">
