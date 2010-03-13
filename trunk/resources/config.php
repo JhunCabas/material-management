@@ -38,7 +38,7 @@ include DOC_ROOT . '/resources/library/flourish/constructor_functions.php';
 		"password" => "test0",
 		),
 	"title" => "Material Management System",
-	"version" => "v1.30b"
+	"version" => "v2.00b"
 	);
 
 /**
