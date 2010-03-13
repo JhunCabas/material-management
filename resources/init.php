@@ -28,4 +28,3 @@ $db  = new fDatabase('mysql', $config['db']['dbName'], $config['db']['dbUsername
 fORMDatabase::attach($db);
 
 fSession::open();
-//session_start();

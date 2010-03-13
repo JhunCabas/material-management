@@ -160,7 +160,7 @@ function getRunningNumber()
 {
 	$.post("parser/Good_receipt_note.php",{type:"count",branch:$("#branch_id").val()},function (data){
 		$("#run_num").val(data);
-		$("#doc_num").val("GRN"+"/"+$("#branch_id").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
+		$("#doc_num").val("GRN"+"/"+$("#branchami").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 	});
 }
 

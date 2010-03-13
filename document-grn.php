@@ -92,6 +92,7 @@ $tmpl->place('menu');
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
 				$me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
+				$meRecord = new User($me); echo "<input type=\"hidden\" id=\"branchami\" value=\"".$meRecord->prepareBranchId()."\"/>";
 				}catch	(fExpectedException $e) {
 					echo $e->printMessage();
 				}
