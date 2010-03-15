@@ -277,6 +277,7 @@ function addingRow()
 							{
 								counter--;
 								$(this).parent().remove();
+								calculateTotal();
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
