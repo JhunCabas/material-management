@@ -165,6 +165,7 @@ function fillingRow(itemCode,itemDesc,itemQuantity,itemUOM,itemPrice,itemExtend,
 									type: "deleteDetail",
 									key: $(this).children(".detailId").val()
 								});
+								calculateTotal();
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
@@ -243,6 +244,7 @@ function addingRow()
 							{
 								counter--;
 								$(this).parent().remove();
+								calculateTotal();
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
