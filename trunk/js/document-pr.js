@@ -13,6 +13,7 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
+	setInterval("calculateTotal()",1000);
 	$("#sup1auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
