@@ -9,6 +9,7 @@ $(function (){
 	$("#dialogBox").dialog({
 		autoOpen: false
 	});
+	setInterval("calculateTotal()",1000);
 	$(".signHere").click(function (){
 		if($(this).parent().next().children("input").val() == "")
 			alert("Input Date first");
