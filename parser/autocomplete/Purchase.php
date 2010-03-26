@@ -2,7 +2,7 @@
 include '../../resources/init.php';
 $q = strtolower($_GET["q"]);
 if (!$q) return;
-$pos = Purchase::findAllUncompletePO(10);
+$pos = Purchase::findAllUncompletePO();
 $jsonString = "[";
 foreach($pos as $po)
 {
