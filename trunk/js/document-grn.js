@@ -79,7 +79,7 @@ $(function (){
 		var doc_number = $("#doc_num").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
-		var branch_id = $("#branch_id").val();
+		var branch_id = $("#branchami").val();
 		var supplier = $("#supplierID").val();
 		var do_no = $("#doNo").val();
 		var po_no = $("#poNo").val();
@@ -154,7 +154,6 @@ function encodeHTML(decodedString)
 {
 	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
 }
-
 
 function getRunningNumber()
 {
