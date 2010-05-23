@@ -6,7 +6,7 @@ include_once('class/DBConn.php');
 $doc_num = $PRnum;
 
 ////////////
-$perpage = 10; 
+$perpage = 9; 
 $page = 1;
 $limit = $perpage; 
 
@@ -16,7 +16,7 @@ $count ="SELECT DISTINCT COUNT(B.`doc_number`) AS count
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id";
        connectToDB();
-                     $getCount = mysql_query($count) or die ("Execution SQL; count disnct");
+                     $getCount = mysql_query($count) or die ("Execution SQL; count DISTINCT");
              $rowCount = mysql_fetch_array($getCount);
             				
             	$items = $rowCount['count'];
@@ -119,7 +119,7 @@ $starting = 82;
             		  $extendedprice = $row['extended_price'];
             		  
             		  $currency = $row['currency'];
-            			$total = $row['total'];
+            			$total  =$row['total'];
             			$discount = $row['discount'];
             			
             			$req_date = $row['requester_date'];
@@ -165,7 +165,7 @@ $starting = 82;
       }
      
      
-      $desc = str_split($description, 52);
+      $desc = str_split($description, 50);
      
      
       $pdf->Text(12,$starting,$count);
@@ -174,7 +174,7 @@ $starting = 82;
       $pdf->Text(140,$starting,$quantity);
       $pdf->Text(152,$starting,$unitmeasure);
       
-       if (strlen($description) > 52 )
+       if (strlen($description) > 50 )
       {
        $starting = $starting + 5;
       $pdf->Text(42,$starting,$desc[1]);
@@ -280,7 +280,7 @@ $pdf->Text(130,263,"Date : ");
 
 
 ////////////                                          ////////////
-///do this if more than 13 items.///do this if more than 13 items.
+///do this if more than 10 items.///do this if more than 10 items.
 ///do this if more than 13 items.///do this if more than 13 items.
 ///do this if more than 13 items.///do this if more than 13 items.
 ///do this if more than 13 items.///do this if more than 13 items.
@@ -294,11 +294,11 @@ if ($items > 1){
         for ($i = 1; $i < $items; $i++) 
             {
             
-      $start=$limit;  //in case the limit we tuka, new page start item from previouss
+      $start=$start+$perpage;  //in case the limit we tuka, new page start item from previouss
                 
       $page += 1;
     //set start ,limit
-    $limit=$start+$perpage;
+    //$start=$start+$perpage; //this created the wrong sql - 5th Jan 2010
     
             
       $pdf->AddPage('P','Letter');
@@ -510,7 +510,7 @@ if ($items > 1){
 
 
 $pdf->Text(167,175,'TOTAL');
-$pdf->Text(100,165,'DISCOUNT');
+$pdf->Text(100,168,'DISCOUNT');
 
 
 $pdf->Text(187,175,$total);
