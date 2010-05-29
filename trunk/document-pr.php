@@ -16,8 +16,31 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Purchase Request</h3><br />
 			<input type="hidden" name="run_num" value="" id="run_num"/>
-		<label for="doc_num">Document Number </label> 
-			<input type="text" name="doc_num" size="30" id="doc_num"/> <span id="loaderBar"><img src="img/layout/ajax-loaderBar.gif"/> Loading </span><br />
+		<div class="span-12">
+			<label for="doc_num">Document Number </label> 
+				<input type="text" name="doc_num" size="30" id="doc_num"/> <span id="loaderBar"><img src="img/layout/ajax-loaderBar.gif"/> Loading </span>
+		</div>
+		<div class="mofbox span-10 last">			
+			<div id="mofinput" class="span-10">				
+				<div class="span-9">	
+					<label for="moffinal">MOF Number: </label>				
+					<input type="text" maxlength="3" name="mof1" size="3" id="mof1"/>/
+					<input type="text" maxlength="3" name="mof2" size="3" id="mof2"/>/
+					<input type="text" maxlength="2" name="mof3" size="2" id="mof3"/>/
+					<input type="text" maxlength="4" name="mof4" size="4" id="mof4"/>
+				</div>
+				<div id="mofenter" class="span-1 ui-icon ui-icon-circle-plus"></div>
+			</div>
+			<div id="moffinal" class="span-10">
+				<div class="span-9">
+					<label for="moffinal">MOF Number: </label>	
+					<input type="text" name="moftext" size="30" id="moftext"/>				
+				</div>
+				<div id="mofedit" class="span-1 ui-icon ui-icon-pencil"></div>
+			</div>		
+		</div>
+			<br />
+		<div class="span-12">
 		<label for="doc_date">Document Date </label>
 			<input type="text" name="doc_date" value="" id="doc_date" /><br />
 		<label for="doc_type">Document Type </label>
@@ -37,6 +60,7 @@ $tmpl->place('menu');
 			<label for="currency_id">Currency </label>
 				<select type="text" name="currency_id" id="currency_id">
 				</select><br />
+		</div>
 		<div class="supplierBox span-23 last">
 			<div id="box1" class="boxes span-7">
 				<b>Supplier 1</b><br />
