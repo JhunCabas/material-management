@@ -141,7 +141,7 @@ ul#icons {
 	 	text-align: right;
 	 	font-weight: bold;
 	}
-	
+		
 	#addRowBTN{
 		font-style: normal;
 		cursor: pointer;
@@ -214,6 +214,10 @@ td.caption{
 
 .supplierRow{
 	cursor: pointer;
+}
+
+.mofbox{
+	
 }
 
 .supplierBox{

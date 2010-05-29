@@ -1,6 +1,7 @@
 var counter = 0;
 var jsonSupplier = 0;
 var jsonItem = 0;
+var mofedit = true;
 function format(entry) {
 	return entry.name;
 }
@@ -14,6 +15,19 @@ $(function (){
 		autoOpen: false
 	});
 	setInterval("calculateTotal()",1000);
+	//mof BETA
+	$("#moffinal").hide();
+	$("#moftext").attr("readonly","true");
+	$("#mofenter").click(function(){
+		$("#moftext").val($("#mof1").val()+"/"+$("#mof2").val()+"/"+$("#mof3").val()+"/"+$("#mof4").val());
+		$("#mofinput").hide("slow",function(){$("#moffinal").show("slow");});		
+		mofedit = false;
+	});
+	$("#mofedit").click(function(){
+		$("#moffinal").hide("slow",function(){$("#mofinput").show("slow");});
+		mofedit = true;
+	});
+	//mof
 	$("#sup1auto").autocomplete("parser/autocomplete/Supplier.php",{
 						parse: function(data) {
 							return $.map(eval(data), function(row) {
@@ -105,6 +119,7 @@ $(function (){
 	$("#submitBTN").click(function (){
 		var running_number = $("#run_num").val();
 		var doc_number = $("#doc_num").val();
+		var mof_number = $("#moftext").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
 		var discount = $("#discountRate").val();
@@ -119,10 +134,12 @@ $(function (){
 		var requester_date = $("#reqDate").val();
 		var payment = $("#payment").val();
 		var delivery = $("#delivery").val();
+		if(mofedit!=true){
 		if(confirm("Continue?"))
 		$.post("parser/Purchase.php",{
 			type: "add",
 			doc_number: doc_number,
+			mof_number: mof_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
 			currency: currency,
@@ -155,10 +172,12 @@ $(function (){
 					 });
 				 }
 			});
+		}else{alert("Please enter the MOF number");}
 	});
 	$("#submitPOBTN").click(function (){
 		var running_number = $("#run_num").val();
 		var doc_number = $("#doc_num").val();
+		var mof_number = $("#moftext").val();
 		var doc_date = $("#doc_date").val();
 		var doc_type = $("#doc_type").val();
 		var discount = $("#discountRate").val();
@@ -177,6 +196,7 @@ $(function (){
 		$.post("parser/Purchase.php",{
 			type: "approve",
 			doc_number: doc_number,
+			mof_number: mof_number,
 			doc_date: doc_date,
 			doc_type: doc_type,
 			currency: currency,
