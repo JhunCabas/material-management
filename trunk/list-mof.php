@@ -35,7 +35,7 @@ $tmpl->place('menu');
 		{
 			try{
 				
-				$purchaseEntries = Purchase::findByMof($_GET['search']);
+				$purchaseEntries = Purchase::findByMof($_GET['search'],$_GET['month']);
 	?>
 		<div class="searchResult span-20">
 			<h3>Search Result</h3>
