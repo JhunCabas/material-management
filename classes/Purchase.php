@@ -73,7 +73,7 @@
 	static function findByMof($key, $duration)
 	{
 		return fRecordSet::build('Purchase',
-			array('mof_number~' => $key 'doc_date<' => new fDate('+'.$duration.' months'))
+			array('mof_number~' => $key,'doc_date<' => new fDate('+ '.$duration.' months')),
 			array('doc_date' => 'desc'));
 	}
 	
