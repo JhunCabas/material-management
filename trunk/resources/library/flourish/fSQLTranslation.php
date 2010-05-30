@@ -1,15 +1,18 @@
 <?php
 /**
- * Takes a subset of SQL from MySQL, PostgreSQL, Oracle, SQLite and MSSQL and translates into the various dialects allowing for cross-database code
+ * Takes a subset of SQL from IBM DB2, MySQL, PostgreSQL, Oracle, SQLite and MSSQL and translates into the various dialects allowing for cross-database code
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond
+ * @copyright  Copyright (c) 2007-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fSQLTranslation
  * 
- * @version    1.0.0b13
+ * @version    1.0.0b16
+ * @changes    1.0.0b16  Added IBM DB2 support [wb, 2010-04-13]
+ * @changes    1.0.0b15  Fixed a bug with MSSQL national character conversion when running a SQL statement with a sub-select containing joins [wb, 2009-12-18]
+ * @changes    1.0.0b14  Changed PostgreSQL to cast columns in LOWER() calls to VARCHAR to allow UUID columns (which are treated as a VARCHAR by fSchema) to work with default primary key ordering in fRecordSet [wb, 2009-12-16]
  * @changes    1.0.0b13  Added a parameter to ::enableCaching() to provide a key token that will allow cached values to be shared between multiple databases with the same schema [wb, 2009-10-28]
  * @changes    1.0.0b12  Backwards Compatibility Break - Removed date translation functionality, changed the signature of ::translate(), updated to support quoted identifiers, added support for PostgreSQL, MSSQL and Oracle schemas [wb, 2009-10-22]
  * @changes    1.0.0b11  Fixed a bug with translating MSSQL national columns over an ODBC connection [wb, 2009-09-18]
@@ -66,7 +69,7 @@ class fSQLTranslation
 		$aliases = array();
 		
 		// Turn comma joins into cross joins
-		if (preg_match('#^(?:"?\w+"?(?:\s+(?:as\s+)?(?:"?\w+"?))?)(?:\s*,\s*(?:"?\w+"?(?:\s+(?:as\s+)?(?:"?\w+"?))?))*$#isD', $sql)) {
+		if (preg_match('#^(?:"?:?\w+"?(?:\s+(?:as\s+)?(?:"?\w+"?))?)(?:\s*,\s*(?:"?\w+"?(?:\s+(?:as\s+)?(?:"?\w+"?))?))*$#isD', $sql)) {
 			$sql = str_replace(',', ' CROSS JOIN ', $sql);
 		}
 		
@@ -74,7 +77,7 @@ class fSQLTranslation
 		
 		foreach ($tables as $table) {
 			// This grabs the table name and alias (if there is one)
-			preg_match('#^\s*(["\w.]+|\(((?:[^()]+|\((?2)\))*)\))(?:\s+(?:as\s+)?((?!ON|USING)["\w.]+))?\s*(?:(?:ON|USING)\s+(.*))?\s*$#im', $table, $parts);
+			preg_match('#^\s*([":\w.]+|\(((?:[^()]+|\((?2)\))*)\))(?:\s+(?:as\s+)?((?!ON|USING)["\w.]+))?\s*(?:(?:ON|USING)\s+(.*))?\s*$#im', $table, $parts);
 			
 			$table_name  = $parts[1];
 			$table_alias = (!empty($parts[3])) ? $parts[3] : $parts[1]; 
@@ -534,9 +537,12 @@ class fSQLTranslation
 			$select_clause = trim($select[1]);
 			$from_clause   = trim($select[3]);
 			
-			// This recursively fixes sub-selects
-			if (preg_match('#\bselect\b#', $from_clause)) {
-				$from_clause = $this->fixMSSQLNationalColumns($from_clause);	
+			$sub_selects = array();
+			if (preg_match_all('#\((\s*SELECT\s+((?:[^()]+|\((?2)\))*))\)#i', $from_clause, $from_matches)) {
+				$sub_selects = $from_matches[0];
+				foreach ($sub_selects as $i => $sub_select) {
+					$from_clause = preg_replace('#' . preg_quote($sub_select, '#') . '#', ':sub_select_' . $i, $from_clause, 1);
+				}
 			}
 			
 			$table_aliases = self::parseTableAliases($from_clause);
@@ -671,7 +677,26 @@ class fSQLTranslation
 				}		
 			}
 			
-			$replace = preg_replace('#\bselect\s+' . preg_quote($select_clause, '#') . '#i', 'SELECT ' . strtr(join(', ', array_merge($selections, $additions)), array('\\' => '\\\\', '$' => '\\$')), $select);
+			foreach ($sub_selects as $i => $sub_select) {
+				$sql = preg_replace(
+					'#:sub_select_' . $i . '\b#',
+					strtr(
+						$this->fixMSSQLNationalColumns($sub_select),
+						array('\\' => '\\\\', '$' => '\\$')
+					),
+					$sql,
+					1
+				);	
+			}
+			
+			$replace = preg_replace(
+				'#\bselect\s+' . preg_quote($select_clause, '#') . '#i',
+				'SELECT ' . strtr(
+					join(', ', array_merge($selections, $additions)),
+					array('\\' => '\\\\', '$' => '\\$')
+				),
+				$select
+			);
 			$sql = str_replace($select, $replace, $sql);	
 		}
 		
@@ -748,7 +773,7 @@ class fSQLTranslation
 			// These fixes don't need to know about strings
 			$new_sql = $this->translateBasicSyntax($sql);
 			
-			if ($this->database->getType() == 'mssql' || $this->database->getType() == 'oracle') {
+			if (in_array($this->database->getType(), array('mssql', 'oracle', 'db2'))) {
 				$new_sql = $this->translateLimitOffsetToRowNumber($new_sql);	
 			}
 			
@@ -801,7 +826,21 @@ class fSQLTranslation
 	 */
 	private function translateBasicSyntax($sql)
 	{
-		if ($this->database->getType() == 'mssql') {
+		if ($this->database->getType() == 'db2') {
+			$regex = array(
+				'#\brandom\(#i'         => 'RAND(',
+				'#\bceil\(#i'           => 'CEILING(',
+				'#\btrue\b#i'           => "'1'",
+				'#\bfalse\b#i'          => "'0'",
+				'#\bpi\(\)#i'           => '3.14159265358979',
+				'#\bcot\(\s*((?>[^()\s]+|\(((?:[^()]+|\((?2)\))*)\))+)\s*\)#i' => '(1/TAN(\1))',
+				'#(?:\b|^)((?>[^()%\s]+|\(((?:[^()]+|\((?2)\))*)\))+)\s*%(?![lbdfristp]\b)\s*((?>[^()\s]+|\(((?:[^()]+|\((?4)\))*)\))+)(?:\b|$)#i' => 'MOD(\1, \3)',
+				'#(?<!["\w.])((?>[^()\s]+|\(((?:[^()]+|\((?2)\))*)\))+)\s+(NOT\s+)?LIKE\s+((?>[^()\s]+|\(((?:[^()]+|\((?4)\))*)\))+)(?:\b|$)#i'    => 'LOWER(\1) \3LIKE LOWER(\4)',
+				'#\blog\(\s*((?>[^(),]+|\((?1)(?:,(?1))?\)|\(\))+)\s*,\s*((?>[^(),]+|\((?2)(?:,(?2))?\)|\(\))+)\s*\)#i'                            => '(LN(\2)/LN(\1))'
+			);
+		
+		
+		} elseif ($this->database->getType() == 'mssql') {
 			$regex = array(
 				'#\bbegin\s*(?!tran)#i' => 'BEGIN TRANSACTION ',
 				'#\brandom\(#i'         => 'RAND(',
@@ -844,6 +883,7 @@ class fSQLTranslation
 		} elseif ($this->database->getType() == 'postgresql') {
 			$regex = array(
 				'#(?<!["\w.])(["\w.]+)\s+(not\s+)?like\b#i' => 'CAST(\1 AS VARCHAR) \2ILIKE',
+				'#\blower\(\s*(?<!["\w.])(["\w.]+)\s*\)#i'  => 'LOWER(CAST(\1 AS VARCHAR))',
 				'#\blike\b#i'                               => 'ILIKE'
 			);
 		
@@ -890,7 +930,19 @@ class fSQLTranslation
 		
 		$table = $table_matches[1];
 		
-		if ($this->database->getType() == 'mssql') {
+		if ($this->database->getType() == 'db2') {
+			
+			// Data type translation
+			$regex = array(
+				'#\btext\b#i'                                => 'CLOB',
+				'#("[^"]+"|\w+)\s+boolean(.*?)(,|\)|$)#im'   => '\1 CHAR(1)\2 CHECK(\1 IN (\'0\', \'1\'))\3',
+				'#\binteger(?:\(\d+\))?\s+autoincrement\b#i' => 'INTEGER GENERATED BY DEFAULT AS IDENTITY'
+			);
+			
+			$sql = preg_replace(array_keys($regex), array_values($regex), $sql);
+		
+			
+		} elseif ($this->database->getType() == 'mssql') {
 			
 			// Data type translation
 			$regex = array(
@@ -1123,6 +1175,27 @@ class fSQLTranslation
 				// Otherwise we just have a limit
 				} else {
 					$replacement = 'SELECT * FROM (SELECT' . $match[1] . $match[3] . $match[5] . ') WHERE rownum <= ' . $match[7];
+				}
+					
+			} elseif ($this->database->getType() == 'db2') {
+				
+				// This means we have an offset clause
+				if (!empty($match[8])) {
+					
+					if ($match[5] === '') {
+						$match[5] = "ORDER BY rand(1) ASC";	
+					}
+					
+					$select  = $match[1] . ', ROW_NUMBER() OVER (';
+					$select .= $match[5];
+					$select .= ') AS flourish__row__num ';
+					$select .= $match[3];
+					
+					$replacement = 'SELECT * FROM (SELECT ' . trim($match[1]) . ', ROW_NUMBER() OVER (' . $match[5] . ') AS flourish__row__num ' . $match[3] . ') AS original_query WHERE flourish__row__num > ' . $match[8] . ' AND flourish__row__num <= ' . ($match[7] + $match[8]) . ' ORDER BY flourish__row__num';
+				
+				// Otherwise we just have a limit
+				} else {
+					$replacement = 'SELECT ' . trim($match[1] . $match[3] . $match[5]) . ' FETCH FIRST ' . $match[7] . ' ROWS ONLY';
 				}
 					
 			}

@@ -2,14 +2,25 @@
 /**
  * Gets schema information for the selected database
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond
+ * @copyright  Copyright (c) 2007-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fSchema
  * 
- * @version    1.0.0b28
+ * @version    1.0.0b39
+ * @changes    1.0.0b39  Fixed a regression where key detection SQL was not compatible with PostgreSQL 8.1 [wb, 2010-04-13]
+ * @changes    1.0.0b38  Added Oracle support to ::getDatabases() [wb, 2010-04-13]
+ * @changes    1.0.0b37  Fixed ::getDatabases() for MSSQL [wb, 2010-04-09]
+ * @changes    1.0.0b36  Fixed PostgreSQL to properly report explicit `NULL` default values via ::getColumnInfo() [wb, 2010-03-30]
+ * @changes    1.0.0b35  Added `max_length` values for various text and blob data types across all databases [wb, 2010-03-29]
+ * @changes    1.0.0b34  Added `min_value` and `max_value` attributes to ::getColumnInfo() to specify the valid range for numeric columns [wb, 2010-03-16]
+ * @changes    1.0.0b33  Changed it so that PostgreSQL unique indexes containing functions are ignored since they can't be properly detected at this point [wb, 2010-03-14]
+ * @changes    1.0.0b32  Fixed ::getTables() to not include views for MySQL [wb, 2010-03-14]
+ * @changes    1.0.0b31  Fixed the creation of the default caching key for ::enableCaching() [wb, 2010-03-02]
+ * @changes    1.0.0b30  Fixed the class to work with lower privilege Oracle accounts and added detection of Oracle number columns [wb, 2010-01-25]
+ * @changes    1.0.0b29  Added on_delete and on_update elements to one-to-one relationship info retrieved by ::getRelationships() [wb, 2009-12-16]
  * @changes    1.0.0b28  Fixed a bug with detecting some multi-column unique constraints in SQL Server databases [wb, 2009-11-13]
  * @changes    1.0.0b27  Added a parameter to ::enableCaching() to provide a key token that will allow cached values to be shared between multiple databases with the same schema [wb, 2009-10-28]
  * @changes    1.0.0b26  Added the placeholder element to the output of ::getColumnInfo(), added support for PostgreSQL, MSSQL and Oracle "schemas", added support for parsing quoted SQLite identifiers [wb, 2009-10-22]
@@ -245,6 +256,10 @@ class fSchema
 		}
 		
 		switch ($this->database->getType()) {
+			case 'db2':
+				$column_info = $this->fetchDB2ColumnInfo($table);
+				break;
+			
 			case 'mssql':
 				$column_info = $this->fetchMSSQLColumnInfo($table);
 				break;
@@ -278,6 +293,304 @@ class fSchema
 	
 	
 	/**
+	 * Gets the column info from a DB2 database
+	 * 
+	 * @param  string $table  The table to fetch the column info for
+	 * @return array  The column info for the table specified - see ::getColumnInfo() for details
+	 */
+	private function fetchDB2ColumnInfo($table)
+	{
+		$column_info = array();
+		
+		$schema = strtolower($this->database->getUsername());
+		if (strpos($table, '.') !== FALSE) {
+			list ($schema, $table) = explode('.', $table);
+		}
+		
+		$data_type_mapping = array(
+			'smallint'          => 'integer',
+			'integer'           => 'integer',
+			'bigint'            => 'integer',
+			'timestamp'         => 'timestamp',
+			'date'              => 'date',
+			'time'              => 'time',
+			'varchar'           => 'varchar',
+			'long varchar'      => 'varchar',
+			'vargraphic'        => 'varchar',
+			'long vargraphic'   => 'varchar',
+			'character'         => 'char',
+			'graphic'           => 'char',
+			'real'              => 'float',
+			'decimal'           => 'float',
+			'numeric'           => 'float',
+			'blob'              => 'blob',
+			'clob'              => 'text',
+			'dbclob'            => 'text'
+		);
+		
+		$max_min_values = array(
+			'smallint'   => array('min' => new fNumber(-32768),                  'max' => new fNumber(32767)),
+			'integer'    => array('min' => new fNumber(-2147483648),             'max' => new fNumber(2147483647)),
+			'bigint'     => array('min' => new fNumber('-9223372036854775808'),  'max' => new fNumber('9223372036854775807'))
+		);
+		
+		// Get the column info
+		$sql = "SELECT
+					LOWER(C.COLNAME) AS \"COLUMN\",
+					C.TYPENAME AS TYPE,
+					C.NULLS AS NULLABLE,
+					C.DEFAULT,
+					C.LENGTH AS MAX_LENGTH,
+					C.SCALE,
+					CASE WHEN C.IDENTITY = 'Y' AND (C.GENERATED = 'D' OR C.GENERATED = 'A') THEN '1' ELSE '0' END AS AUTO_INCREMENT,
+					CH.TEXT AS \"CONSTRAINT\"
+				FROM
+					SYSCAT.COLUMNS AS C LEFT JOIN
+					SYSCAT.COLCHECKS AS CC ON C.TABSCHEMA = CC.TABSCHEMA AND C.TABNAME = CC.TABNAME AND C.COLNAME = CC.COLNAME AND CC.USAGE = 'R' LEFT JOIN
+					SYSCAT.CHECKS AS CH ON C.TABSCHEMA = CH.TABSCHEMA AND C.TABNAME = CH.TABNAME AND CH.TYPE = 'C' AND CH.CONSTNAME = CC.CONSTNAME
+				WHERE
+					C.TABSCHEMA = %s AND
+					C.TABNAME = %s
+				ORDER BY
+					C.COLNO ASC";
+		
+		$result = $this->database->query($sql, strtoupper($schema), strtoupper($table));
+		
+		foreach ($result as $row) {
+			
+			$info = array();
+			
+			foreach ($data_type_mapping as $data_type => $mapped_data_type) {
+				if (stripos($row['type'], $data_type) === 0) {
+					if (isset($max_min_values[$data_type])) {
+						$info['min_value'] = $max_min_values[$data_type]['min'];
+						$info['max_value'] = $max_min_values[$data_type]['max'];
+					}
+					$info['type'] = $mapped_data_type;
+					break;
+				}
+			}
+			
+			// Handle decimal places and min/max for numeric/decimals
+			if (in_array(strtolower($row['type']), array('decimal', 'numeric'))) {
+				$info['decimal_places'] = $row['scale'];
+				$before_digits = str_pad('', $row['max_length'] - $row['scale'], '9');
+				$after_digits  = str_pad('', $row['scale'], '9');
+				$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+				$info['min_value'] = new fNumber('-' . $max_min);
+				$info['max_value'] = new fNumber($max_min);
+			}
+			
+			if (!isset($info['type'])) {
+				$info['type'] = $row['type'];
+			}
+			
+			// Handle the special data for varchar columns
+			if (in_array($info['type'], array('char', 'varchar', 'text', 'blob'))) {
+				$info['max_length'] = $row['max_length'];
+			}
+			
+			// The generally accepted practice for boolean on DB2 is a CHAR(1) with a CHECK constraint
+			if ($info['type'] == 'char' && $info['max_length'] == 1 && !empty($row['constraint'])) {
+				if (is_resource($row['constraint'])) {
+					$row['constraint'] = stream_get_contents($row['constraint']);
+				}
+				if (preg_match('/^\s*' . preg_quote($row['column'], '/') . '\s+in\s+\(\s*(\'0\',\s*\'1\'|\'1\',\s*\'0\')\s*\)\s*$/i', $row['constraint'])) {
+					$info['type'] = 'boolean';
+					$info['max_length'] = NULL;
+				}
+			}
+			
+			// If the column has a constraint, look for valid values
+			if (in_array($info['type'], array('char', 'varchar')) && !empty($row['constraint'])) {
+				if (preg_match('/^\s*' . preg_quote($row['column'], '/') . '\s+in\s+\((.*?)\)\s*$/i', $row['constraint'], $match)) {
+					if (preg_match_all("/(?<!')'((''|[^']+)*)'/", $match[1], $matches, PREG_PATTERN_ORDER)) {
+						$info['valid_values'] = str_replace("''", "'", $matches[1]);
+					}			
+				}
+			}
+			
+			// Handle auto increment
+			if ($row['auto_increment']) {
+				$info['auto_increment'] = TRUE;
+			}
+			
+			// Handle default values
+			if ($row['default'] !== NULL) {
+				if ($row['default'] == 'NULL') {
+					$info['default'] = NULL;
+				} elseif (in_array($info['type'], array('char', 'varchar', 'text', 'timestamp')) ) {
+					$info['default'] = substr($row['default'], 1, -1);
+				} elseif ($info['type'] == 'boolean') {
+					$info['default'] = (boolean) substr($row['default'], 1, -1);
+				} else {
+					$info['default'] = $row['default'];
+				}
+			}
+			
+			// Handle not null
+			$info['not_null'] = ($row['nullable'] == 'N') ? TRUE : FALSE;
+			
+			$column_info[$row['column']] = $info;
+		}
+		
+		return $column_info;
+	}
+	
+	
+	/**
+	 * Fetches the key info for a DB2 database
+	 * 
+	 * @return array  The keys arrays for every table in the database - see ::getKeys() for details
+	 */
+	private function fetchDB2Keys()
+	{
+		$keys = array();
+		
+		$default_schema = strtolower($this->database->getUsername());
+		
+		$tables = $this->getTables();
+		foreach ($tables as $table) {
+			$keys[$table] = array();
+			$keys[$table]['primary'] = array();
+			$keys[$table]['unique']  = array();
+			$keys[$table]['foreign'] = array();
+		}
+		
+		$params  = array();
+		
+		$sql  = "(SELECT
+					 LOWER(RTRIM(R.TABSCHEMA)) AS \"SCHEMA\",
+					 LOWER(R.TABNAME) AS \"TABLE\",
+					 R.CONSTNAME AS CONSTRAINT_NAME,
+					 'foreign' AS \"TYPE\",
+					 LOWER(K.COLNAME) AS \"COLUMN\",
+					 LOWER(RTRIM(R.REFTABSCHEMA)) AS FOREIGN_SCHEMA,
+					 LOWER(R.REFTABNAME) AS FOREIGN_TABLE,
+					 LOWER(FK.COLNAME) AS FOREIGN_COLUMN,
+					 CASE R.DELETERULE WHEN 'C' THEN 'cascade' WHEN 'A' THEN 'no_action' WHEN 'R' THEN 'restrict' ELSE 'set_null' END AS ON_DELETE,
+					 CASE R.UPDATERULE WHEN 'A' THEN 'no_action' WHEN 'R' THEN 'restrict' END AS ON_UPDATE,
+					 K.COLSEQ
+				 FROM
+					 SYSCAT.REFERENCES AS R INNER JOIN 
+					 SYSCAT.KEYCOLUSE AS K ON R.CONSTNAME = K.CONSTNAME AND R.TABSCHEMA = K.TABSCHEMA AND R.TABNAME = K.TABNAME INNER JOIN
+					 SYSCAT.KEYCOLUSE AS FK ON R.REFKEYNAME = FK.CONSTNAME AND R.REFTABSCHEMA = FK.TABSCHEMA AND R.REFTABNAME = FK.TABNAME
+				 WHERE ";
+		
+		$conditions = array();
+		foreach ($tables as $table) {
+			if (strpos($table, '.') === FALSE) {
+				$table = $default_schema . '.' . $table;
+			}	
+			list ($schema, $table) = explode('.', strtoupper($table));
+			$conditions[] = "R.TABSCHEMA = %s AND R.TABNAME = %s";
+			$params[] = $schema;
+			$params[] = $table;
+		}
+		$sql .= '((' . join(') OR( ', $conditions) . '))';
+		 
+		$sql .= "
+				 ) UNION (
+				 SELECT
+					 LOWER(RTRIM(I.TABSCHEMA)) AS \"SCHEMA\",
+					 LOWER(I.TABNAME) AS \"TABLE\",
+					 LOWER(I.INDNAME) AS CONSTRAINT_NAME,
+					 CASE I.UNIQUERULE WHEN 'U' THEN 'unique' ELSE 'primary' END AS \"TYPE\",
+					 LOWER(C.COLNAME) AS \"COLUMN\",
+					 NULL AS FOREIGN_SCHEMA,
+					 NULL AS FOREIGN_TABLE,
+					 NULL AS FOREIGN_COLUMN,
+					 NULL AS ON_DELETE,
+					 NULL AS ON_UPDATE,
+					 C.COLSEQ
+				 FROM
+					 SYSCAT.INDEXES AS I INNER JOIN
+					 SYSCAT.INDEXCOLUSE AS C ON I.INDSCHEMA = C.INDSCHEMA AND I.INDNAME = C.INDNAME
+				 WHERE
+					 I.UNIQUERULE IN ('U', 'P') AND
+					 ";
+		
+		$conditions = array();
+		foreach ($tables as $table) {
+			if (strpos($table, '.') === FALSE) {
+				$table = $default_schema . '.' . $table;
+			}	
+			list ($schema, $table) = explode('.', strtoupper($table));
+			$conditions[] = "I.TABSCHEMA = %s AND I.TABNAME = %s";
+			$params[] = $schema;
+			$params[] = $table;
+		}
+		$sql .= '((' . join(') OR( ', $conditions) . '))';
+		
+		$sql .= "
+				 )
+				 ORDER BY 4, 1, 2, 3, 11";
+		
+		$result = $this->database->query($sql, $params);
+		
+		$last_name  = '';
+		$last_table = '';
+		$last_type  = '';
+		foreach ($result as $row) {
+			
+			if ($row['constraint_name'] != $last_name) {
+				
+				if ($last_name) {
+					if ($last_type == 'foreign' || $last_type == 'unique') {
+						$keys[$last_table][$last_type][] = $temp;
+					} else {
+						$keys[$last_table][$last_type] = $temp;
+					}
+				}
+				
+				$temp = array();
+				if ($row['type'] == 'foreign') {
+					
+					$temp['column']         = $row['column'];
+					$temp['foreign_table']  = $row['foreign_table'];
+					if ($row['foreign_schema'] != $default_schema) {
+						$temp['foreign_table'] = $row['foreign_schema'] . '.' . $temp['foreign_table'];
+					}
+					$temp['foreign_column'] = $row['foreign_column'];
+					$temp['on_delete']      = 'no_action';
+					$temp['on_update']      = 'no_action';
+					
+					if (!empty($row['on_delete'])) {
+						$temp['on_delete'] = $row['on_delete'];
+					}
+					if (!empty($row['on_update'])) {
+						$temp['on_update'] = $row['on_update'];
+					}
+					
+				} else {
+					$temp[] = $row['column'];
+				}
+				
+				$last_table = $row['table'];
+				if ($row['schema'] != $default_schema) {
+					$last_table = $row['schema'] . '.' . $last_table;
+				}
+				$last_name  = $row['constraint_name'];
+				$last_type  = $row['type'];
+				
+			} else {
+				$temp[] = $row['column'];
+			}
+		}
+		
+		if (isset($temp)) {
+			if ($last_type == 'foreign' || $last_type == 'unique') {
+				$keys[$last_table][$last_type][] = $temp;
+			} else {
+				$keys[$last_table][$last_type] = $temp;
+			}
+		}
+		
+		return $keys;
+	}
+	
+	
+	/**
 	 * Gets the `PRIMARY KEY`, `FOREIGN KEY` and `UNIQUE` key constraints from the database
 	 * 
 	 * @return void
@@ -289,6 +602,10 @@ class fSchema
 		}
 		
 		switch ($this->database->getType()) {
+			case 'db2':
+				$keys = $this->fetchDB2Keys();
+				break;
+			
 			case 'mssql':
 				$keys = $this->fetchMSSQLKeys();
 				break;
@@ -333,31 +650,43 @@ class fSchema
 		}
 		
 		$data_type_mapping = array(
-			'bit'			    => 'boolean',
+			'bit'               => 'boolean',
 			'tinyint'           => 'integer',
-			'smallint'			=> 'integer',
-			'int'				=> 'integer',
-			'bigint'			=> 'integer',
-			'datetime'			=> 'timestamp',
+			'smallint'          => 'integer',
+			'int'               => 'integer',
+			'bigint'            => 'integer',
+			'timestamp'         => 'integer',
+			'datetime'          => 'timestamp',
 			'smalldatetime'     => 'timestamp',
 			'datetime2'         => 'timestamp',
 			'date'              => 'date',
 			'time'              => 'time',
-			'varchar'	        => 'varchar',
+			'varchar'           => 'varchar',
 			'nvarchar'          => 'varchar',
-			'char'			    => 'char',
+			'uniqueidentifier'  => 'varchar',
+			'char'              => 'char',
 			'nchar'             => 'char',
-			'real'				=> 'float',
+			'real'              => 'float',
 			'float'             => 'float',
 			'money'             => 'float',
 			'smallmoney'        => 'float',
-			'decimal'			=> 'float',
-			'numeric'			=> 'float',
-			'binary'			=> 'blob',
+			'decimal'           => 'float',
+			'numeric'           => 'float',
+			'binary'            => 'blob',
 			'varbinary'         => 'blob',
 			'image'             => 'blob',
-			'text'				=> 'text',
-			'ntext'             => 'text'
+			'text'              => 'text',
+			'ntext'             => 'text',
+			'xml'               => 'text'
+		);
+		
+		$max_min_values = array(
+			'tinyint'    => array('min' => new fNumber(0),                       'max' => new fNumber(255)),
+			'smallint'   => array('min' => new fNumber(-32768),                  'max' => new fNumber(32767)),
+			'int'        => array('min' => new fNumber(-2147483648),             'max' => new fNumber(2147483647)),
+			'bigint'     => array('min' => new fNumber('-9223372036854775808'),  'max' => new fNumber('9223372036854775807')),
+			'smallmoney' => array('min' => new fNumber('-214748.3648'),          'max' => new fNumber('214748.3647')),
+			'money'      => array('min' => new fNumber('-922337203685477.5808'), 'max' => new fNumber('922337203685477.5807'))
 		);
 		
 		// Get the column info
@@ -367,6 +696,7 @@ class fSchema
 						c.is_nullable              AS nullable,
 						c.column_default           AS 'default',
 						c.character_maximum_length AS max_length,
+						c.numeric_precision        AS precision,
 						c.numeric_scale            AS decimal_places,
 						CASE
 							WHEN
@@ -393,18 +723,27 @@ class fSchema
 			
 			foreach ($data_type_mapping as $data_type => $mapped_data_type) {
 				if (stripos($row['type'], $data_type) === 0) {
+					if (isset($max_min_values[$data_type])) {
+						$info['min_value'] = $max_min_values[$data_type]['min'];
+						$info['max_value'] = $max_min_values[$data_type]['max'];
+					}
 					$info['type'] = $mapped_data_type;
 					break;
 				}
 			}
 			
-			if (!isset($info['type'])) {
-				$info['type'] = $row['type'];
+			// Handle decimal places and min/max for numeric/decimals
+			if (in_array(strtolower($row['type']), array('decimal', 'numeric'))) {
+				$info['decimal_places'] = $row['decimal_places'];
+				$before_digits = str_pad('', $row['precision'] - $row['decimal_places'], '9');
+				$after_digits  = str_pad('', $row['decimal_places'], '9');
+				$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+				$info['min_value'] = new fNumber('-' . $max_min);
+				$info['max_value'] = new fNumber($max_min);
 			}
 			
-			// Handle decimal places for numeric/decimals
-			if (in_array($row['type'], array('numeric', 'decimal'))) {
-				$info['decimal_places'] = $row['decimal_places'];
+			if (!isset($info['type'])) {
+				$info['type'] = $row['type'];
 			}
 			
 			// Handle decimal places for money/smallmoney
@@ -413,7 +752,12 @@ class fSchema
 			}
 			
 			// Handle the special data for varchar columns
-			if (in_array($info['type'], array('char', 'varchar'))) {
+			if (in_array($info['type'], array('char', 'varchar', 'text', 'blob'))) {
+				if ($row['type'] == 'uniqueidentifier') {
+					$row['max_length'] = 32;
+				} elseif ($row['max_length'] == -1) {
+					$row['max_length'] = $row['type'] == 'nvarchar' ? 1073741823 : 2147483647;
+				}
 				$info['max_length'] = $row['max_length'];
 			}
 			
@@ -614,6 +958,19 @@ class fSchema
 			'longtext'			=> 'text'
 		);
 		
+		$max_min_values = array(
+			'tinyint'             => array('min' => new fNumber(-128),                    'max' => new fNumber(127)),
+			'unsigned tinyint'    => array('min' => new fNumber(0),                       'max' => new fNumber(255)),
+			'smallint'            => array('min' => new fNumber(-32768),                  'max' => new fNumber(32767)),
+			'unsigned smallint'   => array('min' => new fNumber(0),                       'max' => new fNumber(65535)),
+			'mediumint'           => array('min' => new fNumber(-8388608),                'max' => new fNumber(8388607)),
+			'unsigned mediumint'  => array('min' => new fNumber(0),                       'max' => new fNumber(16777215)),
+			'int'                 => array('min' => new fNumber(-2147483648),             'max' => new fNumber(2147483647)),
+			'unsigned int'        => array('min' => new fNumber(0),                       'max' => new fNumber('4294967295')),
+			'bigint'              => array('min' => new fNumber('-9223372036854775808'),  'max' => new fNumber('9223372036854775807')),
+			'unsigned bigint'     => array('min' => new fNumber(0),                       'max' => new fNumber('18446744073709551615'))
+		);
+		
 		$column_info = array();
 		
 		$result     = $this->database->query('SHOW CREATE TABLE ' . $table);
@@ -622,10 +979,10 @@ class fSchema
 			$row        = $result->fetchRow();
 			$create_sql = $row['Create Table'];
 		} catch (fNoRowsException $e) {
-			return array();			
+			return array();
 		}
 		
-		preg_match_all('#(?<=,|\()\s+(?:"|\`)(\w+)(?:"|\`)\s+(?:([a-z]+)(?:\(([^)]+)\))?(?: unsigned| zerofill){0,2})(?: character set [^ ]+)?(?: collate [^ ]+)?(?: NULL)?( NOT NULL)?(?: DEFAULT ((?:[^, \']*|\'(?:\'\'|[^\']+)*\')))?( auto_increment)?( COMMENT \'(?:\'\'|[^\']+)*\')?( ON UPDATE CURRENT_TIMESTAMP)?\s*(?:,|\s*(?=\)))#mi', $create_sql, $matches, PREG_SET_ORDER);
+		preg_match_all('#(?<=,|\()\s+(?:"|\`)(\w+)(?:"|\`)\s+(?:([a-z]+)(?:\(([^)]+)\))?( unsigned)?(?: zerofill)?)(?: character set [^ ]+)?(?: collate [^ ]+)?(?: NULL)?( NOT NULL)?(?: DEFAULT ((?:[^, \']*|\'(?:\'\'|[^\']+)*\')))?( auto_increment)?( COMMENT \'(?:\'\'|[^\']+)*\')?( ON UPDATE CURRENT_TIMESTAMP)?\s*(?:,|\s*(?=\)))#mi', $create_sql, $matches, PREG_SET_ORDER);
 		
 		foreach ($matches as $match) {
 			
@@ -634,15 +991,43 @@ class fSchema
 			foreach ($data_type_mapping as $data_type => $mapped_data_type) {
 				if (stripos($match[2], $data_type) === 0) {
 					if ($match[2] == 'tinyint' && $match[3] == 1) {
-						$mapped_data_type = 'boolean';	
+						$mapped_data_type = 'boolean';
+					
+					} elseif (preg_match('#((?:unsigned )?(?:tiny|small|medium|big)?int)#', (isset($match[4]) ? $match[4] . ' ' : '') . $data_type, $int_match)) {
+						if (isset($max_min_values[$int_match[1]])) {
+							$info['min_value'] = $max_min_values[$int_match[1]]['min'];
+							$info['max_value'] = $max_min_values[$int_match[1]]['max'];	
+						}
 					}
-				
+					
 					$info['type'] = $mapped_data_type;
 					break;
 				}
 			}
 			if (!isset($info['type'])) {
 				$info['type'] = preg_replace('#^([a-z ]+).*$#iD', '\1', $match[2]);
+			}
+			
+			switch ($match[2]) {
+				case 'tinyblob':
+				case 'tinytext':
+					$info['max_length'] = 255;
+					break;
+				
+				case 'blob':
+				case 'text':
+					$info['max_length'] = 65535;
+					break;
+				
+				case 'mediumblob':
+				case 'mediumtext':
+					$info['max_length'] = 16777215;
+					break;
+				
+				case 'longblob':
+				case 'longtext':
+					$info['max_length'] = 4294967295;
+					break;
 			}
 		
 			if (stripos($match[2], 'enum') === 0) {
@@ -669,17 +1054,22 @@ class fSchema
 			
 			// Grab the number of decimal places
 			if (stripos($match[2], 'decimal') === 0) {
-				if (preg_match('#^\s*\d+\s*,\s*(\d+)\s*$#D', $match[3], $data_type_info)) {
-					$info['decimal_places'] = $data_type_info[1];
+				if (preg_match('#^\s*(\d+)\s*,\s*(\d+)\s*$#D', $match[3], $data_type_info)) {
+					$info['decimal_places'] = $data_type_info[2];
+					$before_digits = str_pad('', $data_type_info[1] - $info['decimal_places'], '9');
+					$after_digits  = str_pad('', $info['decimal_places'], '9');
+					$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+					$info['min_value'] = new fNumber('-' . $max_min);
+					$info['max_value'] = new fNumber($max_min);
 				}
 			}
 			
 			// Not null
-			$info['not_null'] = (!empty($match[4])) ? TRUE : FALSE;
+			$info['not_null'] = (!empty($match[5])) ? TRUE : FALSE;
 		
 			// Default values
-			if (!empty($match[5]) && $match[5] != 'NULL') {
-				$info['default'] = preg_replace("/^'|'\$/D", '', $match[5]);
+			if (!empty($match[6]) && $match[6] != 'NULL') {
+				$info['default'] = preg_replace("/^'|'\$/D", '', $match[6]);
 			}
 			
 			if ($info['type'] == 'boolean' && isset($info['default'])) {
@@ -687,7 +1077,7 @@ class fSchema
 			}
 		
 			// Auto increment fields
-			if (!empty($match[6])) {
+			if (!empty($match[7])) {
 				$info['auto_increment'] = TRUE;
 			}
 		
@@ -771,6 +1161,7 @@ class fSchema
 		
 		$data_type_mapping = array(
 			'boolean'			=> 'boolean',
+			'number'            => 'integer',
 			'integer'			=> 'integer',
 			'timestamp'			=> 'timestamp',
 			'date'				=> 'date',
@@ -823,10 +1214,11 @@ class fSchema
 								ATC.DATA_SCALE != 0	AND
 								ATC.DATA_PRECISION IS NOT NULL
 							THEN
-								ATC.DATA_SCALE	
+								ATC.DATA_SCALE
 							ELSE
 								NULL
 							END LENGTH,
+						ATC.DATA_PRECISION PRECISION,
 						ATC.NULLABLE,
 						ATC.DATA_DEFAULT,
 						AC.SEARCH_CONDITION CHECK_CONSTRAINT
@@ -863,9 +1255,9 @@ class fSchema
 			
 			if (isset($column_info[$column])) {
 				$info = $column_info[$column];
-				$duplicate = TRUE;	
+				$duplicate = TRUE;
 			} else {
-				$info = array();	
+				$info = array();
 			}
 			
 			if (!$duplicate) {
@@ -879,6 +1271,19 @@ class fSchema
 				
 				if (!isset($info['type'])) {
 					$info['type'] = $row['data_type'];
+				}
+				
+				if (in_array($info['type'], array('blob', 'text'))) {
+					$info['max_length'] = 4294967295;
+				}
+				
+				if ($row['data_type'] == 'float' && $row['precision']) {
+					$row['length'] = (int) $row['length'];
+					$before_digits = str_pad('', $row['precision'] - $row['length'], '9');
+					$after_digits  = str_pad('', $row['length'], '9');
+					$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+					$info['min_value'] = new fNumber('-' . $max_min);
+					$info['max_value'] = new fNumber($max_min);	
 				}
 				
 				// Handle the length of decimal/numeric fields
@@ -1107,6 +1512,14 @@ class fSchema
 			'longtext'			=> 'text'
 		);
 		
+		$max_min_values = array(
+			'smallint'  => array('min' => new fNumber(-32768),                  'max' => new fNumber(32767)),
+			'int'       => array('min' => new fNumber(-2147483648),             'max' => new fNumber(2147483647)),
+			'bigint'    => array('min' => new fNumber('-9223372036854775808'),  'max' => new fNumber('9223372036854775807')),
+			'serial'    => array('min' => new fNumber(-2147483648),             'max' => new fNumber(2147483647)),
+			'bigserial' => array('min' => new fNumber('-9223372036854775808'),  'max' => new fNumber('9223372036854775807'))
+		);
+		
 		// PgSQL required this complicated SQL to get the column info
 		$sql = "SELECT
 						pg_attribute.attname                                        AS column,
@@ -1144,6 +1557,10 @@ class fSchema
 			foreach ($data_type_mapping as $data_type => $mapped_data_type) {
 				if (stripos($column_data_type[1], $data_type) === 0) {
 					$info['type'] = $mapped_data_type;
+					if (isset($max_min_values[$data_type])) {
+						$info['min_value'] = $max_min_values[$data_type]['min'];
+						$info['max_value'] = $max_min_values[$data_type]['max'];
+					}
 					break;
 				}
 			}
@@ -1152,14 +1569,27 @@ class fSchema
 				$info['type'] = $column_data_type[1];
 			}
 			
+			if ($info['type'] == 'blob' || $info['type'] == 'text') {
+				$info['max_length'] = 1073741824; 
+			}
+			
 			// Handle the length of decimal/numeric fields
 			if ($info['type'] == 'float' && isset($column_data_type[3]) && strlen($column_data_type[3]) > 0) {
 				$info['decimal_places'] = (int) $column_data_type[3];
+				$before_digits = str_pad('', $column_data_type[2] - $info['decimal_places'], '9');
+				$after_digits  = str_pad('', $info['decimal_places'], '9');
+				$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+				$info['min_value'] = new fNumber('-' . $max_min);
+				$info['max_value'] = new fNumber($max_min);
 			}
 			
 			// Handle the special data for varchar fields
-			if (in_array($info['type'], array('char', 'varchar')) && !empty($column_data_type[2])) {
-				$info['max_length'] = $column_data_type[2];
+			if (in_array($info['type'], array('char', 'varchar'))) {
+				if (!empty($column_data_type[2])) {
+					$info['max_length'] = $column_data_type[2];
+				} else {
+					$info['max_length'] = 1073741824; 
+				}
 			}
 			
 			// In PostgreSQL, a UUID can be the 32 digits, 32 digits plus 4 hyphens or 32 digits plus 4 hyphens and 2 curly braces
@@ -1181,7 +1611,9 @@ class fSchema
 				$info['auto_increment'] = TRUE;
 				
 			} elseif ($row['default'] !== NULL) {
-				if ($row['default'] == 'now()') {
+				if (preg_match('#^NULL::[\w\s]+$#', $row['default'])) {
+					$info['default'] = NULL;
+				} elseif ($row['default'] == 'now()') {
 					$info['default'] = 'CURRENT_TIMESTAMP';
 				} elseif ($row['default'] == "('now'::text)::date") {
 					$info['default'] = 'CURRENT_DATE';
@@ -1290,7 +1722,8 @@ class fSchema
 						n.nspname NOT IN ('pg_catalog', 'pg_toast') AND
 						indisunique = TRUE AND
 						indisprimary = FALSE AND
-						con.oid IS NULL
+						con.oid IS NULL AND
+						0 != ALL ((ind.indkey)::int[])
 				) ORDER BY 1, 2, 4, 3, 11";
 		
 		$result = $this->database->query($sql);
@@ -1411,13 +1844,26 @@ class fSchema
 			}
 		
 			// Type specific information
-			if (in_array($info['type'], array('char', 'varchar')) && !empty($match[3])) {
-				$info['max_length'] = $match[3];
+			if (in_array($info['type'], array('char', 'varchar'))) {
+				if (!empty($match[3])) {
+					$info['max_length'] = $match[3];
+				} else {
+					$info['max_length'] = 1000000000;   
+				}
+			}
+			
+			if ($info['type'] == 'text' || $info['type'] == 'blob') {
+				$info['max_length'] = 1000000000;   
 			}
 			
 			// Figure out how many decimal places for a decimal
 			if (in_array(strtolower($match[2]), array('decimal', 'numeric')) && !empty($match[4])) {
 				$info['decimal_places'] = $match[4];
+				$before_digits = str_pad('', $match[3] - $match[4], '9');
+				$after_digits  = str_pad('', $match[4], '9');
+				$max_min       = $before_digits . ($after_digits ? '.' : '') . $after_digits;
+				$info['min_value'] = new fNumber('-' . $max_min);
+				$info['max_value'] = new fNumber($max_min);
 			}
 			
 			// Not null
@@ -1597,10 +2043,8 @@ class fSchema
 			$temp['column']         = $key['foreign_column'];
 			$temp['related_table']  = $table;
 			$temp['related_column'] = $key['column'];
-			if ($type == 'one-to-many') {
-				$temp['on_delete']      = $key['on_delete'];
-				$temp['on_update']      = $key['on_update'];
-			}
+			$temp['on_delete']      = $key['on_delete'];
+			$temp['on_update']      = $key['on_update'];
 			$this->relationships[$key['foreign_table']][$type][] = $temp;
 		}
 	}
@@ -1621,6 +2065,10 @@ class fSchema
 			$temp['related_table']  = $key['foreign_table'];
 			$temp['related_column'] = $key['foreign_column'];
 			$type = ($this->checkForSingleColumnUniqueKey($table, $key['column'])) ? 'one-to-one' : 'many-to-one';
+			if ($type == 'one-to-one') {
+				$temp['on_delete'] = $key['on_delete'];
+				$temp['on_update'] = $key['on_update'];	
+			}
 			$this->relationships[$table][$type][] = $temp;
 		}
 	}
@@ -1674,6 +2122,8 @@ class fSchema
 	 *         'default'        => (mixed)   {the default value},
 	 *         'valid_values'   => (array)   {the valid values for a varchar field},
 	 *         'max_length'     => (integer) {the maximum length in a varchar field},
+	 *         'min_value'      => (numeric) {the minimum value for an integer/float field},
+	 *         'max_value'      => (numeric) {the maximum value for an integer/float field},
 	 *         'decimal_places' => (integer) {the number of decimal places for a decimal/numeric/money/smallmoney field},
 	 *         'auto_increment' => (boolean) {if the integer primary key column is a serial/autoincrement/auto_increment/indentity column}
 	 *     ), ...
@@ -1690,7 +2140,9 @@ class fSchema
 	 *     'default'        => (mixed)   {the default value-may contain special strings CURRENT_TIMESTAMP, CURRENT_TIME or CURRENT_DATE},
 	 *     'valid_values'   => (array)   {the valid values for a varchar field},
 	 *     'max_length'     => (integer) {the maximum length in a char/varchar field},
-	 *     'decimal_places' => (integer) {the number of decimal places for a decimal/numeric/money/smallmoney field},
+	 *     'min_value'      => (fNumber) {the minimum value for an integer/float field},
+	 *     'max_value'      => (fNumber) {the maximum value for an integer/float field},
+	  *    'decimal_places' => (integer) {the number of decimal places for a decimal/numeric/money/smallmoney field},
 	 *     'auto_increment' => (boolean) {if the integer primary key column is a serial/autoincrement/auto_increment/indentity column}
 	 * )
 	 * }}}
@@ -1780,17 +2232,15 @@ class fSchema
 		
 		switch ($this->database->getType()) {
 			case 'mssql':
-				$sql = 'SELECT
-								DISTINCT CATALOG_NAME
-							FROM
-								INFORMATION_SCHEMA.SCHEMATA
-							ORDER BY
-								LOWER(CATALOG_NAME)';
+				$sql = 'EXECUTE sp_databases';
 				break;
 			
 			case 'mysql':
 				$sql = 'SHOW DATABASES';
 				break;
+				
+			case 'oracle':
+				$sql = 'SELECT ora_database_name FROM dual';
 			
 			case 'postgresql':
 				$sql = "SELECT
@@ -1801,6 +2251,7 @@ class fSchema
 								LOWER(datname)";
 				break;
 								
+			case 'db2':
 			case 'sqlite':
 				$this->databases[] = $this->database->getDatabase();
 				return $this->databases;
@@ -1902,7 +2353,9 @@ class fSchema
 	 *             'table'          => (string) {the name of the table this relationship is for},
 	 *             'column'         => (string) {the column in the specified table},
 	 *             'related_table'  => (string) {the related table},
-	 *             'related_column' => (string) {the related column}
+	 *             'related_column' => (string) {the related column},
+	 *             'on_delete'      => (string) {the ON DELETE action: 'no_action', 'restrict', 'cascade', 'set_null', or 'set_default'},
+	 *             'on_update'      => (string) {the ON UPDATE action: 'no_action', 'restrict', 'cascade', 'set_null', or 'set_default'}
 	 *         ), ...
 	 *     ),
 	 *     'many-to-one' => array(
@@ -1993,6 +2446,22 @@ class fSchema
 		}
 		
 		switch ($this->database->getType()) {
+			case 'db2':
+				$sql = "SELECT
+								LOWER(RTRIM(TABSCHEMA)) AS \"schema\",
+								LOWER(TABNAME) AS \"table\"
+							FROM
+								SYSCAT.TABLES
+							WHERE
+								TYPE = 'T' AND
+								TABSCHEMA != 'SYSIBM' AND
+								DEFINER != 'SYSIBM' AND
+								TABSCHEMA != 'SYSTOOLS' AND
+								DEFINER != 'SYSTOOLS'
+							ORDER BY
+								LOWER(TABNAME)";
+				break;
+				
 			case 'mssql':
 				$sql = "SELECT
 								TABLE_SCHEMA AS \"schema\",
@@ -2006,7 +2475,13 @@ class fSchema
 				break;
 			
 			case 'mysql':
-				$sql = 'SHOW TABLES';
+				$version = $this->database->query("SELECT version()")->fetchScalar();
+				$version = substr($version, 0, strpos($version, '.'));
+				if ($version <= 4) {
+					$sql = 'SHOW TABLES';
+				} else {
+					$sql = "SHOW FULL TABLES WHERE table_type = 'BASE TABLE'";	
+				}
 				break;
 			
 			case 'oracle':
@@ -2016,12 +2491,32 @@ class fSchema
 							FROM
 								ALL_TABLES
 							WHERE
-								OWNER IN (SELECT
-										username
-									FROM
-										dba_users
-									WHERE
-										default_tablespace NOT IN ('SYSTEM', 'SYSAUX')) AND
+								OWNER NOT IN (
+									'SYS',
+									'SYSTEM',
+									'OUTLN',
+									'ANONYMOUS',
+									'AURORA\$ORB\$UNAUTHENTICATED',
+									'AWR_STAGE',
+									'CSMIG',
+									'CTXSYS',
+									'DBSNMP',
+									'DIP',
+									'DMSYS',
+									'DSSYS',
+									'EXFSYS',
+									'FLOWS_020100',
+									'FLOWS_FILES',
+									'LBACSYS',
+									'MDSYS',
+									'ORACLE_OCM',
+									'ORDPLUGINS',
+									'ORDSYS',
+									'PERFSTAT',
+									'TRACESVR',
+									'TSMSYS',
+									'XDB'
+								) AND
 								DROPPED = 'NO' 
 							ORDER BY
 								TABLE_NAME ASC";
@@ -2061,6 +2556,7 @@ class fSchema
 		if (!in_array($this->database->getType(), array('mysql', 'sqlite'))) {
 			
 			$default_schema_map = array(
+				'db2'        => strtolower($this->database->getUsername()),
 				'mssql'      => 'dbo',
 				'oracle'     => strtolower($this->database->getUsername()),
 				'postgresql' => 'public'
@@ -2142,7 +2638,8 @@ class fSchema
 			$prefix .= $this->database->getDatabase() . '::';
 			if ($this->database->getUsername()) {
 				$prefix .= $this->database->getUsername() . '::';
-			}	
+			}
+			$this->cache_prefix = $prefix;
 		}
 		
 		return $this->cache_prefix;
@@ -2184,7 +2681,16 @@ class fSchema
 			}
 		}
 		
-		$optional_elements = array('not_null', 'default', 'valid_values', 'max_length', 'decimal_places', 'auto_increment');
+		$optional_elements = array(
+			'not_null',
+			'default',
+			'valid_values',
+			'max_length',
+			'max_value',
+			'min_value',
+			'decimal_places',
+			'auto_increment'
+		);
 		
 		foreach ($this->merged_column_info as $table => $column_array) {
 			foreach ($column_array as $column => $info) {
@@ -2266,6 +2772,8 @@ class fSchema
 	 *  - `'default'`
 	 *  - `'valid_values'`
 	 *  - `'max_length'`
+	 *  - `'min_value'`
+	 *  - `'max_value'`
 	 *  - `'decimal_places'`
 	 *  - `'auto_increment'`
 	 * 
@@ -2274,6 +2782,8 @@ class fSchema
 	 *  - `'default'`
 	 *  - `'valid_values'`
 	 *  - `'max_length'`
+	 *  - `'min_value'`
+	 *  - `'max_value'`
 	 *  - `'decimal_places'`
 	 *  
 	 * The key `'auto_increment'` should be a boolean.
@@ -2349,7 +2859,7 @@ class fSchema
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
