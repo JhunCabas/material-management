@@ -29,7 +29,10 @@ $tmpl->place('menu');
 			<?php 
 				echo $purchase->preparePoNumber(); 
 				echo "<input id=\"PrNumber\" type=\"hidden\" value=\"".$purchase->prepareDocNumber()."\" />";
-			?><br />
+			?>
+		<label class="mofLabel" for="mof_num">MOF Number</label>
+			<span id="mof_num"><?php echo $purchase->prepareMofNumber(); ?></span>
+		<br />
 		<label for="doc_date">Document Date </label>
 			<?php echo $purchase->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
