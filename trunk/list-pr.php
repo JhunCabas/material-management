@@ -20,6 +20,7 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Purchase Request</h2>
 	<h3>Add Purchase Request : <a href="document-pr.php">Form</a></h3>
+	<h3>MOF : <a href="list-mof.php">Search</a></h3>
 	<?php 
 		if(fAuthorization::checkAuthLevel('admin'))
 		{
