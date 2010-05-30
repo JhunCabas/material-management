@@ -234,6 +234,24 @@ td.caption{
 		margin-left: 6px;
 		font-size: 90%;
 	}
+	
+.searchBox{
+	padding-left: 35px;
+	background-color: #DDD;
+	margin-bottom: 20px;
+}
+
+	.searchBox input{
+		margin-right: 30px;
+	}
+	
+	.searchBox select{
+		margin-right: 30px;
+	}
+
+.searchResult{
+	margin-left: 80px;
+}
 
 .exporter{
 	text-align: right;
