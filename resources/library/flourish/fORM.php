@@ -2,14 +2,18 @@
 /**
  * Dynamically handles many centralized object-relational mapping tasks
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond
+ * @copyright  Copyright (c) 2007-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fORM
  * 
- * @version    1.0.0b16
+ * @version    1.0.0b20
+ * @changes    1.0.0b20  Added the ability to register a wildcard active record method for all classes [wb, 2010-04-22]
+ * @changes    1.0.0b19  Added the method ::isClassMappedToTable() [wb, 2010-03-30]
+ * @changes    1.0.0b18  Added the `post::loadFromIdentityMap()` hook [wb, 2010-03-14]
+ * @changes    1.0.0b17  Changed ::enableSchemaCaching() to rely on fDatabase::clearCache() instead of explicitly calling fSQLTranslation::clearCache() [wb, 2010-03-09]
  * @changes    1.0.0b16  Backwards Compatibility Break - renamed ::addCustomClassToTableMapping() to ::mapClassToTable(). Added ::getDatabaseName() and ::mapClassToDatabase(). Updated code for new fORMDatabase and fORMSchema APIs [wb, 2009-10-28]
  * @changes    1.0.0b15  Added support for fActiveRecord to ::getRecordName() [wb, 2009-10-06]
  * @changes    1.0.0b14  Updated documentation for ::registerActiveRecordMethod() to include info about prefix method matches [wb, 2009-08-07]
@@ -43,6 +47,7 @@ class fORM
 	const getDatabaseName            = 'fORM::getDatabaseName';
 	const getRecordName              = 'fORM::getRecordName';
 	const getRecordSetMethod         = 'fORM::getRecordSetMethod';
+	const isClassMappedToTable       = 'fORM::isClassMappedToTable';
 	const mapClassToDatabase         = 'fORM::mapClassToDatabase';
 	const mapClassToTable            = 'fORM::mapClassToTable';
 	const objectify                  = 'fORM::objectify';
@@ -396,7 +401,6 @@ class fORM
 		
 		$sql_translation = $db->getSQLTranslation();
 		$sql_translation->enableCaching($cache, $token);
-		fException::registerCallback($sql_translation->clearCache, 'fUnexpectedException');
 		
 		$schema = fORMSchema::retrieve('name:' . $database_name);
 		$schema->enableCaching($cache, $token);
@@ -440,6 +444,8 @@ class fORM
 			list($action, $subject) = self::parseMethod($method);
 			if (isset(self::$active_record_method_callbacks[$class][$action . '*'])) {
 				$callback = self::$active_record_method_callbacks[$class][$action . '*'];	
+			} elseif (isset(self::$active_record_method_callbacks['*'][$action . '*'])) {
+				$callback = self::$active_record_method_callbacks['*'][$action . '*'];	
 			}	
 		}
 		
@@ -556,6 +562,22 @@ class fORM
 		}
 		
 		return NULL;	
+	}
+	
+	
+	/**
+	 * Checks if a class has been mapped to a table
+	 * 
+	 * @internal
+	 * 
+	 * @param  mixed  $class  The name of the class
+	 * @return boolean  If the class has been mapped to a table
+	 */
+	static public function isClassMappedToTable($class)
+	{
+		$class = self::getClass($class);
+		
+		return isset(self::$class_table_map[$class]);
 	}
 	
 	
@@ -777,6 +799,7 @@ class fORM
 	 *  - `'post-commit::delete()'`
 	 *  - `'post-rollback::delete()'`
 	 *  - `'post::delete()'`
+	 *  - `'post::loadFromIdentityMap()'`
 	 *  - `'post::loadFromResult()'`
 	 *  - `'pre::populate()'`
 	 *  - `'post::populate()'`
@@ -807,6 +830,7 @@ class fORM
 			'post-commit::delete()',
 			'post-rollback::delete()',
 			'post::delete()',
+			'post::loadFromIdentityMap()',
 			'post::loadFromResult()',
 			'pre::populate()',
 			'post::populate()',
@@ -1118,7 +1142,7 @@ class fORM
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

@@ -2,21 +2,26 @@
 /**
  * Provides special column functionality for fActiveRecord classes
  * 
- * @copyright  Copyright (c) 2008-2009 Will Bond
+ * @copyright  Copyright (c) 2008-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fORMColumn
  * 
- * @version    1.0.0b7
- * @changes    1.0.0b7  Updated code for the new fORMDatabase and fORMSchema APIs [wb, 2009-10-28]
- * @changes    1.0.0b6  Changed SQL statements to use value placeholders, identifier escaping and schema support [wb, 2009-10-22]
- * @changes    1.0.0b5  Updated to use new fORM::registerInspectCallback() method [wb, 2009-07-13]
- * @changes    1.0.0b4  Updated code for new fORM API [wb, 2009-06-15]
- * @changes    1.0.0b3  Updated code to use new fValidationException::formatField() method [wb, 2009-06-04]  
- * @changes    1.0.0b2  Fixed a bug with objectifying number columns [wb, 2008-11-24]
- * @changes    1.0.0b   The initial implementation [wb, 2008-05-27]
+ * @version    1.0.0b12
+ * @changes    1.0.0b12  Changed validation messages array to use column name keys [wb, 2010-05-26]
+ * @changes    1.0.0b11  Fixed a bug with ::prepareLinkColumn() returning `http://` for empty link columns and not adding `http://` to links that contained a /, but did not start with it [wb, 2010-03-16]
+ * @changes    1.0.0b10  Fixed ::reflect() to specify the value returned from `set` and `generate` methods, changed ::generate() methods to return the newly generated string [wb, 2010-03-15]
+ * @changes    1.0.0b9   Changed email columns to be automatically trimmed if they are a value email address surrounded by whitespace [wb, 2010-03-14]
+ * @changes    1.0.0b8   Made the validation on link columns a bit more strict [wb, 2010-03-09]
+ * @changes    1.0.0b7   Updated code for the new fORMDatabase and fORMSchema APIs [wb, 2009-10-28]
+ * @changes    1.0.0b6   Changed SQL statements to use value placeholders, identifier escaping and schema support [wb, 2009-10-22]
+ * @changes    1.0.0b5   Updated to use new fORM::registerInspectCallback() method [wb, 2009-07-13]
+ * @changes    1.0.0b4   Updated code for new fORM API [wb, 2009-06-15]
+ * @changes    1.0.0b3   Updated code to use new fValidationException::formatField() method [wb, 2009-06-04]  
+ * @changes    1.0.0b2   Fixed a bug with objectifying number columns [wb, 2008-11-24]
+ * @changes    1.0.0b    The initial implementation [wb, 2008-05-27]
  */
 class fORMColumn
 {
@@ -33,6 +38,7 @@ class fORMColumn
 	const prepareNumberColumn   = 'fORMColumn::prepareNumberColumn';
 	const reflect               = 'fORMColumn::reflect';
 	const reset                 = 'fORMColumn::reset';
+	const setEmailColumn        = 'fORMColumn::setEmailColumn';
 	const setRandomStrings      = 'fORMColumn::setRandomStrings';
 	const validateEmailColumns  = 'fORMColumn::validateEmailColumns';
 	const validateLinkColumns   = 'fORMColumn::validateLinkColumns';
@@ -113,6 +119,12 @@ class fORMColumn
 				join(', ', $valid_data_types)
 			);
 		}
+		
+		fORM::registerActiveRecordMethod(
+			$class,
+			'set' . fGrammar::camelize($column, TRUE),
+			self::setEmailColumn
+		);
 		
 		if (!fORM::checkHookCallback($class, 'post::validate()', self::validateEmailColumns)) {
 			fORM::registerHookCallback($class, 'post::validate()', self::validateEmailColumns);
@@ -323,7 +335,7 @@ class fORMColumn
 	
 	
 	/**
-	 * Generates a new random value for the 
+	 * Generates a new random value for the column
 	 * 
 	 * @internal
 	 * 
@@ -334,7 +346,7 @@ class fORMColumn
 	 * @param  array         &$cache            The cache array for the record
 	 * @param  string        $method_name       The method that was called
 	 * @param  array         $parameters        The parameters passed to the method
-	 * @return string  The encoded number
+	 * @return string  The newly generated random value
 	 */
 	static public function generate($object, &$values, &$old_values, &$related_records, &$cache, $method_name, $parameters)
 	{
@@ -367,6 +379,8 @@ class fORMColumn
 		}
 		
 		fActiveRecord::assign($values, $old_values, $column, $value);
+		
+		return $value;
 	}
 	
 	
@@ -447,7 +461,7 @@ class fORMColumn
 		$value = $values[$column];
 		
 		// Fix domains that don't have the protocol to start
-		if (preg_match('#^([a-z0-9\\-]+\.)+[a-z]{2,}(/|$)#iD', $value)) {
+		if (strlen($value) && !preg_match('#^https?://|^/#iD', $value)) {
 			$value = 'http://' . $value;
 		}
 		
@@ -565,7 +579,7 @@ class fORMColumn
 					$signature .= " * Sets the value for " . $column . "\n";
 					$signature .= " * \n";
 					$signature .= " * @param  fNumber|string|integer \$" . $column . "  The new value - don't use floats since they are imprecise\n";
-					$signature .= " * @return void\n";
+					$signature .= " * @return fActiveRecord  The record object, to allow for method chaining\n";
 					$signature .= " */\n";
 				}
 				$set_method = 'set' . $camelized_column;
@@ -622,7 +636,7 @@ class fORMColumn
 					$signature .= " * \n";
 					$signature .= " * If there is a UNIQUE constraint on the column and the value is not unique it will be regenerated until unique\n";
 					$signature .= " * \n";
-					$signature .= " * @return void\n";
+					$signature .= " * @return string  The randomly generated string\n";
 					$signature .= " */\n";
 				}
 				$generate_method = 'generate' . fGrammar::camelize($column, TRUE);
@@ -647,6 +661,44 @@ class fORMColumn
 		self::$link_columns   = array();
 		self::$number_columns = array();
 		self::$random_columns = array();
+	}
+	
+	
+	/**
+	 * Sets the value for an email column, trimming the value if it is a valid email
+	 * 
+	 * @internal
+	 * 
+	 * @param  fActiveRecord $object            The fActiveRecord instance
+	 * @param  array         &$values           The current values
+	 * @param  array         &$old_values       The old values
+	 * @param  array         &$related_records  Any records related to this record
+	 * @param  array         &$cache            The cache array for the record
+	 * @param  string        $method_name       The method that was called
+	 * @param  array         $parameters        The parameters passed to the method
+	 * @return fActiveRecord  The record object, to allow for method chaining
+	 */
+	static public function setEmailColumn($object, &$values, &$old_values, &$related_records, &$cache, $method_name, $parameters)
+	{
+		list ($action, $column) = fORM::parseMethod($method_name);
+		
+		$class = get_class($object);
+		
+		if (count($parameters) < 1) {
+			throw new fProgrammerException(
+				'The method, %s(), requires at least one parameter',
+				$method_name
+			);	
+		}
+		
+		$email = $parameters[0];
+		if (preg_match('#^\s*[a-z0-9\\.\'_\\-\\+]+@(?:[a-z0-9\\-]+\.)+[a-z]{2,}\s*$#iD', $email)) {
+			$email = trim($email);	
+		}
+		
+		fActiveRecord::assign($values, $old_values, $column, $email);
+		
+		return $object;
 	}
 	
 	
@@ -714,7 +766,7 @@ class fORMColumn
 				continue;
 			}
 			if (!preg_match('#^[a-z0-9\\.\'_\\-\\+]+@(?:[a-z0-9\\-]+\.)+[a-z]{2,}$#iD', $values[$column])) {
-				$validation_messages[] = self::compose(
+				$validation_messages[$column] = self::compose(
 					'%sPlease enter an email address in the form name@example.com',
 					fValidationException::formatField(fORM::getColumnName($class, $column))
 				);
@@ -748,8 +800,12 @@ class fORMColumn
 			if (!strlen($values[$column])) {
 				continue;
 			}
-			if (!preg_match('#^(http(s)?://|/|([a-z0-9\\-]+\.)+[a-z]{2,})#i', $values[$column])) {
-				$validation_messages[] = self::compose(
+			
+			$ip_regex       = '(?:(?:[01]?\d?\d|2[0-4]\d|25[0-5])\.){3}(?:[01]?\d?\d|2[0-4]\d|25[0-5])';
+			$hostname_regex = '[a-z]+(?:[a-z0-9\-]*[a-z0-9]\.?|\.)*';
+			$domain_regex   = '([a-z]+([a-z0-9\-]*[a-z0-9])?\.)+[a-z]{2,}';
+			if (!preg_match('#^(https?://(' . $ip_regex . '|' . $hostname_regex . ')(?=/|$)|' . $domain_regex . '(?=/|$)|/)#i', $values[$column])) {
+				$validation_messages[$column] = self::compose(
 					'%sPlease enter a link in the form http://www.example.com',
 					fValidationException::formatField(fORM::getColumnName($class, $column))
 				);
@@ -769,7 +825,7 @@ class fORMColumn
 
 
 /**
- * Copyright (c) 2008-2009 Will Bond <will@flourishlib.com>
+ * Copyright (c) 2008-2010 Will Bond <will@flourishlib.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

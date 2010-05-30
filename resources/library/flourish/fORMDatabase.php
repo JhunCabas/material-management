@@ -2,7 +2,7 @@
 /**
  * Holds a single instance of the fDatabase class and provides database manipulation functionality for ORM code
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond, others
+ * @copyright  Copyright (c) 2007-2010 Will Bond, others
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @author     Craig Ruksznis, iMarc LLC [cr-imarc] <craigruk@imarc.net>
  * @license    http://flourishlib.com/license
@@ -10,7 +10,12 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fORMDatabase
  * 
- * @version    1.0.0b18
+ * @version    1.0.0b23
+ * @changes    1.0.0b23  Fixed error messages in ::retrieve() [wb, 2010-04-23]
+ * @changes    1.0.0b22  Added support for IBM DB2, fixed an issue with building record sets or records that have recursive relationships [wb, 2010-04-13]
+ * @changes    1.0.0b21  Changed ::injectFromAndGroupByClauses() to be able to handle table aliases that contain other aliases inside of them [wb, 2010-03-03]
+ * @changes    1.0.0b20  Fixed a bug where joining to a table two separate ways could cause table alias issues and incorrect SQL to be generated [wb, 2009-12-16]
+ * @changes    1.0.0b19  Added the ability to compare columns with the `=:`, `!:`, `<:`, `<=:`, `>:` and `>=:` operators [wb, 2009-12-08]
  * @changes    1.0.0b18  Fixed a bug affecting where conditions with columns that are not null but have a default value [wb, 2009-11-03]
  * @changes    1.0.0b17  Added support for multiple databases [wb, 2009-10-28]
  * @changes    1.0.0b16  Internal Backwards Compatibility Break - Renamed methods and significantly changed parameters and functionality for SQL statements to use value placeholders, identifier escaping and to handle schemas [wb, 2009-10-22]
@@ -133,9 +138,9 @@ class fORMDatabase
 		}
 		
 		list($table, $column) = self::getTableAndColumn($schema, $table, $column);
-		
-		if ($placeholder === NULL) {
-			$placeholder = $schema->getColumnInfo($table, $column, 'placeholder');	
+								 
+		if ($placeholder === NULL && !in_array($operator, array('=:', '!=:', '<:', '<=:', '>:', '>=:'))) {
+			$placeholder = $schema->getColumnInfo($table, $column, 'placeholder');
 		}
 		
 		// More than one value
@@ -225,6 +230,29 @@ class fORMDatabase
 			}
 								  
 			switch ($operator) {
+				case '!:':
+					$operator = '<>:';
+				case '=:':
+				case '<:':
+				case '<=:':
+				case '>:':
+				case '>=:':
+					$params[0] .= $escaped_column . ' ';
+					$params[0] .= substr($operator, 0, -1) . ' ';
+					
+					// If the column to match is a function, split the function
+					// name off so we can escape the column name
+					$prefix = '';
+					$suffix = '';
+					if (preg_match('#^([^(]+\()\s*([^\s]+)\s*(\))$#D', $value, $parts)) {
+						 $prefix = $parts[1];
+						 $value  = $parts[2];
+						 $suffix = $parts[3];
+					}
+					
+					$params[0] .= $prefix . $db->escape('%r', (strpos($value, '.') === FALSE) ? $table . '.' . $value : $value) . $suffix;
+					break;
+				
 				case '=':
 					if ($value === NULL) {
 						$operator = 'IS';	
@@ -299,13 +327,16 @@ class fORMDatabase
 			}
 			
 			// Splits the operator off of the end of the expression
-			if (in_array(substr($expression, -2), array('<=', '>=', '!=', '<>'))) {
+			if (in_array(substr($expression, -3), array('!=:', '>=:', '<=:', '<>:'))) {
+				$operator = strtr(
+					substr($expression, -3),
+					array('<>:' => '!:', '!=:' => '!:')
+				);
+				$expression = substr($expression, 0, -3);
+			} elseif (in_array(substr($expression, -2), array('<=', '>=', '!=', '<>', '=:', '!:', '<:', '>:'))) {
 				$operator   = strtr(
 					substr($expression, -2),
-					array(
-						'<>' => '!',
-						'!=' => '!'
-					)
+					array('<>' => '!', '!=' => '!')
 				);
 				$expression = substr($expression, 0, -2);
 			} else {
@@ -463,13 +494,16 @@ class fORMDatabase
 				$params[0] .= ' AND ';	
 			}
 			
-			if (in_array(substr($column, -2), array('<=', '>=', '!=', '<>', '!~', '&~', '><'))) {
+			if (in_array(substr($column, -3), array('!=:', '>=:', '<=:', '<>:'))) {
+				$operator = strtr(
+					substr($column, -3),
+					array('<>:' => '!:', '!=:' => '!:')
+				);
+				$column   = substr($column, 0, -3);
+			} elseif (in_array(substr($column, -2), array('<=', '>=', '!=', '<>', '!~', '&~', '><', '=:', '!:', '<:', '>:'))) {
 				$operator = strtr(
 					substr($column, -2),
-					array(
-						'<>' => '!',
-						'!=' => '!'
-					)
+					array('<>' => '!', '!=' => '!')
 				);
 				$column   = substr($column, 0, -2);
 			} else {
@@ -501,13 +535,16 @@ class fORMDatabase
 				$operators = array();
 				
 				foreach ($columns as &$_column) {
-					if (in_array(substr($_column, -2), array('<=', '>=', '!=', '<>', '!~', '&~'))) {
+					if (in_array(substr($_column, -3), array('!=:', '>=:', '<=:', '<>:'))) {
+						$operators[] = strtr(
+							substr($_column, -3),
+							array('<>:' => '!:', '!=:' => '!:')
+						);
+						$_column     = substr($_column, 0, -3);
+					} elseif (in_array(substr($_column, -2), array('<=', '>=', '!=', '<>', '!~', '&~', '=:', '!:', '<:', '>:'))) {
 						$operators[] = strtr(
 							substr($_column, -2),
-							array(
-								'<>' => '!',
-								'!=' => '!'
-							)
+							array('<>' => '!', '!=' => '!')
 						);
 						$_column     = substr($_column, 0, -2);
 					} elseif (!ctype_alnum(substr($_column, -1))) {
@@ -517,17 +554,17 @@ class fORMDatabase
 				}
 				$operators[] = $operator;
 				
-				// Make sure every column is qualified by a table name
-				$new_columns = array();
-				foreach ($columns as $column) {
-					if (strpos($column, '.') === FALSE) {
-						$column = $table . '.' . $column;
-					}
-					$new_columns[] = $column;	
-				}
-				$columns = $new_columns;
-				
 				if (sizeof($operators) == 1) {
+					
+					// Make sure every column is qualified by a table name
+					$new_columns = array();
+					foreach ($columns as $column) {
+						if (strpos($column, '.') === FALSE) {
+							$column = $table . '.' . $column;
+						}
+						$new_columns[] = $column;	
+					}
+					$columns = $new_columns;
 					
 					// Handle fuzzy searches
 					if ($operator == '~') {
@@ -926,7 +963,7 @@ class fORMDatabase
 					}
 					$table_match[4] = self::cleanTableName($schema, $table_match[4]);
 					
-					if ($db->getType() == 'oracle') {
+					if (in_array($db->getType(), array('oracle', 'db2'))) {
 						foreach (array(2, 3, 4, 5) as $subpattern) {
 							if (isset($table_match[$subpattern])) {
 								$table_match[$subpattern] = strtolower($table_match[$subpattern]);	
@@ -942,17 +979,28 @@ class fORMDatabase
 						
 						$join_name = $table . '_' . $related_table . '{' . $route . '}';
 						
+						$once_removed_table = $table_match[4];
+						
+						// Add the once removed table to the aliases in case we also join directly to it
+						// which may cause the replacements later in this method to convert first to the
+						// real table name and then from the real table to the real table's alias
+						if (!in_array($once_removed_table, $used_aliases)) {
+							$used_aliases[] = $once_removed_table;
+						}
+
 						self::createJoin($schema, $table, $table_alias, $related_table, $route, $joins, $used_aliases);
 						
-						$once_removed_table = $table_match[4];
 						$route = fORMSchema::getRouteName($schema, $related_table, $once_removed_table, $table_match[5]);
 						
 						$join_name = self::createJoin($schema, $related_table, $joins[$join_name]['table_alias'], $once_removed_table, $route, $joins, $used_aliases);
 						
 						$table_map[$table_match[1]] = $db->escape('%r', $joins[$join_name]['table_alias']);
+						
+						// Remove the once removed table from the aliases so we also join directly to it without an alias
+						unset($used_aliases[array_search($once_removed_table, $used_aliases)]);
 					
 					// This is a related table
-					} elseif (($table_match[4] != $table || fORMSchema::getRoutes($schema, $table, $table_match[4])) && $table_match[1] != $table) {
+					} elseif (($table_match[4] != $table || fORMSchema::getRoutes($schema, $table, $table_match[4])) && self::cleanTableName($schema, $table_match[1]) != $table) {
 					
 						$related_table = $table_match[4];
 						$route = fORMSchema::getRouteName($schema, $table, $related_table, $table_match[5]);
@@ -1027,7 +1075,7 @@ class fORMDatabase
 				$temp_sql = preg_replace('#(\{\w+)"\."(\w+\})#', '\1.\2', $match);
 				
 				foreach ($table_map as $arrow_table => $alias) {
-					$temp_sql = str_replace($arrow_table, $alias, $temp_sql);
+					$temp_sql = preg_replace('#(?<![\w"])' . preg_quote($arrow_table, '#') . '(?!=[\w"])#', $alias, $temp_sql);
 				}
 				
 				// In the ORDER BY clause we need to wrap columns in
@@ -1170,7 +1218,7 @@ class fORMDatabase
 		
 		if (!isset(self::$database_objects[$database_name])) {
 			throw new fProgrammerException(
-				'The database object named "%s$1" has not been attached via %s$2 yet',
+				'The database object named "%1$s" has not been attached via %2$s yet',
 				$database_name,
 				__CLASS__ . '::attach()'
 			);
@@ -1185,7 +1233,7 @@ class fORMDatabase
 			
 			if (!isset(self::$database_objects[$database_name][$role])) {
 				throw new fProgrammerException(
-					'The database object named "%s$1" for the %2$s role has not been attached via %s$3 yet',
+					'The database object named "%1$s" for the %s$2 role has not been attached via %3$s yet',
 					$database_name,
 					$role,
 					__CLASS__ . '::attach()'
@@ -1216,9 +1264,10 @@ class fORMDatabase
 	{
 		$having_conditions = array();
 		
-		foreach ($where_conditions as $column => $value)
-		{
-			if (preg_match('#^(count\(|max\(|avg\(|min\(|sum\()#i', $column)) {
+		foreach ($where_conditions as $column => $value) {
+			$column_has_aggregate             = preg_match('#^(count\(|max\(|avg\(|min\(|sum\()#i', $column);
+			$is_column_compare_with_aggregate = substr($column, -1) == ':' && preg_match('#^(count\(|max\(|avg\(|min\(|sum\()#i', $value);
+			if ($column_has_aggregate || $is_column_compare_with_aggregate) {
 				$having_conditions[$column] = $value;
 				unset($where_conditions[$column]);
 			}	
@@ -1239,7 +1288,7 @@ class fORMDatabase
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>, others
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>, others
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

@@ -7,7 +7,7 @@
  * method calls for getting, setting and other operations on columns. It also
  * dynamically handles retrieving and storing related records.
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond, others
+ * @copyright  Copyright (c) 2007-2010 Will Bond, others
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @author     Will Bond, iMarc LLC [wb-imarc] <will@imarc.net>
  * @license    http://flourishlib.com/license
@@ -15,7 +15,20 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fActiveRecord
  * 
- * @version    1.0.0b51
+ * @version    1.0.0b64
+ * @changes    1.0.0b64  BackwardsCompatibilityBreak - changed ::validate()'s returned messages array to have field name keys - added the option to ::validate() to remove field names from messages [wb, 2010-05-26]
+ * @changes    1.0.0b63  Changed how is_subclass_of() is used to work around a bug in 5.2.x [wb, 2010-04-06]
+ * @changes    1.0.0b62  Fixed a bug that could cause infinite recursion starting in v1.0.0b60 [wb, 2010-04-02]
+ * @changes    1.0.0b61  Fixed issues with handling `populate` actions when working with mapped classes [wb, 2010-03-31]
+ * @changes    1.0.0b60  Fixed issues with handling `associate` and `has` actions when working with mapped classes, added ::validateClass() [wb, 2010-03-30]
+ * @changes    1.0.0b59  Changed an extended UTF-8 arrow character into the correct `->` [wb, 2010-03-29]
+ * @changes    1.0.0b58  Fixed ::reflect() to specify the value returned from `set` methods [wb, 2010-03-15]
+ * @changes    1.0.0b57  Added the `post::loadFromIdentityMap()` hook and fixed ::__construct() to always call the `post::__construct()` hook [wb, 2010-03-14]
+ * @changes    1.0.0b56  Fixed `$force_cascade` in ::delete() to work even when the restricted relationship is once-removed through an unrestricted relationship [wb, 2010-03-09]
+ * @changes    1.0.0b55  Fixed ::load() to that related records are cleared, requiring them to be loaded from the database [wb, 2010-03-04]
+ * @changes    1.0.0b54  Fixed detection of route name for one-to-one relationships in ::delete() [wb, 2010-03-03]
+ * @changes    1.0.0b53  Fixed a bug where related records with a primary key that contained a foreign key with an on update cascade clause would be deleted when changing the value of the column referenced by the foreign key [wb, 2009-12-17]
+ * @changes    1.0.0b52  Backwards Compatibility Break - Added the $force_cascade parameter to ::delete() and ::store() - enabled calling ::prepare() and ::encode() for non-column get methods, added `::has{RelatedRecords}()` methods [wb, 2009-12-16]
  * @changes    1.0.0b51  Made ::changed() properly recognize that a blank string and NULL are equivalent due to the way that ::set() casts values [wb, 2009-11-14]
  * @changes    1.0.0b50  Fixed a bug with trying to load by a multi-column primary key where one of the columns was not specified [wb, 2009-11-13]
  * @changes    1.0.0b49  Fixed a bug affecting where conditions with columns that are not null but have a default value [wb, 2009-11-03]
@@ -78,6 +91,7 @@ abstract class fActiveRecord
 	const hasOld          = 'fActiveRecord::hasOld';
 	const reset           = 'fActiveRecord::reset';
 	const retrieveOld     = 'fActiveRecord::retrieveOld';
+	const validateClass   = 'fActiveRecord::validateClass';
 	
 	
 	/**
@@ -185,6 +199,27 @@ abstract class fActiveRecord
 		}
 		
 		return $oldest_value != $new_value;	
+	}
+	
+	
+	/**
+	 * Ensures a class extends fActiveRecord
+	 * 
+	 * @internal
+	 * 
+	 * @param  string $class  The class to check
+	 * @return boolean  If the class is an fActiveRecord descendant
+	 */
+	static public function checkClass($class)
+	{
+		if (isset(self::$configured[$class])) {
+			return TRUE;
+		}
+		
+		if (!is_string($class) || !$class || !class_exists($class) || !($class == 'fActiveRecord' || is_subclass_of($class, 'fActiveRecord'))) {
+			return FALSE;
+		}
+		return TRUE;
 	}
 	
 	
@@ -507,6 +542,58 @@ abstract class fActiveRecord
 	
 	
 	/**
+	 * Takes information from a method call and determines the subject, route and if subject was plural
+	 * 
+	 * @param string $class    The class the method was called on
+	 * @param string $subject  An underscore_notation subject - either a singular or plural class name
+	 * @param string $route    The route to the subject
+	 * @return array  An array with the structure: array(0 => $subject, 1 => $route, 2 => $plural)
+	 */
+	static private function determineSubject($class, $subject, $route)
+	{
+		$schema  = fORMSchema::retrieve($class);
+		$table   = fORM::tablize($class);
+		$type    = '*-to-many';
+		$plural  = FALSE;
+		
+		// one-to-many relationships need to use plural forms
+		$singular_form = fGrammar::singularize($subject, TRUE);
+		if ($singular_form && fORM::isClassMappedToTable(fGrammar::camelize($singular_form, TRUE))) {
+			$subject = fGrammar::camelize($singular_form, TRUE);
+			$plural  = TRUE;
+			
+		} elseif (fORM::isClassMappedToTable(fGrammar::camelize($subject, TRUE))) {
+			$subject = fGrammar::camelize($subject, TRUE);
+			
+		} else {
+			if (in_array($subject, $schema->getTables())) {
+				$subject = fGrammar::singularize($subject);
+				$plural  = TRUE;
+			}
+			$subject = fGrammar::camelize($subject, TRUE);
+		}
+		
+		$related_table = fORM::tablize($subject);
+		$one_to_one    = fORMSchema::isOneToOne($schema, $table, $related_table, $route);
+		if ($one_to_one) {
+			$type = 'one-to-one';
+		}
+		if (($one_to_one && $plural) || (!$plural && !$one_to_one)) {
+			throw new fProgrammerException(
+				'The table %1$s is not in a %2$srelationship with the table %3$s',
+				$table,
+				$type,
+				$related_table
+			); 
+		}
+		
+		$route = fORMSchema::getRouteName($schema, $table, $related_table, $route, $type);
+		
+		return array($subject, $route, $plural);
+	}
+	
+	
+	/**
 	 * Ensures that ::configure() has been called for the class
 	 *
 	 * @internal
@@ -637,6 +724,30 @@ abstract class fActiveRecord
 	
 	
 	/**
+	 * Ensures a class extends fActiveRecord
+	 * 
+	 * @internal
+	 * 
+	 * @param  string $class  The class to verify
+	 * @return void
+	 */
+	static public function validateClass($class)
+	{
+		if (isset(self::$configured[$class])) {
+			return TRUE;
+		}
+		
+		if (!self::checkClass($class)) {
+			throw new fProgrammerException(
+				'The class specified, %1$s, does not appear to be a valid %2$s class',
+				$class,
+				'fActiveRecord'
+			);
+		}
+	}
+	
+	
+	/**
 	 * A data store for caching data related to a record, the structure of this is completely up to the developer using it
 	 * 
 	 * @var array
@@ -685,10 +796,12 @@ abstract class fActiveRecord
 	 * methods for each column in this record. Method names are in the form
 	 * `verbColumName()`.
 	 * 
-	 * This method also handles `associate`, `build`, `count` and `link` verbs
-	 * for records in many-to-many relationships; `build`, `count` and
-	 * `populate` verbs for all related records in one-to-many relationships
-	 * and the `create` verb for all related records in *-to-one relationships.
+	 * This method also handles `associate`, `build`, `count`, `has`, and `link`
+	 * verbs for records in many-to-many relationships; `build`, `count`, `has`
+	 * and `populate` verbs for all related records in one-to-many relationships
+	 * and `create`, `has` and `populate` verbs for all related records in
+	 * one-to-one relationships, and the `create` verb for all related records
+	 * in many-to-one relationships.
 	 * 
 	 * Method callbacks registered through fORM::registerActiveRecordMethod()
 	 * will be delegated via this method.
@@ -777,32 +890,13 @@ abstract class fActiveRecord
 					);
 				}
 				
-				$table   = fORM::tablize($class);
 				$records = $parameters[0];
 				$route   = isset($parameters[1]) ? $parameters[1] : NULL;
-				$plural  = FALSE;
 				
-				// one-to-many relationships need to use plural forms
-				$schema = fORMSchema::retrieve($class);
-				if (in_array($subject, $schema->getTables())) {
-					if (fORMSchema::isOneToOne($schema, $table, $subject, $route)) {
-						throw new fProgrammerException(
-							'The table %1$s is not in a %2$srelationship with the table %3$s',
-							$table,
-							'*-to-many ',
-							$subject
-						); 		
-					}
-					$subject = fGrammar::singularize($subject);
-					$plural  = TRUE;
-				}
-				$subject = fGrammar::camelize($subject, TRUE);
+				list ($subject, $route, $plural) = self::determineSubject($class, $subject, $route);
 				
-				// This handles one-to-many and many-to-many relationships
 				if ($plural) {
 					fORMRelated::associateRecords($class, $this->related_records, $subject, $records, $route);
-				
-				// This handles one-to-one relationships
 				} else {
 					fORMRelated::associateRecord($class, $this->related_records, $subject, $records, $route);
 				}
@@ -833,6 +927,13 @@ abstract class fActiveRecord
 					return fORMRelated::createRecord($class, $this->values, $this->related_records, $subject, $parameters[0]);
 				}
 				return fORMRelated::createRecord($class, $this->values, $this->related_records, $subject);
+				
+			case 'has':
+				$route = isset($parameters[0]) ? $parameters[0] : NULL;
+				
+				list ($subject, $route, ) = self::determineSubject($class, $subject, $route);
+				
+				return fORMRelated::hasRecords($class, $this->values, $this->related_records, $subject, $route);
 			 
 			case 'inject':
 				if (sizeof($parameters) < 1) {
@@ -871,24 +972,9 @@ abstract class fActiveRecord
 				return fORMRelated::getPrimaryKeys($class, $this->values, $this->related_records, $subject);
 			
 			case 'populate':
-				$table = fORM::tablize($class);
 				$route = isset($parameters[0]) ? $parameters[0] : NULL;
 				
-				// one-to-many relationships need to use plural forms
-				$schema = fORMSchema::retrieve($class);
-				if (in_array($subject, $schema->getTables())) {
-					if (fORMSchema::isOneToOne($schema, $table, $subject, $route)) {
-						throw new fProgrammerException(
-							'The table %1$s is not in a%2$srelationship with the table %3$s',
-							$table,
-							' one-to-many ',
-							$subject
-						); 		
-					}
-					$subject = fGrammar::singularize($subject);
-				}
-				
-				$subject = fGrammar::camelize($subject, TRUE);
+				list ($subject, $route, ) = self::determineSubject($class, $subject, $route);
 				
 				fORMRelated::populateRecords($class, $this->related_records, $subject, $route);
 				return $this;
@@ -994,8 +1080,8 @@ abstract class fActiveRecord
 		
 		// If the features of this class haven't been set yet, do it
 		if (!isset(self::$configured[$class])) {
-			$this->configure();
 			self::$configured[$class] = TRUE;
+			$this->configure();
 			
 			$table = fORM::tablize($class);
 			if (!$schema->getKeys($table, 'primary')) {
@@ -1037,9 +1123,7 @@ abstract class fActiveRecord
 		// Handle loading by a result object passed via the fRecordSet class
 		if ($key instanceof Iterator) {
 			
-			if ($this->loadFromResult($key)) {
-				return;
-			}
+			$this->loadFromResult($key);
 		
 		// Handle loading an object from the database
 		} elseif ($key !== NULL) {
@@ -1073,27 +1157,23 @@ abstract class fActiveRecord
 			if ($is_unique_key) {
 				
 				$result = $this->fetchResultFromUniqueKey($key);
-				if ($this->loadFromResult($result)) {
-					return;	
-				}
+				$this->loadFromResult($result);
 				
 			} else {
 				
 				$hash = self::hash($key, $class);
-				if ($this->loadFromIdentityMap($key, $hash)) {
-					return;
-				}
-				
-				// Assign the primary key values for loading
-				if (is_array($key)) {
-					foreach ($pk_columns as $pk_column) {
-						$this->values[$pk_column] = $key[$pk_column];
+				if (!$this->loadFromIdentityMap($key, $hash)) {
+					// Assign the primary key values for loading
+					if (is_array($key)) {
+						foreach ($pk_columns as $pk_column) {
+							$this->values[$pk_column] = $key[$pk_column];
+						}
+					} else {
+						$this->values[$pk_columns[0]] = $key;
 					}
-				} else {
-					$this->values[$pk_columns[0]] = $key;
+					
+					$this->load();
 				}
-				
-				$this->load();
 			}
 			
 		// Create an empty array for new objects
@@ -1257,10 +1337,17 @@ abstract class fActiveRecord
 	 * 
 	 * This method will start a database transaction if one is not already active.
 	 * 
+	 * @param  boolean $force_cascade  When TRUE, this will cause all child objects to be deleted, even if the ON DELETE clause is RESTRICT or NO ACTION
 	 * @return fActiveRecord  The record object, to allow for method chaining
 	 */
-	public function delete()
+	public function delete($force_cascade=FALSE)
 	{
+		// This flag prevents recursive relationships, such as one-to-one
+		// relationships, from creating infinite loops
+		if (!empty($this->cache['fActiveRecord::delete()::being_deleted'])) {
+			return;	
+		}
+		
 		$class = get_class($this);
 		
 		if (fORM::getActiveRecordMethod($class, 'delete')) {
@@ -1306,44 +1393,89 @@ abstract class fActiveRecord
 			);
 			
 			// Check to ensure no foreign dependencies prevent deletion
+			$one_to_one_relationships   = $schema->getRelationships($table, 'one-to-one');
 			$one_to_many_relationships  = $schema->getRelationships($table, 'one-to-many');
 			$many_to_many_relationships = $schema->getRelationships($table, 'many-to-many');
 			
-			$relationships = array_merge($one_to_many_relationships, $many_to_many_relationships);
+			$relationships = array_merge($one_to_one_relationships, $one_to_many_relationships, $many_to_many_relationships);
 			$records_sets_to_delete = array();
 			
 			$restriction_messages = array();
 			
+			$this->cache['fActiveRecord::delete()::being_deleted'] = TRUE;
+			
 			foreach ($relationships as $relationship) {
 				
 				// Figure out how to check for related records
-				$type = (isset($relationship['join_table'])) ? 'many-to-many' : 'one-to-many';
+				if (isset($relationship['join_table'])) {
+					$type = 'many-to-many';
+				} else {
+					$type = in_array($relationship, $one_to_one_relationships) ? 'one-to-one' : 'one-to-many';
+				}
 				$route = fORMSchema::getRouteNameFromRelationship($type, $relationship);
 				
-				$related_class   = fORM::classize($relationship['related_table']);
-				$related_objects = fGrammar::pluralize($related_class);
-				$method          = 'build' . $related_objects;
+				$related_class = fORM::classize($relationship['related_table']);
 				
-				// Grab the related records
-				$record_set = $this->$method($route);
-				
-				// If there are none, we can just move on
-				if (!$record_set->count()) {
-					continue;
-				}
-				
-				if ($type == 'one-to-many' && $relationship['on_delete'] == 'cascade') {
-					$records_sets_to_delete[] = $record_set;
-				}
-				
-				if ($relationship['on_delete'] == 'restrict' || $relationship['on_delete'] == 'no_action') {
+				if ($type == 'one-to-one') {
+					$method         = 'create' . $related_class;
+					$related_record = $this->$method($route);
+					if (!$related_record->exists()) {
+						continue;
+					} 
 					
-					// Otherwise we have a restriction
+				} else {
+					$method     = 'build' . fGrammar::pluralize($related_class);
+					$record_set = $this->$method($route);
+					if (!$record_set->count()) {
+						continue;
+					}
+					
+					if ($type == 'one-to-many' && $relationship['on_delete'] == 'cascade') {
+						$records_sets_to_delete[] = $record_set;
+					}
+				}
+				
+				// If we are focing the cascade we have to delete child records and join table entries before this record
+				if ($force_cascade) {
+					
+					if ($type == 'one-to-one') {
+						$related_record->delete($force_cascade);
+						
+					// For one-to-many we explicitly delete all of the records
+					} elseif ($type == 'one-to-many') {
+						foreach ($record_set as $record) {
+							if ($record->exists()) {
+								$record->delete($force_cascade);
+							}
+						}
+					
+					// For many-to-many relationships we explicitly delete the join table entries
+					} elseif ($type == 'many-to-many') {
+						$join_column_placeholder = $schema->getColumnInfo($relationship['join_table'], $relationship['join_column'], 'placeholder');
+						$column_get_method       = 'get' . fGrammar::camelize($relationship['column'], TRUE);
+						
+						$db->translatedQuery(
+							$db->escape(
+								'DELETE FROM %r WHERE %r = ',
+								$relationship['join_table'],
+								$relationship['join_column']
+							) . $join_column_placeholder,
+							$this->$column_get_method()
+						);		
+					}
+				
+				// Otherwise we have a restriction and we can to create a nice error message for the user
+				} elseif ($relationship['on_delete'] == 'restrict' || $relationship['on_delete'] == 'no_action') {
+					
 					$related_class_name  = fORM::classize($relationship['related_table']);
 					$related_record_name = fORM::getRecordName($related_class_name);
-					$related_record_name = fGrammar::pluralize($related_record_name);
 					
-					$restriction_messages[] = self::compose("One or more %s references it", $related_record_name);
+					if ($type == 'one-to-one') {
+						$restriction_messages[] = self::compose("A %s references it", $related_record_name);
+					} else {
+						$related_record_name = fGrammar::pluralize($related_record_name);
+						$restriction_messages[] = self::compose("One or more %s references it", $related_record_name);
+					}
 				}
 			}
 			
@@ -1362,14 +1494,16 @@ abstract class fActiveRecord
 			$result = call_user_func_array($db->translatedQuery, $params);
 			
 			
-			// Delete related records
+			// Delete related records to ensure any PHP-level cleanup is done
 			foreach ($records_sets_to_delete as $record_set) {
 				foreach ($record_set as $record) {
 					if ($record->exists()) {
-						$record->delete();
+						$record->delete($force_cascade);
 					}
 				}
 			}
+			
+			unset($this->cache['fActiveRecord::delete()::being_deleted']);
 			
 			fORM::callHookCallbacks(
 				$this,
@@ -1473,36 +1607,46 @@ abstract class fActiveRecord
 	 */
 	protected function encode($column, $formatting=NULL)
 	{
-		if (!array_key_exists($column, $this->values)) {
+		$column_exists = array_key_exists($column, $this->values);
+		$method_name   = 'get' . fGrammar::camelize($column, TRUE);
+		$method_exists = method_exists($this, $method_name);
+		
+		if (!$column_exists && !$method_exists) {
 			throw new fProgrammerException(
 				'The column specified, %s, does not exist',
 				$column
 			);
 		}
 		
-		$class       = get_class($this);
-		$schema      = fORMSchema::retrieve($class);
-		$table       = fORM::tablize($class);
-		$column_type = $schema->getColumnInfo($table, $column, 'type');
-		
-		// Ensure the programmer is calling the function properly
-		if ($column_type == 'blob') {
-			throw new fProgrammerException(
-				'The column specified, %s, does not support forming because it is a blob column',
-				$column
-			);
-		}
-		
-		if ($formatting !== NULL && in_array($column_type, array('boolean', 'integer'))) {
-			throw new fProgrammerException(
-				'The column specified, %s, does not support any formatting options',
-				$column
-			);
+		if ($column_exists) {
+			$class       = get_class($this);
+			$schema      = fORMSchema::retrieve($class);
+			$table       = fORM::tablize($class);
+			$column_type = $schema->getColumnInfo($table, $column, 'type');
+			
+			// Ensure the programmer is calling the function properly
+			if ($column_type == 'blob') {
+				throw new fProgrammerException(
+					'The column specified, %s, does not support forming because it is a blob column',
+					$column
+				);
+			}
+			
+			if ($formatting !== NULL && in_array($column_type, array('boolean', 'integer'))) {
+				throw new fProgrammerException(
+					'The column specified, %s, does not support any formatting options',
+					$column
+				);
+			}
+			
+		// If the column doesn't exist, we are just pulling the
+		// value from a get method, so treat it as text
+		} else {
+			$column_type = 'text';	
 		}
 		
 		// Grab the value for empty value checking
-		$method_name = 'get' . fGrammar::camelize($column, TRUE);
-		$value       = $this->$method_name();
+		$value = $this->$method_name();
 		
 		// Date/time objects
 		if (is_object($value) && in_array($column_type, array('date', 'time', 'timestamp'))) {
@@ -1741,6 +1885,9 @@ abstract class fActiveRecord
 		
 		$this->loadFromResult($result, TRUE);
 		
+		// Clears the cached related records so they get pulled from the database
+		$this->related_records = array();
+		
 		return $this;
 	}
 	
@@ -1841,6 +1988,16 @@ abstract class fActiveRecord
 		$this->values          = &$object->values;
 		$this->old_values      = &$object->old_values;
 		$this->related_records = &$object->related_records;
+		
+		fORM::callHookCallbacks(
+			$this,
+			'post::loadFromIdentityMap()',
+			$this->values,
+			$this->old_values,
+			$this->related_records,
+			$this->cache
+		);
+		
 		return TRUE;
 	}
 	
@@ -1909,38 +2066,48 @@ abstract class fActiveRecord
 	 */
 	protected function prepare($column, $formatting=NULL)
 	{
-		if (!array_key_exists($column, $this->values)) {
+		$column_exists = array_key_exists($column, $this->values);
+		$method_name   = 'get' . fGrammar::camelize($column, TRUE);
+		$method_exists = method_exists($this, $method_name);
+		
+		if (!$column_exists && !$method_exists) {
 			throw new fProgrammerException(
 				'The column specified, %s, does not exist',
 				$column
 			);
 		}
 		
-		$class  = get_class($this);
-		$table  = fORM::tablize($class);
-		$schema = fORMSchema::retrieve($class);
+		if ($column_exists) {
+			$class  = get_class($this);
+			$table  = fORM::tablize($class);
+			$schema = fORMSchema::retrieve($class);
+			
+			$column_info = $schema->getColumnInfo($table, $column);
+			$column_type = $column_info['type'];
+			
+			// Ensure the programmer is calling the function properly
+			if ($column_type == 'blob') {
+				throw new fProgrammerException(
+					'The column specified, %s, can not be prepared because it is a blob column',
+					$column
+				);
+			}
+			
+			if ($formatting !== NULL && in_array($column_type, array('integer', 'boolean'))) {
+				throw new fProgrammerException(
+					'The column specified, %s, does not support any formatting options',
+					$column
+				);
+			}
 		
-		$column_info = $schema->getColumnInfo($table, $column);
-		$column_type = $column_info['type'];
-		
-		// Ensure the programmer is calling the function properly
-		if ($column_type == 'blob') {
-			throw new fProgrammerException(
-				'The column specified, %s, can not be prepared because it is a blob column',
-				$column
-			);
-		}
-		
-		if ($formatting !== NULL && in_array($column_type, array('integer', 'boolean'))) {
-			throw new fProgrammerException(
-				'The column specified, %s, does not support any formatting options',
-				$column
-			);
+		// If the column doesn't exist, we are just pulling the
+		// value from a get method, so treat it as text
+		} else {
+			$column_type = 'text';	
 		}
 		
 		// Grab the value for empty value checking
-		$method_name = 'get' . fGrammar::camelize($column, TRUE);
-		$value       = $this->$method_name();
+		$value = $this->$method_name();
 		
 		// Date/time objects
 		if (is_object($value) && in_array($column_type, array('date', 'time', 'timestamp'))) {
@@ -2065,7 +2232,7 @@ abstract class fActiveRecord
 				$signature .= " * Sets the value for " . $column . "\n";
 				$signature .= " * \n";
 				$signature .= " * @param  " . $fixed_type . " \$" . $column . "  The new value\n";
-				$signature .= " * @return void\n";
+				$signature .= " * @return fActiveRecord  The record object, to allow for method chaining\n";
 				$signature .= " */\n";
 			}
 			$set_method = 'set' . $camelized_column;
@@ -2448,9 +2615,10 @@ abstract class fActiveRecord
 	 * 
 	 * @throws fValidationException  When ::validate() throws an exception
 	 * 
+	 * @param  boolean $force_cascade  When storing related records, this will force deleting child records even if they have their own children in a relationship with an RESTRICT or NO ACTION for the ON DELETE clause
 	 * @return fActiveRecord  The record object, to allow for method chaining
 	 */
-	public function store()
+	public function store($force_cascade=FALSE)
 	{
 		$class = get_class($this);
 		
@@ -2527,8 +2695,54 @@ abstract class fActiveRecord
 			}
 			
 			
-			// Storing *-to-many relationships
-			fORMRelated::store($class, $this->values, $this->related_records);
+			// Fix cascade updated columns for in-memory objects to prevent issues when saving
+			$one_to_one_relationships  = $schema->getRelationships($table, 'one-to-one');
+			$one_to_many_relationships = $schema->getRelationships($table, 'one-to-many');
+			
+			$relationships = array_merge($one_to_one_relationships, $one_to_many_relationships);
+			
+			foreach ($relationships as $relationship) {
+				$type  = in_array($relationship, $one_to_one_relationships) ? 'one-to-one' : 'one-to-many';
+				$route = fORMSchema::getRouteNameFromRelationship($type, $relationship);
+				
+				$related_table = $relationship['related_table'];
+				$related_class = fORM::classize($related_table);
+				
+				if ($relationship['on_update'] != 'cascade') {
+					continue;
+				}
+				
+				$column = $relationship['column'];
+				if (!fActiveRecord::changed($this->values, $this->old_values, $column)) {
+					continue;
+				}
+				
+				if (!isset($this->related_records[$related_table][$route]['record_set'])) {
+					continue;
+				}
+				
+				$record_set     = $this->related_records[$related_table][$route]['record_set'];
+				$related_column = $relationship['related_column'];
+				
+				$old_value      = fActiveRecord::retrieveOld($this->old_values, $column);
+				$value          = $this->values[$column];
+				
+				foreach ($record_set as $record) {
+					if (isset($record->old_values[$related_column])) {
+						foreach (array_keys($record->old_values[$related_column]) as $key) {
+							if ($record->old_values[$related_column][$key] === $old_value) {
+								$record->old_values[$related_column][$key] = $value;
+							}
+						}
+					}
+					if ($record->values[$related_column] === $old_value) {
+						$record->values[$related_column] = $value;
+					}
+				}
+			}
+			
+			// Storing *-to-many and one-to-one relationships
+			fORMRelated::store($class, $this->values, $this->related_records, $force_cascade);
 			
 			
 			fORM::callHookCallbacks(
@@ -2611,10 +2825,11 @@ abstract class fActiveRecord
 	 * 
 	 * @throws fValidationException  When the record, or one of the associated records, violates one of the validation rules for the class or can not be properly stored in the database
 	 * 
-	 * @param  boolean $return_messages  If an array of validation messages should be returned instead of an exception being thrown
+	 * @param  boolean $return_messages      If an array of validation messages should be returned instead of an exception being thrown
+	 * @param  boolean $remove_column_names  If column names should be removed from the returned messages, leaving just the message itself
 	 * @return void|array  If $return_messages is TRUE, an array of validation messages will be returned
 	 */
-	public function validate($return_messages=FALSE)
+	public function validate($return_messages=FALSE, $remove_column_names=FALSE)
 	{
 		$class = get_class($this);
 		
@@ -2658,6 +2873,9 @@ abstract class fActiveRecord
 		$validation_messages = fORMValidation::reorderMessages($class, $validation_messages);
 		
 		if ($return_messages) {
+			if ($remove_column_names) {
+				$validation_messages = fValidationException::removeFieldNames($validation_messages);
+			}
 			return $validation_messages;
 		}
 		
@@ -2673,7 +2891,7 @@ abstract class fActiveRecord
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>, others
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>, others
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

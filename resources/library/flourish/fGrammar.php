@@ -2,14 +2,17 @@
 /**
  * Provides english word inflection, notation conversion, grammar helpers and internationlization support
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond
+ * @copyright  Copyright (c) 2007-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fGrammar
  * 
- * @version    1.0.0b5
+ * @version    1.0.0b8
+ * @changes    1.0.0b8  Added the ::stem() method [wb, 2010-05-27]
+ * @changes    1.0.0b7  Added the `$return_error` parameter to ::pluralize() and ::singularize() [wb, 2010-03-30]
+ * @changes    1.0.0b6  Added missing ::compose() method [wb, 2010-03-03]
  * @changes    1.0.0b5  Fixed ::reset() to properly reset the singularization and pluralization rules [wb, 2009-10-28]
  * @changes    1.0.0b4  Added caching for various methods - provided significant performance boost to ORM [wb, 2009-06-15] 
  * @changes    1.0.0b3  Changed replacement values in preg_replace() calls to be properly escaped [wb, 2009-06-11]
@@ -30,6 +33,7 @@ class fGrammar
 	const registerJoinArrayCallback = 'fGrammar::registerJoinArrayCallback';
 	const reset                     = 'fGrammar::reset';
 	const singularize               = 'fGrammar::singularize';
+	const stem                      = 'fGrammar::stem';
 	const underscorize              = 'fGrammar::underscorize';
 	
 	
@@ -238,6 +242,29 @@ class fGrammar
 	
 	
 	/**
+	 * Composes text using fText if loaded
+	 * 
+	 * @param  string  $message    The message to compose
+	 * @param  mixed   $component  A string or number to insert into the message
+	 * @param  mixed   ...
+	 * @return string  The composed and possible translated message
+	 */
+	static protected function compose($message)
+	{
+		$args = array_slice(func_get_args(), 1);
+		
+		if (class_exists('fText', FALSE)) {
+			return call_user_func_array(
+				array('fText', 'compose'),
+				array($message, $args)
+			);
+		} else {
+			return vsprintf($message, $args);
+		}
+	}
+	
+	
+	/**
 	 * Makes an `underscore_notation`, `camelCase`, or human-friendly string into a human-friendly string
 	 * 
 	 * @param  string $string  The string to humanize
@@ -379,10 +406,11 @@ class fGrammar
 	/**
 	 * Returns the plural version of a singular noun
 	 * 
-	 * @param  string $singular_noun  The singular noun to pluralize
+	 * @param  string  $singular_noun  The singular noun to pluralize
+	 * @param  boolean $return_error   If this is `TRUE` and the noun can't be pluralized, `FALSE` will be returned instead
 	 * @return string  The pluralized noun
 	 */
-	static public function pluralize($singular_noun)
+	static public function pluralize($singular_noun, $return_error=FALSE)
 	{
 		if (isset(self::$cache['pluralize'][$singular_noun])) {
 			return self::$cache['pluralize'][$singular_noun];		
@@ -400,6 +428,10 @@ class fGrammar
 		}
 		
 		if (!$plural_noun) {
+			if ($return_error) {
+				self::$cache['pluralize'][$singular_noun] = FALSE;
+				return FALSE;
+			}
 			throw new fProgrammerException('The noun specified could not be pluralized');
 		}
 		
@@ -493,10 +525,11 @@ class fGrammar
 	/**
 	 * Returns the singular version of a plural noun
 	 * 
-	 * @param  string $plural_noun  The plural noun to singularize
+	 * @param  string  $plural_noun   The plural noun to singularize
+	 * @param  boolean $return_error  If this is `TRUE` and the noun can't be pluralized, `FALSE` will be returned instead
 	 * @return string  The singularized noun
 	 */
-	static public function singularize($plural_noun)
+	static public function singularize($plural_noun, $return_error=FALSE)
 	{
 		if (isset(self::$cache['singularize'][$plural_noun])) {
 			return self::$cache['singularize'][$plural_noun];		
@@ -514,6 +547,10 @@ class fGrammar
 		}
 		
 		if (!$singular_noun) {
+			if ($return_error) {
+				self::$cache['singularize'][$plural_noun] = FALSE;
+				return FALSE;
+			}
 			throw new fProgrammerException('The noun specified could not be singularized');
 		}
 		
@@ -548,6 +585,124 @@ class fGrammar
 		}
 		
 		return array('', $string);
+	}
+	
+	
+	/**
+	 * Uses the Porter Stemming algorithm to create the stem of a word, which is useful for searching
+	 * 
+	 * See http://tartarus.org/~martin/PorterStemmer/ for details about the
+	 * algorithm.
+	 * 
+	 * @param string $word  The word to get the stem of
+	 * @return string  The stem of the word
+	 */
+	static public function stem($word)
+	{
+		$s_v  = '^([^aeiou][^aeiouy]*)?[aeiouy]';
+		$mgr0 = $s_v . '[aeiou]*[^aeiou][^aeiouy]*';
+		
+		$s_v_regex  = '#' . $s_v . '#';
+		$mgr0_regex = '#' . $mgr0 . '#';
+		$meq1_regex = '#' . $mgr0 . '([aeiouy][aeiou]*)?$#';
+		$mgr1_regex = '#' . $mgr0 . '[aeiouy][aeiou]*[^aeiou][^aeiouy]*#';
+		
+		$word = fUTF8::ascii($word);
+		$word = strtolower($word);
+		
+		if (strlen($word) < 3) {
+			return $word;
+		}
+		
+		if ($word[0] == 'y') {
+			$word = 'Y' . substr($word, 1);
+		}
+		
+		// Step 1a
+		$word = preg_replace('#^(.+?)(?:(ss|i)es|([^s])s)$#', '\1\2\3', $word);
+		
+		// Step 1b
+		if (preg_match('#^(.+?)eed$#', $word, $match)) {
+			if (preg_match($mgr0_regex, $match[1])) {
+				$word = substr($word, 0, -1);
+			}
+			
+		} elseif (preg_match('#^(.+?)(ed|ing)$#', $word, $match)) {
+			if (preg_match($s_v_regex, $match[1])) {
+				$word = $match[1];
+				if (preg_match('#(at|bl|iz)$#', $word)) {
+					$word .= 'e';
+				} elseif (preg_match('#([^aeiouylsz])\1$#', $word)) {
+					$word = substr($word, 0, -1);
+				} elseif (preg_match('#^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$#', $word)) {
+					$word .= 'e';
+				}
+			}
+		}
+		
+		// Step 1c
+		if (substr($word, -1) == 'y') {
+			$stem = substr($word, 0, -1);
+			if (preg_match($s_v_regex, $stem)) {
+				$word = $stem . 'i';
+			}
+		}
+		
+		// Step 2
+		if (preg_match('#^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$#', $word, $match)) {
+			if (preg_match($mgr0_regex, $match[1])) {
+				$word = $match[1] . strtr(
+					$match[2],
+					array(
+						'ational' => 'ate',  'tional'  => 'tion', 'enci'    => 'ence',
+						'anci'    => 'ance', 'izer'    => 'ize',  'bli'     => 'ble',
+						'alli'    => 'al',   'entli'   => 'ent',  'eli'     => 'e',
+						'ousli'   => 'ous',  'ization' => 'ize',  'ation'   => 'ate',
+						'ator'    => 'ate',  'alism'   => 'al',   'iveness' => 'ive',
+						'fulness' => 'ful',  'ousness' => 'ous',  'aliti'   => 'al',
+						'iviti'   => 'ive',  'biliti'  => 'ble',  'logi'    => 'log'
+					)
+				);
+			}
+		}
+		
+		// Step 3
+		if (preg_match('#^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$#', $word, $match)) {
+			if (preg_match($mgr0_regex, $match[1])) {
+				$word = $match[1] . strtr(
+					$match[2],
+					array(
+						'icate' => 'ic', 'ative' => '', 'alize' => 'al', 'iciti' => 'ic',
+						'ical'  => 'ic', 'ful'   => '', 'ness'  => ''
+					)
+				);
+			}
+		}
+		
+		// Step 4
+		if (preg_match('#^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize|(?<=[st])ion)$#', $word, $match) && preg_match($mgr1_regex, $match[1])) {
+			$word = $match[1];
+		}
+		
+		// Step 5
+		if (substr($word, -1) == 'e') {
+			$stem = substr($word, 0, -1);
+			if (preg_match($mgr1_regex, $stem)) {
+				$word = $stem;
+			} elseif (preg_match($meq1_regex, $stem) && !preg_match('#^[^aeiou][^aeiouy]*[aeiouy][^aeiouwxy]$#', $stem)) {
+				$word = $stem;
+			}
+		}
+		
+		if (preg_match('#ll$#', $word) && preg_match($mgr1_regex, $word)) {
+			$word = substr($word, 0, -1);
+		}
+		
+		if ($word[0] == 'Y') {
+			$word = 'y' . substr($word, 1);
+		}
+		
+		return $word;
 	}
 	
 	
@@ -604,7 +759,7 @@ class fGrammar
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

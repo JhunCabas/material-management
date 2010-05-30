@@ -2,19 +2,80 @@
 /**
  * Allows for quick and flexible HTML templating
  * 
- * @copyright  Copyright (c) 2007-2009 Will Bond
+ * @copyright  Copyright (c) 2007-2010 Will Bond
  * @author     Will Bond [wb] <will@flourishlib.com>
  * @license    http://flourishlib.com/license
  * 
  * @package    Flourish
  * @link       http://flourishlib.com/fTemplating
  * 
- * @version    1.0.0b2
+ * @version    1.0.0b5
+ * @changes    1.0.0b5  Added ::encode() [wb, 2010-05-20]
+ * @changes    1.0.0b4  Added ::create() and ::retrieve() for named fTemplating instances [wb, 2010-05-11]
+ * @changes    1.0.0b3  Fixed an issue with placing relative file path [wb, 2010-04-23]
  * @changes    1.0.0b2  Added the ::inject() method [wb, 2009-01-09]
  * @changes    1.0.0b   The initial implementation [wb, 2007-06-14]
  */
 class fTemplating
 {
+	const create   = 'fTemplating::create';
+	const reset    = 'fTemplating::reset';
+	const retrieve = 'fTemplating::retrieve';
+	
+	
+	/**
+	 * Named fTemplating instances
+	 * 
+	 * @var array
+	 */
+	static $instances = array();
+	
+	
+	/**
+	 * Creates a named template that can be accessed from any scope via ::retrieve()
+	 * 
+	 * @param  string $name  The name for this template instance
+	 * @param  string $root  The filesystem path to use when accessing relative files, defaults to `$_SERVER['DOCUMENT_ROOT']`
+	 * @return fTemplating  The new fTemplating instance
+	 */
+	static public function create($name, $root=NULL)
+	{
+		self::$instances[$name] = new self($root);
+		return self::$instances[$name];
+	}
+	
+	
+	/**
+	 * Resets the configuration of the class
+	 * 
+	 * @internal
+	 * 
+	 * @return void
+	 */
+	static public function reset()
+	{
+		self::$instances = array();
+	}
+	
+	
+	/**
+	 * Retrieves a named template
+	 * 
+	 * @param  string $name  The name of the template to retrieve
+	 * @return fTemplating  The specified fTemplating instance
+	 */
+	static public function retrieve($name)
+	{
+		if (!isset(self::$instances[$name])) {
+			throw new fProgrammerException(
+				'The named template specified, %s, has not been created yet',
+				$name
+			);
+		}
+		return self::$instances[$name];
+	}
+	
+	
 	/**
 	 * The buffered object id, used for differentiating different instances when doing replacements
 	 * 
@@ -176,6 +237,19 @@ class fTemplating
 		fBuffer::stop();
 		
 		$this->__destruct();
+	}
+	
+	
+	/**
+	 * Gets the value of an element and runs it through fHTML::encode()
+	 * 
+	 * @param  string $element        The element to get
+	 * @param  mixed  $default_value  The value to return if the element has not been set
+	 * @return mixed  The value of the element specified run through fHTML::encode(), or the default value if it has not been set
+	 */
+	public function encode($element, $default_value=NULL)
+	{
+		return fHTML::encode($this->get($element, $default_value));
 	}
 	
 	
@@ -362,7 +436,7 @@ class fTemplating
 		
 		// Check to see if the element is relative to the current script
 		} elseif (preg_match('#^(\./|\.\\\\)#', $path)) {
-			$path = pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME) . substr($path, 2);
+			$path = pathinfo($_SERVER['SCRIPT_FILENAME'], PATHINFO_DIRNAME) . substr($path, 1);
 		}
 		
 		if (!file_exists($path)) {
@@ -523,7 +597,7 @@ class fTemplating
 
 
 /**
- * Copyright (c) 2007-2009 Will Bond <will@flourishlib.com>
+ * Copyright (c) 2007-2010 Will Bond <will@flourishlib.com>
  * 
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
