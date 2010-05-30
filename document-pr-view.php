@@ -29,7 +29,10 @@ $tmpl->place('menu');
 	<div class="form-frame span-23 last">
 		<h3>Purchase Request</h3><br />
 		<label for="doc_num">Document Number </label>
-			<span id="docNum"><?php echo $purchase->prepareDocNumber(); ?></span><br />
+			<span id="docNum"><?php echo $purchase->prepareDocNumber(); ?></span>
+		<label class="mofLabel" for="mof_num">MOF Number</label>
+			<span id="mof_num"><?php echo $purchase->prepareMofNumber(); ?></span>
+		<br />
 		<label for="doc_date">Document Date </label>
 			<?php echo $purchase->prepareDocDate("j F Y"); ?><br />
 		<label for="doc_type">Document Type </label>
