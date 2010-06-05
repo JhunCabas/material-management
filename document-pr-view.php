@@ -82,9 +82,9 @@ $tmpl->place('menu');
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"><?php echo $purchase->prepareTotal(2); ?></td></tr>
 			</tfoot>
 		</table>
-		<div class="pdbox span-11"><label>Payment Terms</label><br /><?php echo $purchase->preparePayment(); ?></div>
-		<div class="pdbox span-11"><label>Delivery Terms</label><br /><?php echo $purchase->prepareDelivery(); ?></div>
-		<div class="pdbox span-11"><label>Special Instructions</label><br /><?php echo $purchase->prepareSpecialInstruction(); ?></div>
+		<div class="pdbox span-11"><label>Payment Terms</label><br /><textarea id="payment" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"><?php echo $purchase->preparePayment(); ?></textarea></div>
+		<div class="pdbox span-11"><label>Delivery Terms</label><br /><textarea id="delivery" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"><?php echo $purchase->prepareDelivery(); ?></textarea></div>
+		<div class="pdbox span-11"><label>Special Instructions</label><br /><textarea id="special" rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"><?php echo $purchase->prepareSpecialInstruction(); ?></textarea></div>
 		<table id="approveContent">
 			<tbody>
 				<tr>
