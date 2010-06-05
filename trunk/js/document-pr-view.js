@@ -73,6 +73,9 @@ $(function (){
 		var discount = $("#discountRate").val();
 		var approver1 = $("#approver1").text();
 		var approver1_date = $("#app1Date").val();
+		var payment = $("#payment").val();
+		var delivery = $("#delivery").val();
+		var special = $("#special").val();
 		if(confirm("Continue?"))
 		$.post("parser/Purchase.php",{
 			type: "edit",
@@ -81,7 +84,10 @@ $(function (){
 			discount: discount,
 			total: total,
 			approver_1: approver1,
-			approver_1_date: approver1_date
+			approver_1_date: approver1_date,
+			payment: payment,
+			delivery: delivery,
+			special_instruction: special
 			}, function (data){
 		 		if(data != "")
 				 {
