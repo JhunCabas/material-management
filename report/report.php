@@ -36,6 +36,18 @@ $table = "  <td>#</td>
             <td bgcolor=blue>Issuer</td>
             <td bgcolor=blue>Branch From</td>
             <td bgcolor=blue>Status</td>";
+}else if ( $op == 'Sup')
+{
+$getTable = getSupplierList();
+$table = "  <td>#</td>
+            <td bgcolor=blue>Supplier Name</td>
+            <td bgcolor=blue>Location</td>
+            <td bgcolor=blue>Address</td>
+            <td bgcolor=blue>Contact Person</td>
+            <td bgcolor=blue>Contact</td>
+            <td bgcolor=blue>Info</td>
+            <td bgcolor=blue>Fax No</td>
+            <td bgcolor=blue>Status</td>";
 }
 
 

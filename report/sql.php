@@ -358,6 +358,77 @@ session_start();
          return $table;
       }		
 
+//added for MOF 
+
+###################################
+###### export Monthly MOF Tracker to Excel######
+#  mof_number, doc_number, po_number, doc_date, po_date, grn_number,grn_date, status
+###################################
+    	function exportMOFTracker($month,$year)
+    		{
+    		$count='1';
+      $sql ="	select A.mof_number,A.doc_number,A.po_number, A.doc_date, A.po_date, B.doc_number as grn_number,B.doc_date AS grn_date, A.status
+                from purchases A left join good_receipt_notes B on A.po_number=B.po_no
+                WHERE YEAR( A.doc_date ) = $year 
+                AND MONTH( A.doc_date ) = $month 
+                order by A.doc_date";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['mof_number']."</td>
+              <td>".$row['doc_number']."</td>
+              <td>".$row['doc_date']."</td>
+              <td>".$row['po_number']."</td>
+              <td>".$row['po_date']."</td>
+              <td>".$row['grn_number']."</td>
+              <td>".$row['grn_date']."</td>
+              <td>".$row['status']."</td>";
+          
+    	   $count++;
+         }
+         return $table;
+      }		
+ 
+//added for Supplier Exporting 
+
+###################################
+###### export Supplier Listing to Excel######
+#  mof_number, doc_number, po_number, doc_date, po_date, grn_number,grn_date, status
+###################################
+    	function getSupplierList()
+    		{
+    		$count='1';
+            $sql ="	SELECT * 
+                    FROM  `suppliers`";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+                <td>$count</td>
+              <td>".$row['name']."</td>
+              <td>".$row['address']."</td>
+              <td>".$row['line_1'].",".$row['line_2'].",".$row['line_3']."</td>
+              <td>".$row['contact_person']."</td>
+              <td>".$row['contact']."</td>
+              <td>".$row['info']."</td>
+              <td>".$row['fax_no']."</td>
+              <td>".$row['status']."</td>";
+     
+    	   $count++;
+         }
+         return $table;
+      }		
+ 
+
+
 ###################################			         
 //end get  
 ##############################################################
