@@ -6,7 +6,8 @@ include_once('class/DBConn.php');
 $doc_num = $POnum;
 
 ////////////
-$perpage = 13; 
+$perpage = 12; 
+$limit = $perpage;
 $page = 1;
 
 $count ="SELECT DISTINCT COUNT(B.`doc_number`) AS count
@@ -43,7 +44,7 @@ function Header()
         $this->Line(165,60,165,183); //5
         $this->Line(185,60,185,183); //6
         
-        $this->Line(10,70,205,70);
+        $this->Line(10,73,205,73);
         $this->Line(10,183,205,183);
           
            
@@ -80,34 +81,36 @@ $pdf->Text(187,67,'PRICE');
 ////////////
 
 
-$starting = 74;
+$starting = 77;
 
             $count = '0';
             //SQL  //gives the following  
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`po_number`, A.`branch_id`, A.`currency`, date_format(A.po_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`po_number`, A.`branch_id`, A.`currency`, date_format(A.po_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction, A.mof_number,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
-            D.`unit_of_measure`,
+            D.`unit_of_measure`,F.country as currency,
             A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
-            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
+            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E,currencies F
             WHERE A.doc_number='$doc_num'
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
             AND B.item_id = D.id
+            AND A.currency = F.id
             LIMIT 0,$perpage";
                  
              connectToDB();
-                     $getData = mysql_query($sql) or die ("Execution SQL; error");
+                     $getData = mysql_query($sql) or die ("Execution SQL; error 1");
             while ( $row = mysql_fetch_array($getData))
             					{
             			 $count++;
             			 
             			$item_id = $row['item_id'];
-            			$description = addslashes($row['description']);
-                  $description = html_entity_decode($description);
+            		//	$description = addslashes($row['description']);
+            			$description = $row['description'];
+                  $description = html_entity_decode($description, ENT_QUOTES);
             			$quantity = $row['quantity'];
             			$unitmeasure = $row['unit_of_measure'];
             			$unitprice = $row['unit_price'];
@@ -125,7 +128,8 @@ $starting = 74;
       
             		  $doc_date = $row['doc_date'];
             			$branchName =$row['branchName'];
-                  $branchLocation = $row['branchLocation'];
+                 // $branchLocation = $row['branchLocation'];
+                  	$branchLocation = explode(",", $row['branchLocation']);
                   //must add branchFax
                   $branchNo=$row['branchNo'];
                   
@@ -143,7 +147,11 @@ $starting = 74;
                   $payment = $row['payment'];
                   $delivery = $row['delivery'];
                   $special_instruction = $row['special_instruction'];
+                  $currency = $row['currency'];
                   
+                  //for MOF
+                  
+            		  $mof_number = $row['mof_number'];
                   		
              if (strlen($unitprice) > 7 )
               {     
@@ -208,17 +216,28 @@ $date = $doc_date;
 
 $pdf->Text(125,56,"Tel: ".$branchNo);
 //$pdf->Text(155,56,"Fax: ".$branchFax);
-$pdf->Text(125,44,$sad3);
-$pdf->Text(125,40,$sad2);
-$pdf->Text(125,36,$branchLocation);
+  $pdf->Text(125,48,$branchLocation[3]." ".$branchLocation[4]);
+            $pdf->Text(125,44,$branchLocation[2].", ");
+            $pdf->Text(125,40,$branchLocation[1].", ");
+            $pdf->Text(125,36,$branchLocation[0].", ");
 $pdf->Text(125,32,$branchName);
 $pdf->Text(110,32,"Ship To:");
 
 $pdf->Text(130,20,"Date: ".$date);
 $pdf->Text(130,24,"PO No: ".$POnum);
 
+
+
+
+$pdf->Text(167,71,"( ".$currency." )");
+$pdf->Text(187,71,"( ".$currency." )");
+
 $pdf->Text(12,203,"SPECIAL INSTRUCTIONS AND TERMS");
 $pdf->Text(12,207,$special_instruction);
+
+//for MOF
+$pdf->Text(90,203,"MOF Number: ".$mof_number);
+
 $pdf->Text(160,203,"PAGE ".$page." OF ".$totalpage);
 $pdf->Text(12,219,"Delivery Terms:");
 $pdf->Text(12,221,"-----------------------");
@@ -238,7 +257,7 @@ $pdf->Text(130,225,$payment);
 ///do this if more than 13 items.///do this if more than 13 items.
 ////////////                                          ////////////
 
-    $start=$limit;  //in case the limit we tuka, new page start item from previouss
+   // $start=$limit;  //in case the limit we tuka, new page start item from previouss
     
 if ($items > 1){
 
@@ -246,12 +265,13 @@ if ($items > 1){
         for ($i = 1; $i < $items; $i++) 
             {
             
-       $start=$limit;  //in case the limit we tuka, new page start item from previouss
+          $start=$start+$perpage;  //in case the limit we tuka, new page start item from previouss
                 
       $page += 1;
     //set start ,limit
-    $limit=$start+$perpage;
-    
+    //$start=$start+$perpage; //this created the wrong sql - 5th Jan 2010
+       
+     
             
       $pdf->AddPage('P','Letter');
       $pdf->SetFont('Arial','',10);
@@ -276,7 +296,7 @@ if ($items > 1){
     /////////SQL
     ////// data comes here
               
-            $starting = 74;
+            $starting = 77;
             unset($sql);
             unset($row);
             unset($getData);
@@ -286,27 +306,28 @@ if ($items > 1){
             //SQL  //gives the following  
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`po_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`po_number`, A.`branch_id`, A.`currency`, date_format(A.po_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction, A.mof_number,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
-            D.`unit_of_measure`,
+            D.`unit_of_measure`,F.country as currency,
             A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
-            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E
+            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E,currencies F
             WHERE A.doc_number='$doc_num'
             AND B.doc_number = A.doc_number
             AND A.branch_id = C.id
             AND A.supplier_1 = E.id
             AND B.item_id = D.id
-            LIMIT $start,$limit";
+            AND A.currency = F.id
+            LIMIT $start,$perpage";
                  
              connectToDB();
-                     $getData = mysql_query($sql) or die ("Execution SQL; error");
+                     $getData = mysql_query($sql) or die ("Execution SQL; error 2 <br/> $sql");
             while ( $row = mysql_fetch_array($getData))
             					{
             			 $count++;
             			 
             			$item_id = $row['item_id'];
-            			$description = addslashes($row['description']);
-                  $description = html_entity_decode($description);
+            			$description = $row['description'];
+                  $description = html_entity_decode($description, ENT_QUOTES);
             			$quantity = $row['quantity'];
             			$unitmeasure = $row['unit_of_measure'];
             			$unitprice = $row['unit_price'];
@@ -324,7 +345,8 @@ if ($items > 1){
       
             		  $doc_date = $row['doc_date'];
             			$branchName =$row['branchName'];
-                  $branchLocation = $row['branchLocation'];
+                  //$branchLocation = $row['branchLocation'];
+                  	$branchLocation = explode(",", $row['branchLocation']);
                   //must add branchFax
                   $branchNo=$row['branchNo'];
                   
@@ -342,7 +364,11 @@ if ($items > 1){
                   $payment = $row['payment'];
                   $delivery = $row['delivery'];
                   $special_instruction = $row['special_instruction'];
+                  $currency = $row['currency'];
                   
+                  //for MOF
+                  
+            		  $mof_number = $row['mof_number'];
                   		
              if (strlen($unitprice) > 7 )
               {     
@@ -388,6 +414,8 @@ if ($items > 1){
                }
                
             $starting = $starting + 5;
+            
+           
                       
                   	}
 
@@ -407,14 +435,19 @@ $date = $doc_date;
             
             $pdf->Text(125,56,"Tel: ".$branchNo);
             //$pdf->Text(155,56,"Fax: ".$branchFax);
-            $pdf->Text(125,44,$sad3);
-            $pdf->Text(125,40,$sad2);
-            $pdf->Text(125,36,$branchLocation);
+            $pdf->Text(125,48,$branchLocation[3]." ".$branchLocation[4]);
+            $pdf->Text(125,44,$branchLocation[2].", ");
+            $pdf->Text(125,40,$branchLocation[1].", ");
+            $pdf->Text(125,36,$branchLocation[0].", ");
             $pdf->Text(125,32,$branchName);
             $pdf->Text(110,32,"Ship To:");
             
             $pdf->Text(130,20,"Date: ".$date);
             $pdf->Text(130,24,"PO No: ".$POnum);
+            
+            
+//for MOF
+$pdf->Text(90,203,"MOF Number: ".$mof_number);
             
             $pdf->Text(12,203,"SPECIAL INSTRUCTIONS AND TERMS");
             $pdf->Text(12,207,$special_instruction);
