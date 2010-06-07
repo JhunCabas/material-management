@@ -107,7 +107,32 @@ for ($i = -6; $i < 0; $i++) {
 	
 	</ol>
 	
-	<h3>Other Reports</h3>
+	<h3>MOF Report Tracker</h3>
+	<ol>
+	
+	<?php
+// Get the month and year of the current month
+list($m, $y) = explode('-', date('m-Y'));
+$m = date('m');
+$y = date('Y');
+
+// if you're wanting the previous three months, set up a loop to start with
+// three months ago (-3) and to up through last month (-1). If you want to 
+// include the current month, simply change the "$i < 0" to "$i < 1"
+for ($i = -6; $i < 0; $i++) {
+  $ts = mktime(0,0,0,(date('m') + $i),1);
+  $mth = date('m', $ts);
+  $yr  = date('Y', $ts);
+ echo "<li><a href='report/tracker.php?op=MOF&month=$mth&year=$yr' target='_blank'>MOF Report Tracker $mth/$yr</a></li>"; // print out your option
+}
+
+?>
+	
+	
+	</ol>
+  
+  
+  <h3>Other Reports</h3>
 	<ol>
 		<li><a href="report/ViewChart.php?op=itempurchaseyear" target="_blank">Num of Inventory Items vs Purchased Year</a></li>
 	    <li><a href="report/ViewChart.php?op=activeinactive" target="_blank">Num of Active and Inactive Items</a></li>
