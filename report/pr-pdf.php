@@ -88,7 +88,7 @@ $starting = 82;
             //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
                
             $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction, A.mof_number,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             F.name as requester,
@@ -122,6 +122,9 @@ $starting = 82;
             			$total  =$row['total'];
             			$discount = $row['discount'];
             			
+                  //for MOF
+                  $mof_number = $row['mof_number'];
+            		  
             			$req_date = $row['requester_date'];
             			
                  // $unitprice = sprintf("%.2f",$unitprice);
@@ -253,6 +256,8 @@ $pdf->SetFont('Arial','',10);
 $pdf->Text(130,40,"Date: ".$date);
 $pdf->Text(130,36,"P.R Number: ".$PRnum);
 
+//for MOF
+$pdf->Text(130,45,"MOF Number: ".$mof_number);
 
 $pdf->Text(167,71,"( ".$currency." )");
 $pdf->Text(187,71,"( ".$currency." )");
@@ -329,7 +334,7 @@ if ($items > 1){
             
             unset($desc);
           $sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
-            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            A.`doc_number`, A.`branch_id`, A.`currency`, date_format(A.doc_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction, A.mof_number,
             C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
             D.`unit_of_measure`,
             F.name as requester,
@@ -365,6 +370,10 @@ if ($items > 1){
             			
             			$req_date = $row['requester_date'];
             			
+                  //for MOF
+                  
+            		  $mof_number = $row['mof_number'];
+            		  
                  // $unitprice = sprintf("%.2f",$unitprice);
                  $unitprice = number_format($unitprice, 2, '.', ','); 
                 //  $total = sprintf("%.2f",$total);
@@ -474,6 +483,8 @@ if ($items > 1){
             $pdf->Text(130,40,"Date: ".$date);
             $pdf->Text(130,36,"P.R Number: ".$PRnum);
             
+//for MOF
+$pdf->Text(130,45,"MOF Number: ".$mof_number);
             
             $pdf->Text(167,71,"( ".$currency." )");
             $pdf->Text(187,71,"( ".$currency." )");
