@@ -319,7 +319,7 @@ function calculateTotal()
 	$(".itemExtP").each(function (){
 		total = total + parseFloat($(this).val());
 	});
-	total = total - $("#discountRate").val();
+	total = total - $("#discountRate").val().replace(/\,/g,'');
 	$("#purchaseTotal").text(formatAsMoney(total));
 }
 
