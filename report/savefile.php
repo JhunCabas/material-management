@@ -15,17 +15,18 @@ header("Expires: 0");
 //SQL  //gives the following  
 //   doc_number, quantity, unit_price, extended_price, item_id, doc_number, branch_id, currency, doc_date, branchLocation, branchNo, branchName, description, unit_of_measure, supplier_1, supplierContact, supplierNum, supplierName, supplierAddress
    
-$sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,
-A.`doc_number`, A.`branch_id`, A.`currency`, A.`doc_date`, A.payment, A.delivery,
-C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
-D.`description`, D.`unit_of_measure`,
-A.supplier_1, A.supplier_1_contact as supplierContact, E.contact as supplierNum, E.name as supplierName, E.address as supplierAddress
-FROM umw_mms.purchases A, umw_mms.purchase_details B, umw_mms.branches C, umw_mms.inv_items D, umw_mms.suppliers E
-WHERE A.doc_number='$POnum'
-AND B.doc_number = A.doc_number
-AND A.branch_id = C.id
-AND A.supplier_1 = E.id
-AND B.item_id = D.id";
+$sql ="SELECT B.`doc_number`, B.`quantity`, B.`unit_price`, B.`extended_price`,B.`item_id`,B.`description`,
+            A.`po_number`, A.`branch_id`, A.`currency`, date_format(A.po_date, '%D %M, %Y') as doc_date, A.payment, A.delivery, A.discount, A.total, A.special_instruction,
+            C.`location`as branchLocation, C.`phone_no` as branchNo, C.`name` as branchName,
+            D.`unit_of_measure`,F.country as currency,
+            A.supplier_1, E.contact_person as supplierContact, E.contact as supplierNum, E.name as supplierName, E.line_1 as add1, E.line_2 as add2, E.line_3 as add3, E.fax_no
+            FROM purchases A, purchase_details B, branches C, inv_items D, suppliers E,currencies F
+            WHERE A.doc_number='$POnum'
+            AND B.doc_number = A.doc_number
+            AND A.branch_id = C.id
+            AND A.supplier_1 = E.id
+            AND B.item_id = D.id
+            AND A.currency = F.id";
      
  connectToDB();
          $getData = mysql_query($sql) or die ("Execution SQL; error");
@@ -72,7 +73,7 @@ while ( $row = mysql_fetch_array($getData))
 
 <body>
 <p>&nbsp;</p>
-<table width="700" height="150" border="0">
+<table width="800" height="100%" border="0">
   <tr>
     <td width="5%" rowspan="2">&nbsp;</td>
     <td colspan="2" rowspan="2">&nbsp;</td>
@@ -84,12 +85,12 @@ while ( $row = mysql_fetch_array($getData))
     <td><?php echo $POnum; ?></td>
   </tr>
   <tr>
-    <td height="101" valign="top"><strong>To :</strong></td>
+    <td height="" valign="top"><strong>To :</strong></td>
     <td width="51%" align="left" valign="top">
     <?php
     echo $supplierContact."<br/>". $supplierName."<br/>".$supplierAddress."<br/> $supplierNum"; 
     ?>    </td>
-    <td width="9%" valign="top"><p><strong>Ship To </strong>:</p>    </td>
+    <td width="" valign="top"><p><strong>Ship To </strong>:</p>    </td>
     <td colspan="2" align="left" valign="top"><p>
     <?php 
     echo $branchName."<br/>". $branchLocation."<br/>".$branchNo ; 
