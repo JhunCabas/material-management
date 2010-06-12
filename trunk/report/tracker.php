@@ -2,13 +2,14 @@
 session_start();
 include ('sql.php');
 extract($_REQUEST);
+extract($_GET);
 //error_reporting(E_ALL);
 
 $header=" ";
 $today = date("dMy");
 
 header("Content-type: application/x-msdownload");
-header("Content-Disposition: attachment; filename=$today-MonthTracker.xls");
+header("Content-Disposition: attachment; filename=$op-$today-MonthTracker.xls");
 header("Pragma: no-cache");
 header("Expires: 0");
 
@@ -20,6 +21,10 @@ header("Expires: 0");
 
   <tr bordercolor="#000000" align="center" bordercolordark="#000000"> <font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
     <td>#</td>
+    <? if ( $op == 'MOF')
+      { echo "<td>MOF Number</td>";
+      }
+    ?>
     <td>PR Number</td>
     <td>PR Date</td>
     <td>PO Number</td>
@@ -29,8 +34,11 @@ header("Expires: 0");
     <td>Status</td>
     </font> </tr>
   <?php 
-			 
-			 $getTracker = exportTracker($month,$year);
+			if ( $op == 'MOF')
+      { $getTracker = exportMOFTracker($month,$year);
+      }
+			
+      else $getTracker = exportTracker($month,$year);
 				  
 				  	echo $getTracker;
 					
