@@ -9,7 +9,8 @@ $tmpl->place('menu');
 ?>
 <div id="content" class="span-24 last">
 	<?php $tmpl->place('menuAdmin'); ?>
-	<h2>Administration</h2><h3>Supplier</h3>
+	<h2>Administration</h2><h3>Supplier</h3> <a href="report/report.php?op=Sup"> Download All Supplier List</a>
+	<br/>
 	<table>
 		<thead>
 			<tr><th>Name</th><th width="400">Location</th><th>Contact Person</th><th>Contact</th><th>Fax</th><th>Information</th><th>Icon</th></tr>
