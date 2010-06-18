@@ -19,7 +19,11 @@ $(function (){
 	$("#moffinal").hide();
 	$("#moftext").attr("readonly","true");
 	$("#mofenter").click(function(){
-		$("#moftext").val($("#mof1").val()+"/"+$("#mof2").val()+"/"+$("#mof3").val()+"/"+$("#mof4").val());
+		while($("#mof2").val().length < 3)
+			$("#mof2").val("0"+$("#mof2").val());
+		while($("#mof3").val().length < 2)
+			$("#mof3").val("0"+$("#mof3").val());
+		$("#moftext").val($("#mof1").val()+"/"+$("#mof2").val()+"/"+$("#mof3").val()+"/"+$("#mof4").val()+"/"+$("#mof5").val());
 		$("#mofinput").hide("slow",function(){$("#moffinal").show("slow");});		
 		mofedit = false;
 	});

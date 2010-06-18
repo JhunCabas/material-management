@@ -27,7 +27,8 @@ $tmpl->place('menu');
 					<input type="text" maxlength="3" name="mof1" size="3" id="mof1"/>/
 					<input type="text" maxlength="3" name="mof2" size="3" id="mof2"/>/
 					<input type="text" maxlength="2" name="mof3" size="2" id="mof3"/>/
-					<input type="text" maxlength="4" name="mof4" size="4" id="mof4"/>
+					<input type="text" maxlength="4" name="mof4" size="4" id="mof4"/>/
+					<input type="text" maxlength="2" name="mof5" size="2" id="mof5">
 				</div>
 				<div id="mofenter" class="span-1 ui-icon ui-icon-circle-plus"></div>
 			</div>
