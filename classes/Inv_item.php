@@ -14,6 +14,12 @@
     {
         return fRecordSet::build('Inv_item');    
     }
+	
+	static function findLike($key)
+	{
+		return fRecordSet::build('Inv_item',
+			array('id~' => $key));
+	}
 
 	static function findAllLimit($first = 0, $last = 2)
 	{
