@@ -2,7 +2,8 @@
 include '../../resources/init.php';
 $q = strtolower($_GET["q"]);
 if (!$q) return;
-$items = Inv_item::findAll();
+$items = Inv_item::findLike($q);
+//echo $items->count();
 $jsonString = "[";
 foreach($items as $item)
 {
