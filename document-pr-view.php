@@ -34,13 +34,15 @@ $tmpl->place('menu');
 			<span id="mof_num"><?php echo $purchase->prepareMofNumber(); ?></span>
 		<br />
 		<label for="doc_date">Document Date </label>
-			<?php echo $purchase->prepareDocDate("j F Y"); ?><br />
+			<span id="doc_date"><?php echo $purchase->prepareDocDate("j F Y"); ?></span><br />
 		<label for="doc_type">Document Type </label>
 			<?php echo strtoupper($purchase->prepareDocTag()).$purchase->prepareDocType(); ?><br />
-		<label for="branch_id">Branch </label>
-			<?php $branch = new Branch($purchase->getBranchId()); echo $branch->prepareName() . " / " . $purchase->prepareBranchId();?><br />
+		<label for="branch_id">Ship To Branch </label>
+			<select type="text" name="branch_id" id="branch_id" style="display: inline;"><?php $user = new User(fAuthorization::getUserToken()); Branch::findAllOption($purchase->prepareBranchId()); ?></select>
+			<span id="branch_view" class="tochange"><?php $branch = new Branch($purchase->getBranchId()); echo $branch->prepareName() . " / " . $purchase->prepareBranchId();?></span><br />
 		<label for="currency_id">Currency </label>
-				<?php $currency = new Currency($purchase->getCurrency()); echo $currency->prepareCountry()." [".$currency->prepareExchange(2)."]"; ?>
+			<select type="text" name="currency_id" id="currency_id" style="display: inline;"></select>
+			<span id="currency_view" class="tochange"><?php $currency = new Currency($purchase->getCurrency()); echo $currency->prepareCountry()." [".$currency->prepareExchange(2)."]"; ?></span>
 		<div class="supplierBox span-23 last">
 			<div id="box1" class="boxes span-7">
 				<b>Supplier 1</b><br />

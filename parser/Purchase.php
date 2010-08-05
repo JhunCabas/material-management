@@ -284,6 +284,18 @@
 		}else if($_POST['type'] == "deleteDetail")
 		{
 			Purchase_detail::deleteDetail($_POST['key']);
+		}else if($_POST['type'] == "branchEdit")
+		{
+			$key = $_POST["key"];
+			$purchase = new Purchase($key);
+			$purchase->setBranchId($_POST['branch']);
+			$purchase->store();
+		}else if($_POST['type'] == "currencyEdit")
+		{
+			$key = $_POST["key"];
+			$purchase = new Purchase($key);
+			$purchase->setCurrency($_POST['currency']);
+			$purchase->store();
 		}
 	}
 ?>
