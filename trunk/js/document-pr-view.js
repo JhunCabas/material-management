@@ -35,6 +35,27 @@ $(function (){
 		});
 	});
 	$(".datepicker").datepicker();
+	$("select#branch_id,select#currency_id").hide();
+	//$("select#currency_id").hide();
+	getCurrency();
+	$(".tochange")
+		.hover(function(){
+			$(this).addClass("highlight").css("cursor","pointer");
+			},function(){
+			$(this).removeClass("highlight").css("cursor","");
+		});
+	$("#branch_view")
+		.dblclick(function(){
+			$(this).fadeOut("fast",function(){
+				$("select#branch_id").fadeIn("slow");
+			});
+		});
+	$("#currency_view")
+		.dblclick(function(){
+			$(this).fadeOut("fast",function(){
+				$("select#currency_id").fadeIn("slow");
+			});
+		});
 	if($("#docStatus").val() == "unapproved")
 	{
 		editableBody();
@@ -69,6 +90,8 @@ $(function (){
 		});
 	});
 	$("#submitBTN").click(function (){
+		var branch = $("#branch_id").val();
+		var currency = $("#currency_id").val();
 		var total = $("#purchaseTotal").text();
 		var discount = $("#discountRate").val();
 		var approver1 = $("#approver1").text();
@@ -77,6 +100,19 @@ $(function (){
 		var delivery = $("#delivery").val();
 		var special = $("#special").val();
 		if(confirm("Continue?"))
+		{
+		if($("#branch_id").is(':visible'))
+			$.post("parser/Purchase.php",{
+				type: "branchEdit",
+				key: $("#docNum").text(),
+				branch: branch
+			});
+		if($("#currency_id").is(':visible'))
+			$.post("parser/Purchase.php",{
+				type: "currencyEdit",
+				key: $("#docNum").text(),
+				currency: currency
+			});
 		$.post("parser/Purchase.php",{
 			type: "edit",
 			key: $("#docNum").text(),
@@ -104,6 +140,7 @@ $(function (){
 					 });
 				 }
 			});
+		}
 	});
 });
 
@@ -294,6 +331,14 @@ function jsonForm()
 	return jsonString;
 }
 
+function getCurrency()
+{
+	var month = Date.today().toString("MM");
+	var year = Date.today().toString("yyyy");
+	$.post("parser/Currency.php",{type: "option", month: month, year: year}, function (data){
+		$("#currency_id").html(data);
+	});
+}
 
 function formatAsMoney(mnt) {
     mnt -= 0;
