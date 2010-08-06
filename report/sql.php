@@ -427,7 +427,58 @@ session_start();
          return $table;
       }		
  
+//added for Supplier Purchase Exporting
 
+###################################
+###### export Supplier Purchase Listing to Excel######
+#  header (PO number), supplier, counter, total
+###################################
+    	function getSupplierPurchaseList($month,$year)
+    		{
+    		$count='1';
+            $sql ="
+            SELECT header, supplier, counter, total FROM (
+            
+            SELECT ' ' AS header, p.doc_type, s.name AS supplier, CAST(COUNT(p.po_number) AS CHAR) AS counter,
+            CAST(ROUND(SUM(p.total * c.exchange), 2) AS DECIMAL(14,2)) AS total
+            FROM purchases p, suppliers s, currencies c
+            WHERE p.supplier_1 = s.id
+            AND p.currency = c.id
+            AND p.doc_tag = 'po'
+            AND YEAR(p.po_date) = '$year'
+            AND MONTH(p.po_date) = '$month'
+            GROUP BY p.doc_type, p.supplier_1
+            
+            UNION
+            
+            SELECT CONCAT('PO', doc_type) AS header, doc_type, ' '  AS supplier, ' ' AS counter, ' ' AS total
+            FROM purchases
+            WHERE doc_tag = 'po'
+            AND YEAR(po_date) = '$year'
+            AND MONTH(po_date) = '$month'
+            GROUP BY doc_type
+            
+            ) AS tmp
+            ORDER BY doc_type ASC, supplier ASC, counter ASC, total ASC	
+            
+            ";
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+              <td>".$row['header']."</td>
+              <td>".$row['supplier']."</td>
+              <td>".$row['counter']."</td>
+              <td>".$row['total']."</td>";
+     
+    	   $count++;
+         }
+         return $table;
+      }		
+ 
 
 ###################################			         
 //end get  
