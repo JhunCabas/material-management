@@ -48,9 +48,18 @@ $table = "  <td>#</td>
             <td bgcolor=blue>Info</td>
             <td bgcolor=blue>Fax No</td>
             <td bgcolor=blue>Status</td>";
+}else if ( $op == 'SupPur')
+{
+$getTable = getSupplierPurchaseList($month,$year);
+$table = "  
+             <td bgcolor=blue>PO Number</td>
+            <td bgcolor=blue>Supplier Name</td>
+            <td bgcolor=blue>Number of PO</td>
+            <td bgcolor=blue>Total Value (RM)</td>";
 }
 
 
+   
 
 ?> 
 
