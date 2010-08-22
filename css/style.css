@@ -1,15 +1,16 @@
 #header{
- 	background-image: url(../img/layout/umwHeader.png);
+ 	background-image: url(../img/layout/headerBg.png);
  	height: 90px;
 	margin-top: 10px;
 }
 
 	#header .tab{
 	 	background-image: url(../img/layout/headerMenu.png);
-		height: 25px;
+		height: 20px;
 	 	width: 80px;
-	 	margin-top: 55px;
-	 	padding: 5px;
+	 	margin-top: 65px;
+	 	padding-top: 5px;
+		padding-left: 5px;
 	 	font-weight: bold;
 	}
 	
@@ -25,7 +26,18 @@
 	#header #tab1{
 		margin-left: 10px;
 	}
-
+		#header #logo{
+			background-image: url("../img/layout/logo-umw.png");
+			height: 90px;
+			width: 66px;
+		}
+		
+		#header #logintab{
+			margin-top: 65px;
+			margin-left: 350px;
+			width: 125px;
+		}
+		
 	#header .tabhover{
 	 	color: white;
 	}
