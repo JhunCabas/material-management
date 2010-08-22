@@ -14,13 +14,18 @@
 		<div id="tab4" class="span-3 tab ui-corner-top">
         	<a href="report.php">Report</a>
         </div>
+		<div id="logintab" class="span-7">
 		<?php
-			echo "<p style=\"float: right;\">";
+			//echo "<p style=\"float: right;\">";
 			if(fAuthorization::checkLoggedIn())
 			{
 				echo "Welcome ". fAuthorization::getUserToken();
 				//echo "<a>Change Password </a>";
-				echo " <a href=\"authentication.php?type=logout\">Logout </a></p>";
+				echo " <a href=\"authentication.php?type=logout\">Logout </a>";
+				//echo "</p>";
 			}
 		?>
+		</div>
+		<div id="logo" class="go-right span-3 last" />
+		
 	</div>
