@@ -43,7 +43,7 @@
 	}
 
 #toolbar{
- 	border: 1px solid black;
+	background-color: #F8B031;
  	height: 30px;
  	text-align: center;
 }
@@ -51,7 +51,9 @@
 	#toolbar div{
 	 	margin-left: 5px;
 	 	margin-top: 5px;
-	 	border: 1px solid black;
+		background-color: #FFD46C;
+		font-weight: bold;
+		padding: 1px;
 	}
 	
 	#toolbar div a{
