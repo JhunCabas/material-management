@@ -26,6 +26,6 @@
 			}
 		?>
 		</div>
-		<div id="logo" class="go-right span-3 last" />
+		<div id="logo" class="go-right span-3 last"></div>
 		
 	</div>
