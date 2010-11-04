@@ -11,13 +11,13 @@ if(isSet($_POST['type']))
 		} catch (fException $e) {
 			fURL::redirect(URL_ROOT."authentication.php");
 		}
+		
 		if(sha1($_POST['password']) == $user->getPassword())
 		{
 			fAuthorization::setUserAuthLevel($user->getLevel());
 			fAuthorization::setUserToken($_POST['username']);
 			fURL::redirect(fAuthorization::getRequestedUrl(true,URL_ROOT."inventory.php"));
-		}
-		else {
+		}else{
 			fURL::redirect(URL_ROOT."authentication.php");
 		}
 	}
