@@ -1,5 +1,6 @@
 <?php
 include './resources/init.php';
+fAuthorization::requireLoggedIn();
 $tmpl->place('header');
 ?>
 <script type="text/javascript" src="./js/inventory-view.js"></script>
@@ -26,15 +27,19 @@ $tmpl->place('header');
 					{
 						$profile->resize(300,0);
 						$profile->saveChanges();
-						echo "Picture resized";
 					}
 					echo "<img class=\"view-img\" src=\"".$inv_item->prepareImageUrl()."\"></img>";
 				} catch (fExpectedException $e) {
 					if($e->getMessage() === "No filename was specified")
 					{
-						echo "No picture available, please upload.<br />";
+						echo "<div class=\"info\">No picture available, please upload.</div><br />";
+					} else {
+						echo "<div class=\"info\">".$e->getMessage()."</div><br />";
 					}
 				}
+			?>
+			<?php  if (fAuthorization::checkAuthLevel('admin')) {
+			    // Execute admin specific code
 			?>
 			<form id="uploadBox" action="parser/Inv_item.php" method="POST" enctype="multipart/form-data">
 			    <fieldset>
@@ -47,6 +52,7 @@ $tmpl->place('header');
 			        </p>
 			    </fieldset>
 			</form>
+			<?php }?>
 		</div>
 		<div id="ViewTable" class="span-14 last">
 			<table>
@@ -90,6 +96,9 @@ $tmpl->place('header');
 					<td class="caption">Status</td>
 					<td><span id="statusVal" class="varInput"><?php echo Status::convert($inv_item->prepareStatus()); ?></td>
 				</tr>
+				<?php  if (fAuthorization::checkAuthLevel('admin')) {
+				    // Execute admin specific code
+				?>
 				<tr>
 					<td id="iconCell">
 						<ul id="icons" class="ui-widget ui-helper-clearfix">
@@ -98,6 +107,7 @@ $tmpl->place('header');
 						</ul>						
 					</td>
 				</tr>
+				<?php } ?>
 			</table>
 		</div>
 		</div>

@@ -12,16 +12,15 @@ $(function (){
 			$("#saveBTN").fadeIn();
 		});		
 		$.each($("span.varInput"), function (){
+			var tempText = $(this).text();
 			if($(this).attr("id") == "statusVal")
 			{
-				$.post("parser/Inv_item.php", {type: "option"},
+				$.post("parser/Inv_item.php", {type: "option", input: tempText},
 					function(data){
 						$("#statusVal").html(data);
 					});
-			}
-			else{
-				var tempText = $(this).text();
-				$(this).html("<input value=\""+tempText+"\"></input>");
+			}else{
+				$(this).html("<input value=\""+encodeHTML(tempText)+"\"></input>");
 			}
 		});
 	});
@@ -58,3 +57,8 @@ $(function (){
 		});
 	});
 });
+
+function encodeHTML(decodedString)
+{
+	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
+}

@@ -1,4 +1,5 @@
 $(function (){
+	/*
 	//Autoupdate scroll
 	$('document').ready(function(){		
 		updatestatus();		
@@ -25,6 +26,7 @@ $(function (){
 		}
 		setTimeout('scrollalert();', 1500);
 	}
+	*/
 	$(".linkable").mouseenter(function () {
 			$(this).addClass("highlight");
 		}).mouseleave(function (){
