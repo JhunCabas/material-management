@@ -42,8 +42,9 @@
 			}
 		}else if($_POST['type'] == "option")
 		{
+			$selectedOption = $_POST['input'] == "Active" ? 1 : 0;
 			echo "<select>";
-			Status::printOption();
+			Status::printOption($selectedOption);
 			echo "</select>";
 		}else if($_POST['type'] == "lastCode")
 		{
