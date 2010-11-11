@@ -9,15 +9,20 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fGrammar
  * 
- * @version    1.0.0b8
- * @changes    1.0.0b8  Added the ::stem() method [wb, 2010-05-27]
- * @changes    1.0.0b7  Added the `$return_error` parameter to ::pluralize() and ::singularize() [wb, 2010-03-30]
- * @changes    1.0.0b6  Added missing ::compose() method [wb, 2010-03-03]
- * @changes    1.0.0b5  Fixed ::reset() to properly reset the singularization and pluralization rules [wb, 2009-10-28]
- * @changes    1.0.0b4  Added caching for various methods - provided significant performance boost to ORM [wb, 2009-06-15] 
- * @changes    1.0.0b3  Changed replacement values in preg_replace() calls to be properly escaped [wb, 2009-06-11]
- * @changes    1.0.0b2  Fixed a bug where some words would lose capitalization with ::pluralize() and ::singularize() [wb, 2009-01-25]
- * @changes    1.0.0b   The initial implementation [wb, 2007-09-25]
+ * @version    1.0.0b13
+ * @changes    1.0.0b13  Fixed the pluralization of video [wb, 2010-08-10]
+ * @changes    1.0.0b12  Updated ::singularize() and ::pluralize() to be able to handle underscore_CamelCase [wb, 2010-08-06]
+ * @changes    1.0.0b11  Fixed custom camelCase to underscore_notation rules [wb, 2010-06-23]
+ * @changes    1.0.0b10  Removed `e` flag from preg_replace() calls [wb, 2010-06-08]
+ * @changes    1.0.0b9   Fixed a bug with ::camelize() and human-friendly strings [wb, 2010-06-08]
+ * @changes    1.0.0b8   Added the ::stem() method [wb, 2010-05-27]
+ * @changes    1.0.0b7   Added the `$return_error` parameter to ::pluralize() and ::singularize() [wb, 2010-03-30]
+ * @changes    1.0.0b6   Added missing ::compose() method [wb, 2010-03-03]
+ * @changes    1.0.0b5   Fixed ::reset() to properly reset the singularization and pluralization rules [wb, 2009-10-28]
+ * @changes    1.0.0b4   Added caching for various methods - provided significant performance boost to ORM [wb, 2009-06-15] 
+ * @changes    1.0.0b3   Changed replacement values in preg_replace() calls to be properly escaped [wb, 2009-06-11]
+ * @changes    1.0.0b2   Fixed a bug where some words would lose capitalization with ::pluralize() and ::singularize() [wb, 2009-01-25]
+ * @changes    1.0.0b    The initial implementation [wb, 2007-09-25]
  */
 class fGrammar
 {
@@ -105,7 +110,7 @@ class fGrammar
 	static private $singular_to_plural_rules = array(
 		'([ml])ouse$'                  => '\1ice',
 		'(media|info(rmation)?|news)$' => '\1',
-		'(phot|log)o$'                 => '\1os',
+		'(phot|log|vide)o$'            => '\1os',
 		'^(q)uiz$'                     => '\1uizzes',
 		'(c)hild$'                     => '\1hildren',
 		'(p)erson$'                    => '\1eople',
@@ -205,7 +210,7 @@ class fGrammar
 	{
 		$upper = (int) $upper;
 		if (isset(self::$cache['camelize'][$upper][$string])) {
-			return self::$cache['camelize'][$upper][$string];		
+			return self::$cache['camelize'][$upper][$string];
 		}
 		
 		$original = $string;
@@ -214,30 +219,45 @@ class fGrammar
 		if (isset(self::$camelize_rules[$string])) {
 			$string = self::$camelize_rules[$string];
 			if ($upper) {
-				$string = strtoupper($camel[0]) . substr($camel, 1);
+				$string = ucfirst($string);
 			}
 		
-		// Make a humanized string like underscore notation
-		} elseif (strpos($string, ' ') !== FALSE) {
-			$string = strtolower(preg_replace('#\s+#', '_', $string));
-		
-		// Check to make sure this is not already camel case
-		} elseif (strpos($string, '_') === FALSE) {
-			if ($upper) {
-				$string = strtoupper($string[0]) . substr($string, 1);
+		} else {
+			// Make a humanized string like underscore notation
+			if (strpos($string, ' ') !== FALSE) {
+				$string = strtolower(preg_replace('#\s+#', '_', $string));
 			}
 			
-		// Handle underscore notation
-		} else {
-			$string = strtolower($string);
-			if ($upper) {
-				$string = strtoupper($string[0]) . substr($string, 1);
+			// Check to make sure this is not already camel case
+			if (strpos($string, '_') === FALSE) {
+				if ($upper) {
+					$string = ucfirst($string);
+				}
+				
+			// Handle underscore notation
+			} else {
+				$string[0] = strtolower($string[0]);
+				if ($upper) {
+					$string = ucfirst($string);
+				}
+				$string = preg_replace_callback('#_([a-z0-9])#i', array('self', 'camelizeCallback'), $string);		
 			}
-			$string = preg_replace('/(_([a-z0-9]))/e', 'strtoupper("\2")', $string);		
 		}
 		
 		self::$cache['camelize'][$upper][$original] = $string;
 		return $string;
+	}
+	
+	
+	/**
+	 * A callback used by ::camelize() to handle converting underscore to camelCase
+	 * 
+	 * @param array $match  The regular expression match
+	 * @return string  The value to replace the string with
+	 */
+	static private function camelizeCallback($match)
+	{
+		return strtoupper($match[1]);
 	}
 	
 	
@@ -289,9 +309,9 @@ class fGrammar
 				$string = self::underscorize($string);
 			}
 			
-			$string = preg_replace(
-				'/(\b(api|css|gif|html|id|jpg|js|mp3|pdf|php|png|sql|swf|url|xhtml|xml)\b|\b\w)/e',
-				'strtoupper("\1")',
+			$string = preg_replace_callback(
+				'/(\b(api|css|gif|html|id|jpg|js|mp3|pdf|php|png|sql|swf|url|xhtml|xml)\b|\b\w)/',
+				array('self', 'camelizeCallback'),
 				str_replace('_', ' ', $string)
 			);
 		}
@@ -501,7 +521,7 @@ class fGrammar
 		self::$singular_to_plural_rules = array(
 			'([ml])ouse$'                  => '\1ice',
 			'(media|info(rmation)?|news)$' => '\1',
-			'(phot|log)o$'                 => '\1os',
+			'(phot|log|vide)o$'            => '\1os',
 			'^(q)uiz$'                     => '\1uizzes',
 			'(c)hild$'                     => '\1hildren',
 			'(p)erson$'                    => '\1eople',
@@ -580,7 +600,7 @@ class fGrammar
 		}
 		
 		// Handle camel case
-		if (preg_match('#(.*)((?<=[a-zA-Z]|^)(?:[0-9]+|[A-Z][a-z]*)|(?<=[0-9A-Z]|^)(?:[A-Z][a-z]*))$#D', $string, $match)) {
+		if (preg_match('#(.*)((?<=[a-zA-Z_]|^)(?:[0-9]+|[A-Z][a-z]*)|(?<=[0-9A-Z_]|^)(?:[A-Z][a-z]*))$#D', $string, $match)) {
 			return array($match[1], $match[2]);
 		}
 		
@@ -726,7 +746,7 @@ class fGrammar
 			$string = self::$underscorize_rules[$string];
 		
 		// If the string is already underscore notation then leave it
-		} elseif (strpos($string, '_') !== FALSE) {
+		} elseif (strpos($string, '_') !== FALSE && strtolower($string) == $string) {
 		
 		// Allow humanized string to be passed in
 		} elseif (strpos($string, ' ') !== FALSE) {

@@ -9,15 +9,17 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fUpload
  * 
- * @version    1.0.0b8
- * @changes    1.0.0b8  BackwardsCompatiblityBreak - ::validate() no longer returns the `$_FILES` array for the file being validated - added `$return_message` parameter to ::validate(), fixed a bug with detection of mime type for text files [wb, 2010-05-26]
- * @changes    1.0.0b7  Added ::filter() to allow for ignoring array file upload field entries that did not have a file uploaded [wb, 2009-10-06]
- * @changes    1.0.0b6  Updated ::move() to use the new fFilesystem::createObject() method [wb, 2009-01-21]
- * @changes    1.0.0b5  Removed some unnecessary error suppression operators from ::move() [wb, 2009-01-05]
- * @changes    1.0.0b4  Updated ::validate() so it properly handles upload max filesize specified in human-readable notation [wb, 2009-01-05]
- * @changes    1.0.0b3  Removed the dependency on fRequest [wb, 2009-01-05]
- * @changes    1.0.0b2  Fixed a bug with validating filesizes [wb, 2008-11-25]
- * @changes    1.0.0b   The initial implementation [wb, 2007-06-14]
+ * @version    1.0.0b10
+ * @changes    1.0.0b10  BackwardsCompatibilityBreak - renamed ::setMaxFilesize() to ::setMaxSize() to be consistent with fFile::getSize() [wb, 2010-05-30]
+ * @changes    1.0.0b9   BackwardsCompatibilityBreak - the class no longer accepts uploaded files that start with a `.` unless ::allowDotFiles() is called - added ::setOptional() [wb, 2010-05-30]
+ * @changes    1.0.0b8   BackwardsCompatibilityBreak - ::validate() no longer returns the `$_FILES` array for the file being validated - added `$return_message` parameter to ::validate(), fixed a bug with detection of mime type for text files [wb, 2010-05-26]
+ * @changes    1.0.0b7   Added ::filter() to allow for ignoring array file upload field entries that did not have a file uploaded [wb, 2009-10-06]
+ * @changes    1.0.0b6   Updated ::move() to use the new fFilesystem::createObject() method [wb, 2009-01-21]
+ * @changes    1.0.0b5   Removed some unnecessary error suppression operators from ::move() [wb, 2009-01-05]
+ * @changes    1.0.0b4   Updated ::validate() so it properly handles upload max filesize specified in human-readable notation [wb, 2009-01-05]
+ * @changes    1.0.0b3   Removed the dependency on fRequest [wb, 2009-01-05]
+ * @changes    1.0.0b2   Fixed a bug with validating filesizes [wb, 2008-11-25]
+ * @changes    1.0.0b    The initial implementation [wb, 2007-06-14]
  */
 class fUpload
 {
@@ -130,9 +132,16 @@ class fUpload
 	
 	
 	/**
-	 * The type of files accepted
+	 * If files starting with `.` can be uploaded
 	 * 
-	 * @var string
+	 * @var boolean
+	 */
+	private $allow_dot_files = FALSE;
+	
+	/**
+	 * If PHP files can be uploaded
+	 * 
+	 * @var boolean
 	 */
 	private $allow_php = FALSE;
 	
@@ -148,7 +157,7 @@ class fUpload
 	 * 
 	 * @var integer
 	 */
-	private $max_file_size = 0;
+	private $max_size = 0;
 	
 	/**
 	 * The error message to display if the mime types do not match
@@ -164,6 +173,13 @@ class fUpload
 	 */
 	private $mime_types = array();
 	
+	/**
+	 * If the file upload is required
+	 * 
+	 * @var boolean
+	 */
+	private $required = TRUE;
+	
 	
 	/**
 	 * All requests that hit this method should be requests for callbacks
@@ -176,6 +192,20 @@ class fUpload
 	public function __get($method)
 	{
 		return array($this, $method);		
+	}
+	
+	
+	/**
+	 * Sets the upload class to allow files starting with a `.`
+	 * 
+	 * Files starting with `.` may change the behaviour of web servers,
+	 * for instance `.htaccess` files for Apache.
+	 * 
+	 * @return void
+	 */
+	public function allowDotFiles()
+	{
+		$this->allow_dot_files = TRUE;
 	}
 	
 	
@@ -248,7 +278,7 @@ class fUpload
 	 * @param  string|fDirectory $directory  The directory to upload the file to
 	 * @param  string            $field      The file upload field to get the file from
 	 * @param  mixed             $index      If the field was an array file upload field, upload the file corresponding to this index
-	 * @return fFile  An fFile (or fImage) object
+	 * @return fFile|NULL  An fFile (or fImage) object, or `NULL` if no file was uploaded
 	 */
 	public function move($directory, $field, $index=NULL)
 	{
@@ -276,6 +306,11 @@ class fUpload
 			throw new fValidationException($error);
 		}
 		
+		// This will only ever be true if the file is optional
+		if ($file_array['name'] == '' || $file_array['tmp_name'] == '' || $file_array['size'] == 0) {
+			return NULL;
+		}
+		
 		$file_name  = fFilesystem::makeURLSafe($file_array['name']);
 		
 		$file_name = $directory->getPath() . $file_name;
@@ -296,14 +331,42 @@ class fUpload
 	
 	
 	/**
-	 * Sets the file mime types accepted, one per parameter
+	 * Sets the maximum size the uploaded file may be
+	 * 
+	 * This method should be used with the
+	 * [http://php.net/file-upload.post-method `MAX_FILE_SIZE`] hidden form
+	 * input since the hidden form input will reject a file that is too large
+	 * before the file completely uploads, while this method will wait until the
+	 * whole file has been uploaded. This method should always be used since it
+	 * is very easy for the `MAX_FILE_SIZE` post field to be manipulated on the
+	 * client side.
+	 * 
+	 * This method can only further restrict the
+	 * [http://php.net/upload_max_filesize `upload_max_filesize` ini setting],
+	 * it can not increase that setting. `upload_max_filesize` must be set
+	 * in the php.ini (or an Apache configuration) since file uploads are
+	 * handled before the request is handed off to PHP.
 	 * 
 	 * @param  string $size  The maximum file size (e.g. `1MB`, `200K`, `10.5M`) - `0` for no limit
 	 * @return void
 	 */
-	public function setMaxFileSize($size)
+	public function setMaxSize($size)
 	{
-		$this->max_file_size = fFilesystem::convertToBytes($size);
+		$ini_max_size = ini_get('upload_max_filesize');
+		$ini_max_size = (!is_numeric($ini_max_size)) ? fFilesystem::convertToBytes($ini_max_size) : $ini_max_size;
+			
+		$size = fFilesystem::convertToBytes($size);
+		
+		if ($size && $size > $ini_max_size) {
+			throw new fEnvironmentException(
+				'The requested max file upload size, %1$s, is larger than the %2$s ini setting, which is currently set at %3$s. The ini setting must be increased to allow files of this size.',
+				$max_size,
+				'upload_max_filesize',
+				$ini_max_size
+			);
+		}
+		
+		$this->max_size = $size;
 	}
 	
 	
@@ -322,6 +385,17 @@ class fUpload
 	
 	
 	/**
+	 * Sets the file upload to be optional instead of required
+	 * 
+	 * @return void
+	 */
+	public function setOptional()
+	{
+		$this->required = FALSE;
+	}
+	
+	
+	/**
 	 * Validates the uploaded file, ensuring a file was actually uploaded and that is matched the restrictions put in place
 	 * 
 	 * @throws fValidationException  When no file is uploaded or the uploaded file violates the options set for this object
@@ -331,7 +405,7 @@ class fUpload
 	 * @param  boolean $return_message  If any validation error should be returned as a string instead of being thrown as an fValidationException
 	 * @param  string  :$field
 	 * @param  boolean :$return_message
-	 * @return void
+	 * @return NULL|string  If `$return_message` is not `TRUE` or if no error occurs, `NULL`, otherwise a string error message
 	 */
 	public function validate($field, $index=NULL, $return_message=NULL)
 	{
@@ -367,7 +441,10 @@ class fUpload
 	private function validateField($file_array)
 	{
 		if (empty($file_array['name'])) {
-			return self::compose('Please upload a file');
+			if ($this->required) {
+				return self::compose('Please upload a file');
+			}
+			return NULL;
 		}
 		
 		if ($file_array['error'] == UPLOAD_ERR_FORM_SIZE || $file_array['error'] == UPLOAD_ERR_INI_SIZE) {
@@ -378,15 +455,18 @@ class fUpload
 				fFilesystem::formatFilesize($max_size)
 			);
 		}
-		if ($this->max_file_size && $file_array['size'] > $this->max_file_size) {
+		if ($this->max_size && $file_array['size'] > $this->max_size) {
 			return self::compose(
 				'The file uploaded is over the limit of %s',
-				fFilesystem::formatFilesize($this->max_file_size)
+				fFilesystem::formatFilesize($this->max_size)
 			);
 		}
 		
 		if (empty($file_array['tmp_name']) || empty($file_array['size'])) {
-			return self::compose('Please upload a file');	
+			if ($this->required) {
+				return self::compose('Please upload a file');
+			}
+			return NULL;	
 		}
 		
 		if (!empty($this->mime_types) && file_exists($file_array['tmp_name'])) {
@@ -400,6 +480,12 @@ class fUpload
 			$file_info = fFilesystem::getPathInfo($file_array['name']);
 			if (in_array(strtolower($file_info['extension']), array('php', 'php4', 'php5'))) {
 				return self::compose('The file uploaded is a PHP file, but those are not permitted');
+			}
+		}
+		
+		if (!$this->allow_dot_files) {
+			if (substr($file_array['name'], 0, 1) == '.') {
+				return self::compose('The name of the uploaded file may not being with a .');
 			}
 		}
 	}

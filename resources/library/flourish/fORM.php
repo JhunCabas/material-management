@@ -9,7 +9,11 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fORM
  * 
- * @version    1.0.0b20
+ * @version    1.0.0b24
+ * @changes    1.0.0b24  Backwards Compatibility Break - Callbacks registered via ::registerRecordSetMethod() should now accept the `$method_name` in the position where the `$pointer` parameter used to be passed [wb, 2010-09-28]
+ * @changes    1.0.0b23  Added the `'pre::replicate()'`, `'post::replicate()'` and `'cloned::replicate()'` hooks [wb, 2010-09-07]
+ * @changes    1.0.0b22  Internal Backwards Compatibility Break - changed ::parseMethod() to not underscorize the subject of the method [wb, 2010-08-06]
+ * @changes    1.0.0b21  Fixed some documentation to reflect the API changes from v1.0.0b9 [wb, 2010-07-14]
  * @changes    1.0.0b20  Added the ability to register a wildcard active record method for all classes [wb, 2010-04-22]
  * @changes    1.0.0b19  Added the method ::isClassMappedToTable() [wb, 2010-03-30]
  * @changes    1.0.0b18  Added the `post::loadFromIdentityMap()` hook [wb, 2010-03-14]
@@ -624,7 +628,7 @@ class fORM
 	 *
 	 * @internal
 	 * 
-	 * @param  mixed  $class   The class name or instance of the class the column is part of
+	 * @param  string $class   The class name of the class the column is part of
 	 * @param  string $column  The database column
 	 * @param  mixed  $value   The value to possibly objectify
 	 * @return mixed  The scalar or object version of the value, depending on the column type and column options
@@ -734,7 +738,7 @@ class fORM
 				$method
 			);	
 		}
-		self::$cache['parseMethod'][$method] = array($matches[1], fGrammar::underscorize($matches[2]));
+		self::$cache['parseMethod'][$method] = array($matches[1], $matches[2]);
 		return self::$cache['parseMethod'][$method];
 	}
 	
@@ -786,9 +790,15 @@ class fORM
 	 *  - **`&$related_records`**: The related records array for the record
 	 *  - **`&$cache`**:           The cache array for the record
 	 * 
-	 * The `'pre::validate()'` and `'post::validate()'` hooks have an extra parameter:
+	 * The `'pre::validate()'` and `'post::validate()'` hooks have an extra
+	 * parameter:
 	 * 
 	 *  - **`&$validation_messages`**: An ordered array of validation errors that will be returned or tossed as an fValidationException
+	 * 
+	 * The `'pre::replicate()'`, `'post::replicate()'` and
+	 * `'cloned::replicate()'` hooks have an extra parameter:
+	 * 
+	 *  - **`$replication_level`**: An integer representing the level of recursion - the object being replicated will be `0`, children will be `1`, grandchildren `2` and so on.
 	 *  
 	 * Below is a list of all valid hooks:
 	 * 
@@ -803,6 +813,9 @@ class fORM
 	 *  - `'post::loadFromResult()'`
 	 *  - `'pre::populate()'`
 	 *  - `'post::populate()'`
+	 *  - `'pre::replicate()'`
+	 *  - `'post::replicate()'`
+	 *  - `'cloned::replicate()'`
 	 *  - `'pre::store()'`
 	 *  - `'post-begin::store()'`
 	 *  - `'post-validate::store()'`
@@ -834,6 +847,9 @@ class fORM
 			'post::loadFromResult()',
 			'pre::populate()',
 			'post::populate()',
+			'pre::replicate()',
+			'post::replicate()',
+			'cloned::replicate()',
 			'pre::store()',
 			'post-begin::store()',
 			'post-validate::store()',
@@ -930,7 +946,7 @@ class fORM
 	 *  - **`$object`**:      The actual record set
 	 *  - **`$class`**:       The class of each record
 	 *  - **`&$records`**:    The ordered array of fActiveRecord objects
-	 *  - **`&$pointer`**:    The current array pointer for the records array
+	 *  - **`$method_name`**: The method name that was called
 	 *  - **`$parameters`**:  Any parameters passed to the method
 	 * 
 	 * @param  string   $method    The method to hook for
@@ -1119,7 +1135,7 @@ class fORM
 	/**
 	 * Takes a class name (or class) and turns it into a table name - Uses custom mapping if set
 	 * 
-	 * @param  mixed $class  he class name or instance of the class
+	 * @param  string $class  The class name
 	 * @return string  The table name
 	 */
 	static public function tablize($class)

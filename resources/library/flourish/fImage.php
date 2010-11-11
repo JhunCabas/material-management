@@ -9,7 +9,11 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fImage
  * 
- * @version    1.0.0b22
+ * @version    1.0.0b26
+ * @changes    1.0.0b26  Fixed a bug where processing via ImageMagick was not properly setting the default RGB colorspace [wb, 2010-10-19]
+ * @changes    1.0.0b25  Fixed the class to not generate multiple files when saving a JPG from an animated GIF or a TIF with a thumbnail [wb, 2010-09-12]
+ * @changes    1.0.0b24  Updated class to use fCore::startErrorCapture() instead of `error_reporting()` [wb, 2010-08-09]
+ * @changes    1.0.0b23  Fixed the class to detect when exec() is disabled and the function has a space before or after in the list [wb, 2010-07-21]
  * @changes    1.0.0b22  Fixed ::isImageCompatible() to handle certain JPGs created with Photoshop [wb, 2010-04-03]
  * @changes    1.0.0b21  Fixed ::resize() to allow dimensions to be numeric strings instead of just integers [wb, 2010-04-09]
  * @changes    1.0.0b20  Added ::append() [wb, 2010-03-15]
@@ -154,8 +158,8 @@ class fImage extends fFile
 			try {
 				
 				// If exec is disabled we can't use imagemagick
-				if (in_array('exec', explode(',', ini_get('disable_functions')))) {
-					throw new Exception();	
+				if (in_array('exec', array_map('trim', explode(',', ini_get('disable_functions'))))) {
+					throw new Exception();
 				}
 				
 				if (fCore::checkOS('windows')) {
@@ -314,9 +318,9 @@ class fImage extends fFile
 			}	
 		}
 		
-		$old_level  = error_reporting(error_reporting() & ~E_WARNING);
+		fCore::startErrorCapture(E_WARNING);
 		$image_info = getimagesize($image_path);
-		error_reporting($old_level);
+		fCore::stopErrorCapture();
 		
 		if ($image_info == FALSE) {
 			throw new fValidationException(
@@ -975,7 +979,21 @@ class fImage extends fFile
 			$command_line .= ' -set registry:temporary-path ' . escapeshellarg(self::$imagemagick_temp_dir) . ' ';
 		}
 		
-		$command_line .= ' ' . escapeshellarg($this->file) . ' ';
+		// Determining in what format the file is going to be saved
+		$path_info = fFilesystem::getPathInfo($output_file);
+		$new_type = $path_info['extension'];
+		$new_type = ($new_type == 'jpeg') ? 'jpg' : $new_type;
+		
+		if (!in_array($new_type, array('gif', 'jpg', 'png'))) {
+			$new_type = $type;	
+		}
+		
+		$file = $this->file;
+		if ($type != 'gif' || $new_type != 'gif') {
+			$file .= '[0]';
+		}
+		
+		$command_line .= ' ' . escapeshellarg($file) . ' ';
 		
 		// Animated gifs need to be coalesced
 		if ($this->isAnimatedGif()) {
@@ -1010,17 +1028,8 @@ class fImage extends fFile
 		}
 		
 		// Default to the RGB colorspace
-		if (strpos($command_line, ' -colorspace ')) {
+		if (strpos($command_line, ' -colorspace ') === FALSE) {
 			$command_line .= ' -colorspace RGB ';
-		}
-		
-		// Set up jpeg compression
-		$path_info = fFilesystem::getPathInfo($output_file);
-		$new_type = $path_info['extension'];
-		$new_type = ($new_type == 'jpeg') ? 'jpg' : $new_type;
-		
-		if (!in_array($new_type, array('gif', 'jpg', 'png'))) {
-			$new_type = $type;	
 		}
 		
 		if ($new_type == 'jpg') {

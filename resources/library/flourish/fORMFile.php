@@ -9,7 +9,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fORMFile
  * 
- * @version    1.0.0b24
+ * @version    1.0.0b27
+ * @changes    1.0.0b27  Fixed column inheritance to properly handle non-images and inheriting into image upload columns [wb, 2010-09-18]
+ * @changes    1.0.0b26  Enhanced ::configureColumnInheritance() to ensure both columns specified have been set up as file upload columns [wb, 2010-08-18]
+ * @changes    1.0.0b25  Updated code to work with the new fORM API [wb, 2010-08-06]
  * @changes    1.0.0b24  Changed validation messages array to use column name keys [wb, 2010-05-26]
  * @changes    1.0.0b23  Fixed a bug with ::upload() that could cause a method called on a non-object error in relation to the upload directory not being defined [wb, 2010-05-10]
  * @changes    1.0.0b22  Updated the TEMP_DIRECTORY constant to not include the trailing slash, code now uses DIRECTORY_SEPARATOR to fix issues on Windows [wb, 2010-04-28]
@@ -375,6 +378,20 @@ class fORMFile
 	{
 		$class = fORM::getClass($class);
 		
+		if (empty(self::$file_upload_columns[$class][$column])) {
+			throw new fProgrammerException(
+				'The column specified, %s, has not been configured as a file upload column',
+				$column
+			);
+		}
+		
+		if (empty(self::$file_upload_columns[$class][$inherit_from_column])) {
+			throw new fProgrammerException(
+				'The column specified, %s, has not been configured as a file upload column',
+				$column
+			);
+		}
+		
 		if (empty(self::$column_inheritence[$class])) {
 			self::$column_inheritence[$class] = array();
 		}
@@ -523,8 +540,9 @@ class fORMFile
 	 */
 	static public function encode($object, &$values, &$old_values, &$related_records, &$cache, $method_name, $parameters)
 	{
-		list ($action, $column) = fORM::parseMethod($method_name);
+		list ($action, $subject) = fORM::parseMethod($method_name);
 		
+		$column   = fGrammar::underscorize($subject);
 		$filename = ($values[$column] instanceof fFile) ? $values[$column]->getName() : NULL;
 		if ($filename && strpos($values[$column]->getPath(), self::TEMP_DIRECTORY . DIRECTORY_SEPARATOR . $filename) !== FALSE) {
 			$filename = self::TEMP_DIRECTORY . DIRECTORY_SEPARATOR . $filename;
@@ -656,7 +674,8 @@ class fORMFile
 	 */
 	static public function prepare($object, &$values, &$old_values, &$related_records, &$cache, $method_name, $parameters)
 	{
-		list ($action, $column) = fORM::parseMethod($method_name);
+		list ($action, $subject) = fORM::parseMethod($method_name);
+		$column = fGrammar::underscorize($subject);
 		
 		if (sizeof($parameters) > 1) {
 			throw new fProgrammerException(
@@ -720,9 +739,10 @@ class fORMFile
 	 */
 	static public function process($object, &$values, &$old_values, &$related_records, &$cache, $method_name, $parameters)
 	{
-		list ($action, $column) = fORM::parseMethod($method_name);
+		list ($action, $subject) = fORM::parseMethod($method_name);
 		
-		$class = get_class($object);
+		$column = fGrammar::underscorize($subject);
+		$class  = get_class($object);
 		
 		self::processImage($class, $column, $values[$column]);
 		
@@ -991,8 +1011,9 @@ class fORMFile
 	{
 		$class = get_class($object);
 		
-		list ($action, $column) = fORM::parseMethod($method_name);
+		list ($action, $subject) = fORM::parseMethod($method_name);
 		
+		$column   = fGrammar::underscorize($subject);
 		$doc_root = realpath($_SERVER['DOCUMENT_ROOT']);
 		
 		if (!array_key_exists(0, $parameters)) {
@@ -1110,7 +1131,8 @@ class fORMFile
 	{
 		$class = get_class($object);
 		
-		list ($action, $column) = fORM::parseMethod($method_name);
+		list ($action, $subject) = fORM::parseMethod($method_name);
+		$column = fGrammar::underscorize($subject);
 		
 		$existing_temp_file = FALSE;
 		
@@ -1167,8 +1189,8 @@ class fORMFile
 				if ($file) {
 					
 					// Image columns will only inherit if it is an fImage object
-					if (!$file instanceof fImage && isset(self::$image_upload_columns[$class][$other_column])) {
-						continue;		
+					if (!$file instanceof fImage && isset(self::$image_upload_columns[$class]) && array_key_exists($other_column, self::$image_upload_columns[$class])) {
+						continue;
 					}
 					
 					$other_upload_dir = self::$file_upload_columns[$class][$other_column];
