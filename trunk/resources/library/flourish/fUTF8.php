@@ -13,7 +13,9 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fUTF8
  * 
- * @version    1.0.0b7
+ * @version    1.0.0b9
+ * @changes    1.0.0b9  Updated class to use fCore::startErrorCapture() instead of `error_reporting()` [wb, 2010-08-09]
+ * @changes    1.0.0b8  Removed `e` flag from preg_replace() calls [wb, 2010-06-08]
  * @changes    1.0.0b7  Added the methods ::trim(), ::rtrim() and ::ltrim() [wb, 2010-05-11]
  * @changes    1.0.0b6  Fixed ::clean() to work with PHP installs that use an iconv library that doesn't support //IGNORE [wb, 2010-03-02]
  * @changes    1.0.0b5  Changed ::ucwords() to also uppercase words right after various punctuation [wb, 2009-09-18]
@@ -659,11 +661,11 @@ class fUTF8
 				self::$can_ignore_invalid = !preg_match('#iconv\s+implementation\s+(=>\s+)?unknown#ims', $module_info);	
 			}
 			if (!self::$can_ignore_invalid) {
-				$old_level = error_reporting(error_reporting() & ~E_NOTICE);
+				fCore::startErrorCapture(E_NOTICE);
 			}
 			return iconv('UTF-8', 'UTF-8' . (self::$can_ignore_invalid ? '//IGNORE' : ''), (string) $value);
 			if (!self::$can_ignore_invalid) {
-				error_reporting($old_level);
+				fCore::stopErrorCapture();
 			}
 		}
 		
@@ -1500,7 +1502,23 @@ class fUTF8
 	 */
 	static public function ucwords($string)
 	{
-		return preg_replace('#(?<=^|\s|[\x{2000}-\x{200A}]|/|-|\(|\[|\{|\||"|^\'|\s\'|‘|“)(.)#ue', 'self::upper(str_replace("\\\\\'", "\'", "$1"))', $string);
+		return preg_replace_callback(
+			'#(?<=^|\s|[\x{2000}-\x{200A}]|/|-|\(|\[|\{|\||"|^\'|\s\'|‘|“)(.)#u',
+			array('self', 'ucwordsCallback'),
+			$string
+		);
+	}
+	
+	
+	/**
+	 * Handles converting a character to uppercase for ::ucwords()
+	 * 
+	 * @param array $match  The regex match from ::ucwords()
+	 * @return string  The uppercase character
+	 */
+	static private function ucwordsCallback($match)
+	{
+		return self::upper($match[1]);
 	}
 	
 	

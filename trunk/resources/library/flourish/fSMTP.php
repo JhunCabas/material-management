@@ -9,7 +9,12 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fSMTP
  * 
- * @version    1.0.0b4
+ * @version    1.0.0b9
+ * @changes    1.0.0b9  Fixed a bug where lines starting with `.` and containing other content would have the `.` stripped [wb, 2010-09-11]
+ * @changes    1.0.0b8  Updated the class to use fEmail::getFQDN() [wb, 2010-09-07]
+ * @changes    1.0.0b7  Updated class to use new fCore::startErrorCapture() functionality [wb, 2010-08-09]
+ * @changes    1.0.0b6  Updated the class to use new fCore functionality [wb, 2010-07-05]
+ * @changes    1.0.0b5  Hacked around a bug in PHP 5.3 on Windows [wb, 2010-06-22]
  * @changes    1.0.0b4  Updated the class to not connect and authenticate until a message is sent, moved message id generation in fEmail [wb, 2010-05-05]
  * @changes    1.0.0b3  Fixed a bug with connecting to servers that send an initial response of `220-` and instead of `220 ` [wb, 2010-04-26]
  * @changes    1.0.0b2  Fixed a bug where `STARTTLS` would not be triggered if it was last in the SMTP server's list of supported extensions [wb, 2010-04-20]
@@ -44,13 +49,6 @@ class fSMTP
 	 * @var string
 	 */
 	private $host;
-	
-	/**
-	 * The local host name
-	 * 
-	 * @var string
-	 */
-	private $local_host;
 	
 	/**
 	 * The maximum size message the SMTP server supports
@@ -215,17 +213,20 @@ class fSMTP
 			return;
 		}
 		
-		$this->local_host = php_uname('n');
+		$fqdn = fEmail::getFQDN();
 		
-		set_error_handler($this->handleError);
+		fCore::startErrorCapture(E_WARNING);
 		
 		$host = ($this->secure) ? 'tls://' . $this->host : $this->host;
 		$this->connection = fsockopen($host, $this->port, $error_int, $error_string, $this->timeout);
+		
+		foreach (fCore::stopErrorCapture('#ssl#i') as $error) {
+			throw new fConnectivityException('There was an error connecting to the server. A secure connection was requested, but was not available. Try a non-secure connection instead.');
+		}
+		
 		if (!$this->connection) {
 			throw new fConnectivityException('There was an error connecting to the server');
 		}
-		
-		restore_error_handler();
 		
 		$response = $this->read('#^220 #');
 		if (!$this->find($response, '#^220[ -]#')) {
@@ -238,9 +239,9 @@ class fSMTP
 		}
 		
 		// Try sending the ESMTP EHLO command, but fall back to normal SMTP HELO
-		$response = $this->write('EHLO ' . $this->local_host, '#^250 #m');
+		$response = $this->write('EHLO ' . $fqdn, '#^250 #m');
 		if ($this->find($response, '#^500#')) {
-			$response = $this->write('HELO ' . $this->local_host, 1);	
+			$response = $this->write('HELO ' . $fqdn, 1);	
 		}
 		
 		// If STARTTLS is available, use it
@@ -258,7 +259,7 @@ class fSMTP
 			if (!$affirmative || $res === FALSE) {
 				throw new fConnectivityException('Error establishing secure connection');
 			}
-			$response = $this->write('EHLO ' . $this->local_host, '#^250 #m');
+			$response = $this->write('EHLO ' . $fqdn, '#^250 #m');
 		}
 		
 		$this->max_size = 0;
@@ -389,28 +390,6 @@ class fSMTP
 	
 	
 	/**
-	 * Handles PHP errors during the connection to try and give a helpful message about secure/non-secure connections
-	 * 
-	 * @internal
-	 * 
-	 * @param  integer $error_number   The error type
-	 * @param  string  $error_string   The message for the error
-	 * @param  string  $error_file     The file the error occured in
-	 * @param  integer $error_line     The line the error occured on
-	 * @param  array   $error_context  A references to all variables in scope at the occurence of the error
-	 * @return void
-	 */
-	public function handleError($error_number, $error_string, $error_file=NULL, $error_line=NULL, $error_context=NULL)
-	{
-		if (stripos($error_string, 'ssl')) {
-			throw new fConnectivityException('There was an error connecting to the server. A secure connection was requested, but was not available. Try a non-secure connection instead.');
-		}
-		restore_error_handler();
-		trigger_error($error_string, E_USER_ERROR);
-	}
-	
-	
-	/**
 	 * Searches the response array for SMTP error codes
 	 * 
 	 * @param array $response  The response array to search through
@@ -452,7 +431,15 @@ class fSMTP
 		$write    = NULL;
 		$except   = NULL;
 		$response = array();
-		if (stream_select($read, $write, $except, $this->timeout)) {
+		
+		// Fixes an issue with stream_select throwing a warning on PHP 5.3 on Windows
+		if (fCore::checkOS('windows') && fCore::checkVersion('5.3.0')) {
+			$select = @stream_select($read, $write, $except, $this->timeout);
+		} else {
+			$select = stream_select($read, $write, $except, $this->timeout);
+		}
+		
+		if ($select) {
 			while (!feof($this->connection)) {
 				$read = array($this->connection);
 				$write = $except = NULL;
@@ -493,8 +480,9 @@ class fSMTP
 	{
 		$this->connect();
 		
-		// Fixes bare . to prevent accidental end of message
-		$body = preg_replace('#^\.$#m', '..', $body);
+		// Lines starting with . need to start with two .s because the leading
+		// . will be stripped
+		$body = preg_replace('#^\.#m', '..', $body);
 		
 		// Removed the Bcc header incase the SMTP server doesn't
 		$headers = preg_replace('#^Bcc:(.*?)\r\n([^ ])#mi', '\2', $headers);

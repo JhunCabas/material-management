@@ -9,7 +9,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fSchema
  * 
- * @version    1.0.0b39
+ * @version    1.0.0b42
+ * @changes    1.0.0b42  Fixed a bug with MySQL detecting default `ON DELETE` clauses [wb, 2010-10-19]
+ * @changes    1.0.0b41  Fixed handling MySQL table names that require quoting [wb, 2010-08-24]
+ * @changes    1.0.0b40  Fixed bugs in the documentation and error message of ::getColumnInfo() about what are valid elements [wb, 2010-07-21]
  * @changes    1.0.0b39  Fixed a regression where key detection SQL was not compatible with PostgreSQL 8.1 [wb, 2010-04-13]
  * @changes    1.0.0b38  Added Oracle support to ::getDatabases() [wb, 2010-04-13]
  * @changes    1.0.0b37  Fixed ::getDatabases() for MSSQL [wb, 2010-04-09]
@@ -973,7 +976,7 @@ class fSchema
 		
 		$column_info = array();
 		
-		$result     = $this->database->query('SHOW CREATE TABLE ' . $table);
+		$result     = $this->database->query('SHOW CREATE TABLE %r', $table);
 		
 		try {
 			$row        = $result->fetchRow();
@@ -1105,7 +1108,7 @@ class fSchema
 			$keys[$table]['foreign'] = array();
 			$keys[$table]['unique']  = array();
 			
-			$result = $this->database->query('SHOW CREATE TABLE `' . substr($this->database->escape('string', $table), 1, -1) . '`');
+			$result = $this->database->query('SHOW CREATE TABLE %r', $table);
 			$row    = $result->fetchRow();
 			
 			// Primary keys
@@ -1128,10 +1131,10 @@ class fSchema
 							  'foreign_column' => $match[3],
 							  'on_delete'      => 'no_action',
 							  'on_update'      => 'no_action');
-				if (isset($match[4])) {
+				if (!empty($match[4])) {
 					$temp['on_delete'] = strtolower(str_replace(' ', '_', $match[4]));
 				}
-				if (isset($match[5])) {
+				if (!empty($match[5])) {
 					$temp['on_update'] = strtolower(str_replace(' ', '_', $match[5]));
 				}
 				$keys[$table]['foreign'][] = $temp;
@@ -2164,7 +2167,7 @@ class fSchema
 	 * 
 	 * @param  string $table    The table to get the column info for
 	 * @param  string $column   The column to get the info for
-	 * @param  string $element  The element to return: `'type'`, `'placeholder'`, `'not_null'`, `'default'`, `'valid_values'`, `'max_length'`, `'decimal_places'`, `'auto_increment'`
+	 * @param  string $element  The element to return: `'type'`, `'placeholder'`, `'not_null'`, `'default'`, `'valid_values'`, `'max_length'`, `'min_value'`, `'max_value'`, `'decimal_places'`, `'auto_increment'`
 	 * @return mixed  The column info for the table/column/element specified - see method description for format
 	 */
 	public function getColumnInfo($table, $column=NULL, $element=NULL)
@@ -2179,7 +2182,7 @@ class fSchema
 					throw new fProgrammerException(
 						'The element specified, %1$s, is invalid. Must be one of: %2$s.',
 						$element,
-						join(', ', array('type', 'placeholder', 'not_null', 'default', 'valid_values', 'max_length', 'decimal_places', 'auto_increment'))
+						join(', ', array('type', 'placeholder', 'not_null', 'default', 'valid_values', 'max_length', 'min_value', 'max_value', 'decimal_places', 'auto_increment'))
 					);	
 				}
 				return $this->merged_column_info[$table][$column][$element];

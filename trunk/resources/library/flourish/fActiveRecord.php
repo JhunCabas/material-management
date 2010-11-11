@@ -15,7 +15,12 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fActiveRecord
  * 
- * @version    1.0.0b64
+ * @version    1.0.0b69
+ * @changes    1.0.0b69  Backwards Compatibility Break - changed ::validate() to return a nested array of validation messages when there are validation errors on child records [wb-imarc+wb, 2010-10-03]
+ * @changes    1.0.0b68  Added hooks to ::replicate() [wb, 2010-09-07]
+ * @changes    1.0.0b67  Updated code to work with the new fORM API [wb, 2010-08-06]
+ * @changes    1.0.0b66  Fixed a bug with ::store() and non-primary key auto-incrementing columns [wb, 2010-07-05]
+ * @changes    1.0.0b65  Fixed bugs with ::inspect() making some `min_value` and `max_value` elements available for non-numeric types, fixed ::reflect() to list the `min_value` and `max_value` elements [wb, 2010-06-08]
  * @changes    1.0.0b64  BackwardsCompatibilityBreak - changed ::validate()'s returned messages array to have field name keys - added the option to ::validate() to remove field names from messages [wb, 2010-05-26]
  * @changes    1.0.0b63  Changed how is_subclass_of() is used to work around a bug in 5.2.x [wb, 2010-04-06]
  * @changes    1.0.0b62  Fixed a bug that could cause infinite recursion starting in v1.0.0b60 [wb, 2010-04-02]
@@ -558,19 +563,13 @@ abstract class fActiveRecord
 		
 		// one-to-many relationships need to use plural forms
 		$singular_form = fGrammar::singularize($subject, TRUE);
-		if ($singular_form && fORM::isClassMappedToTable(fGrammar::camelize($singular_form, TRUE))) {
-			$subject = fGrammar::camelize($singular_form, TRUE);
+		if ($singular_form && fORM::isClassMappedToTable($singular_form)) {
+			$subject = $singular_form;
 			$plural  = TRUE;
 			
-		} elseif (fORM::isClassMappedToTable(fGrammar::camelize($subject, TRUE))) {
-			$subject = fGrammar::camelize($subject, TRUE);
-			
-		} else {
-			if (in_array($subject, $schema->getTables())) {
-				$subject = fGrammar::singularize($subject);
-				$plural  = TRUE;
-			}
-			$subject = fGrammar::camelize($subject, TRUE);
+		} elseif (!fORM::isClassMappedToTable($subject) && in_array(fGrammar::underscorize($subject), $schema->getTables())) {
+			$subject = fGrammar::singularize($subject);
+			$plural  = TRUE;
 		}
 		
 		$related_table = fORM::tablize($subject);
@@ -839,6 +838,11 @@ abstract class fActiveRecord
 		
 		if (!isset(self::$method_name_cache[$method_name])) {
 			list ($action, $subject) = fORM::parseMethod($method_name);
+			if (in_array($action, array('get', 'encode', 'prepare', 'inspect', 'set'))) {
+				$subject = fGrammar::underscorize($subject);
+			} elseif (in_array($action, array('build', 'count', 'inject', 'link', 'list', 'tally'))) {
+				$subject = fGrammar::singularize($subject);
+			}
 			self::$method_name_cache[$method_name] = array(
 				'action'  => $action,
 				'subject' => $subject
@@ -903,26 +907,18 @@ abstract class fActiveRecord
 				return $this;
 			
 			case 'build':
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
-				
 				if (isset($parameters[0])) {
 					return fORMRelated::buildRecords($class, $this->values, $this->related_records, $subject, $parameters[0]);
 				}
 				return fORMRelated::buildRecords($class, $this->values, $this->related_records, $subject);
 			
 			case 'count':
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
-				
 				if (isset($parameters[0])) {
 					return fORMRelated::countRecords($class, $this->values, $this->related_records, $subject, $parameters[0]);
 				}
 				return fORMRelated::countRecords($class, $this->values, $this->related_records, $subject);
 			
 			case 'create':
-				$subject = fGrammar::camelize($subject, TRUE);
-				
 				if (isset($parameters[0])) {
 					return fORMRelated::createRecord($class, $this->values, $this->related_records, $subject, $parameters[0]);
 				}
@@ -943,18 +939,12 @@ abstract class fActiveRecord
 					);
 				}
 				
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
-				 
 				if (isset($parameters[1])) {
 					return fORMRelated::setRecordSet($class, $this->related_records, $subject, $parameters[0], $parameters[1]);
 				}
 				return fORMRelated::setRecordSet($class, $this->related_records, $subject, $parameters[0]);
 
 			case 'link':
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
-				
 				if (isset($parameters[0])) {
 					fORMRelated::linkRecords($class, $this->related_records, $subject, $parameters[0]);
 				} else {
@@ -963,9 +953,6 @@ abstract class fActiveRecord
 				return $this;
 			
 			case 'list':
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
-				
 				if (isset($parameters[0])) {
 					return fORMRelated::getPrimaryKeys($class, $this->values, $this->related_records, $subject, $parameters[0]);
 				}
@@ -986,9 +973,6 @@ abstract class fActiveRecord
 						$method_name
 					);
 				}
-				
-				$subject = fGrammar::singularize($subject);
-				$subject = fGrammar::camelize($subject, TRUE);
 				
 				if (isset($parameters[1])) {
 					return fORMRelated::setCount($class, $this->related_records, $subject, $parameters[0], $parameters[1]);
@@ -1250,11 +1234,9 @@ abstract class fActiveRecord
 	/**
 	 * Creates the fDatabase::translatedQuery() insert statement params
 	 *
-	 * @param  boolean $new_autoincrementing_record  If the record is new and has an auto-incrementing primary key
-	 * @param  string  $pk_column                    The auto-incrementing primary key column for a new record
 	 * @return array  The parameters for an fDatabase::translatedQuery() SQL insert statement
 	 */
-	protected function constructInsertParams($new_autoincrementing_record, $pk_column)
+	protected function constructInsertParams()
 	{
 		$columns = array();
 		$values  = array();
@@ -1267,8 +1249,7 @@ abstract class fActiveRecord
 		$table       = fORM::tablize($class);
 		$column_info = $schema->getColumnInfo($table);
 		foreach ($column_info as $column => $info) {
-			// Most databases don't like the auto incrementing primary key to be set to NULL
-			if ($new_autoincrementing_record && $pk_column == $column && $this->values[$pk_column] === NULL) {
+			if ($schema->getColumnInfo($table, $column, 'auto_increment') && $schema->getColumnInfo($table, $column, 'not_null') && $this->values[$column] === NULL) {
 				continue;
 			}
 			
@@ -1832,6 +1813,11 @@ abstract class fActiveRecord
 			unset($info['auto_increment']);
 		}
 		
+		if (!in_array($info['type'], array('integer', 'float'))) {
+			unset($info['min_value']);
+			unset($info['max_value']);
+		}
+		
 		$info['feature'] = NULL;
 		
 		fORM::callInspectCallbacks(get_class($this), $column, $info);
@@ -2323,6 +2309,8 @@ abstract class fActiveRecord
 				}
 				if ($column_info['type'] == 'integer') {
 					$elements[] = 'auto_increment';
+					$elements[] = 'min_value';
+					$elements[] = 'max_value';
 				}
 				$signature .= " * @param  string \$element  The element to return. Must be one of: '" . join("', '", $elements) . "'.\n";
 				$signature .= " * @return mixed  The metadata array or a single element\n";
@@ -2441,6 +2429,16 @@ abstract class fActiveRecord
 	 */
 	public function replicate($related_class=NULL)
 	{
+		fORM::callHookCallbacks(
+			$this,
+			'pre::replicate()',
+			$this->values,
+			$this->old_values,
+			$this->related_records,
+			$this->cache,
+			fActiveRecord::$replicate_level
+		);
+		
 		fActiveRecord::$replicate_level++;
 		
 		$class  = get_class($this);
@@ -2563,6 +2561,26 @@ abstract class fActiveRecord
 			fActiveRecord::$replicate_map = array();	
 		}
 		
+		fORM::callHookCallbacks(
+			$this,
+			'post::replicate()',
+			$this->values,
+			$this->old_values,
+			$this->related_records,
+			$this->cache,
+			fActiveRecord::$replicate_level
+		);
+		
+		fORM::callHookCallbacks(
+			$clone,
+			'cloned::replicate()',
+			$clone->values,
+			$clone->old_values,
+			$clone->related_records,
+			$clone->cache,
+			fActiveRecord::$replicate_level
+		);
+		
 		return $clone;
 	}
 	
@@ -2682,7 +2700,7 @@ abstract class fActiveRecord
 			// Storing main table
 			
 			if (!$this->exists()) {
-				$params = $this->constructInsertParams($new_autoincrementing_record, $pk_column);
+				$params = $this->constructInsertParams();
 			} else {
 				$params = $this->constructUpdateParams();
 			}
@@ -2866,8 +2884,6 @@ abstract class fActiveRecord
 			$this->cache,
 			$validation_messages
 		);
-		
-		$validation_messages = array_unique($validation_messages);
 		
 		$validation_messages = fORMValidation::replaceMessages($class, $validation_messages);
 		$validation_messages = fORMValidation::reorderMessages($class, $validation_messages);

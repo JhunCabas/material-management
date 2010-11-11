@@ -9,16 +9,18 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fCryptography
  * 
- * @version    1.0.0b9
- * @changes    1.0.0b9  Added ::hashHMAC() [wb, 2010-04-20]
- * @changes    1.0.0b8  Fixed ::seedRandom() to pass a directory instead of a file to [http://php.net/disk_free_space `disk_free_space()`] [wb, 2010-03-09]
- * @changes    1.0.0b7  SECURITY FIX: fixed issue with ::random() and ::randomString() not producing random output on OSX, made ::seedRandom() more robust [wb, 2009-10-06]
- * @changes    1.0.0b6  Changed ::symmetricKeyEncrypt() to throw an fValidationException when the $secret_key is less than 8 characters [wb, 2009-09-30]
- * @changes    1.0.0b5  Fixed a bug where some windows machines would throw an exception when generating random strings or numbers [wb, 2009-06-09]
- * @changes    1.0.0b4  Updated for new fCore API [wb, 2009-02-16]
- * @changes    1.0.0b3  Changed @ error suppression operator to `error_reporting()` calls [wb, 2009-01-26]
- * @changes    1.0.0b2  Backwards compatibility break - changed ::symmetricKeyEncrypt() to not encrypt the IV since we are using HMAC on it [wb, 2009-01-26]
- * @changes    1.0.0b   The initial implementation [wb, 2007-11-27]
+ * @version    1.0.0b11
+ * @changes    1.0.0b11  Updated class to use fCore::startErrorCapture() instead of `error_reporting()` [wb, 2010-08-09]
+ * @changes    1.0.0b10  Added a missing parameter to an fProgrammerException in ::randomString() [wb, 2010-07-29]
+ * @changes    1.0.0b9   Added ::hashHMAC() [wb, 2010-04-20]
+ * @changes    1.0.0b8   Fixed ::seedRandom() to pass a directory instead of a file to [http://php.net/disk_free_space `disk_free_space()`] [wb, 2010-03-09]
+ * @changes    1.0.0b7   SECURITY FIX: fixed issue with ::random() and ::randomString() not producing random output on OSX, made ::seedRandom() more robust [wb, 2009-10-06]
+ * @changes    1.0.0b6   Changed ::symmetricKeyEncrypt() to throw an fValidationException when the $secret_key is less than 8 characters [wb, 2009-09-30]
+ * @changes    1.0.0b5   Fixed a bug where some windows machines would throw an exception when generating random strings or numbers [wb, 2009-06-09]
+ * @changes    1.0.0b4   Updated for new fCore API [wb, 2009-02-16]
+ * @changes    1.0.0b3   Changed @ error suppression operator to `error_reporting()` calls [wb, 2009-01-26]
+ * @changes    1.0.0b2   Backwards compatibility break - changed ::symmetricKeyEncrypt() to not encrypt the IV since we are using HMAC on it [wb, 2009-01-26]
+ * @changes    1.0.0b    The initial implementation [wb, 2007-11-27]
  */
 class fCryptography
 {
@@ -394,7 +396,8 @@ class fCryptography
 			default:
 				throw new fProgrammerException(
 					'The type specified, %1$s, is invalid. Must be one of: %2$s.',
-					$type
+					$type,
+					join(', ', array('alphanumeric', 'alpha', 'numeric', 'hexadecimal'))
 				);
 		}
 		
@@ -422,7 +425,7 @@ class fCryptography
 			return;
 		}
 		
-		$old_level = error_reporting(error_reporting() & ~E_WARNING);
+		fCore::startErrorCapture(E_WARNING);
 		
 		$bytes = NULL;
 		
@@ -447,7 +450,7 @@ class fCryptography
 			$bytes  = substr(pack('H*', md5($string)), 0, 4);
 		}
 		
-		error_reporting($old_level);
+		fCore::stopErrorCapture();
 		
 		$seed = (int) (base_convert(bin2hex($bytes), 16, 10) - 2147483647);
 		
@@ -501,9 +504,9 @@ class fCryptography
 		$key      = substr(sha1($secret_key), 0, mcrypt_enc_get_key_size($module));
 		mcrypt_generic_init($module, $key, $iv);
 		
-		$old_level = error_reporting(error_reporting() & ~E_WARNING);
+		fCore::startErrorCapture(E_WARNING);
 		$plaintext = mdecrypt_generic($module, $ciphertext);
-		error_reporting($old_level);
+		fCore::stopErrorCapture();
 		
 		mcrypt_generic_deinit($module);
 		mcrypt_module_close($module);
@@ -546,9 +549,9 @@ class fCryptography
 		// Finish the main encryption
 		mcrypt_generic_init($module, $key, $iv);
 		
-		$old_level = error_reporting(error_reporting() & ~E_WARNING);
+		fCore::startErrorCapture(E_WARNING);
 		$ciphertext = mcrypt_generic($module, $plaintext);
-		error_reporting($old_level);
+		fCore::stopErrorCapture();
 		
 		// Clean up the main encryption
 		mcrypt_generic_deinit($module);

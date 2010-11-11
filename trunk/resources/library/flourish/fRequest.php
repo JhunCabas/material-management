@@ -16,7 +16,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fRequest
  * 
- * @version    1.0.0b12
+ * @version    1.0.0b15
+ * @changes    1.0.0b15  Added documentation about `[sub-key]` syntax, added `[sub-key]` support to ::check() [wb, 2010-09-12]
+ * @changes    1.0.0b14  Rewrote ::set() to not require recursion for array syntax [wb, 2010-09-12]
+ * @changes    1.0.0b13  Fixed ::set() to work with `PUT` requests [wb, 2010-06-30]
  * @changes    1.0.0b12  Fixed a bug with ::getBestAcceptLanguage() returning the second-best language [wb, 2010-05-27]
  * @changes    1.0.0b11  Added ::isAjax() [al, 2010-03-15]
  * @changes    1.0.0b10  Fixed ::get() to not truncate integers to the 32bit integer limit [wb, 2010-03-05]
@@ -95,21 +98,50 @@ class fRequest
 	/**
 	 * Indicated if the parameter specified is set in the `$_GET` or `$_POST` superglobals or in the post data of a `PUT` or `DELETE` request
 	 * 
-	 * @param  string $key  The key to check
+	 * @param  string $key  The key to check - array elements can be checked via `[sub-key]` syntax
 	 * @return boolean  If the parameter is set
 	 */
 	static public function check($key)
 	{
 		self::initPutDelete();
 		
-		return isset($_GET[$key]) || isset($_POST[$key]) || isset(self::$put_delete[$key]);
+		$array_dereference = NULL;
+		if (strpos($key, '[')) {
+			$bracket_pos       = strpos($key, '[');
+			$array_dereference = substr($key, $bracket_pos);
+			$key               = substr($key, 0, $bracket_pos);
+		}
+		
+		if (!isset($_GET[$key]) && !isset($_POST[$key]) && !isset(self::$put_delete[$key])) {
+			return FALSE;
+		}
+		
+		$values = array($_GET, $_POST, self::$put_delete);
+		
+		if ($array_dereference) {
+			preg_match_all('#(?<=\[)[^\[\]]+(?=\])#', $array_dereference, $array_keys, PREG_SET_ORDER);
+			$array_keys = array_map('current', $array_keys);
+			array_unshift($array_keys, $key);
+			foreach (array_slice($array_keys, 0, -1) as $array_key) {
+				foreach ($values as &$value) {
+					if (!is_array($value) || !isset($value[$array_key])) {
+						$value = NULL;
+					} else {
+						$value = $value[$array_key];
+					}
+				}
+			}
+			$key = end($array_keys);
+		}
+		
+		return isset($values[0][$key]) || isset($values[1][$key]) || isset($values[2][$key]);
 	}
 	
 	
 	/**
 	 * Gets a value from ::get() and passes it through fHTML::encode()
 	 * 
-	 * @param  string $key            The key to get the value of
+	 * @param  string $key            The key to get the value of - array elements can be accessed via `[sub-key]` syntax
 	 * @param  string $cast_to        Cast the value to this data type
 	 * @param  mixed  $default_value  If the parameter is not set in the `DELETE`/`PUT` post data, `$_POST` or `$_GET`, use this value instead
 	 * @return string  The encoded value
@@ -229,7 +261,7 @@ class fRequest
 	 * All text values are interpreted as UTF-8 string and appropriately
 	 * cleaned.
 	 * 
-	 * @param  string $key            The key to get the value of
+	 * @param  string $key            The key to get the value of - array elements can be accessed via `[sub-key]` syntax
 	 * @param  string $cast_to        Cast the value to this data type - see method description for details
 	 * @param  mixed  $default_value  If the parameter is not set in the `DELETE`/`PUT` post data, `$_POST` or `$_GET`, use this value instead. This value will get cast if a `$cast_to` is specified.
 	 * @return mixed  The value
@@ -239,12 +271,32 @@ class fRequest
 		self::initPutDelete();
 		
 		$value = $default_value;
+		
+		$array_dereference = NULL;
+		if (strpos($key, '[')) {
+			$bracket_pos       = strpos($key, '[');
+			$array_dereference = substr($key, $bracket_pos);
+			$key               = substr($key, 0, $bracket_pos);
+		}
+		
 		if (isset(self::$put_delete[$key])) {
 			$value = self::$put_delete[$key];
 		} elseif (isset($_POST[$key])) {
 			$value = $_POST[$key];
 		} elseif (isset($_GET[$key])) {
 			$value = $_GET[$key];
+		}
+		
+		if ($array_dereference) {
+			preg_match_all('#(?<=\[)[^\[\]]+(?=\])#', $array_dereference, $array_keys, PREG_SET_ORDER);
+			$array_keys = array_map('current', $array_keys);
+			foreach ($array_keys as $array_key) {
+				if (!is_array($value) || !isset($value[$array_key])) {
+					$value = $default_value;
+					break;
+				}
+				$value = $value[$array_key];
+			}
 		}
 		
 		// This allows for data_type? casts to allow NULL through
@@ -367,7 +419,7 @@ class fRequest
 	/**
 	 * Gets a value from the `DELETE`/`PUT` post data, `$_POST` or `$_GET` superglobals (in that order), restricting to a specific set of values
 	 * 
-	 * @param  string $key           The key to get the value of
+	 * @param  string $key           The key to get the value of - array elements can be accessed via `[sub-key]` syntax
 	 * @param  array  $valid_values  The array of values that are permissible, if one is not selected, picks first
 	 * @return mixed  The value
 	 */
@@ -543,7 +595,7 @@ class fRequest
 	/**
 	 * Gets a value from ::get() and passes it through fHTML::prepare()
 	 * 
-	 * @param  string $key            The key to get the value of
+	 * @param  string $key            The key to get the value of - array elements can be accessed via `[sub-key]` syntax
 	 * @param  string $cast_to        Cast the value to this data type
 	 * @param  mixed  $default_value  If the parameter is not set in the `DELETE`/`PUT` post data, `$_POST` or `$_GET`, use this value instead
 	 * @return string  The prepared value
@@ -612,26 +664,39 @@ class fRequest
 	/**
 	 * Sets a value into the appropriate `$_GET` or `$_POST` superglobal, or the local `PUT`/`DELETE` post data based on what HTTP method was used for the request
 	 * 
-	 * @param  string $key    The key to set the value to
+	 * @param  string $key    The key to set the value to - array elements can be modified via `[sub-key]` syntax
 	 * @param  mixed  $value  The value to set
 	 * @return void
 	 */
 	static public function set($key, $value)
 	{		
 		if (self::isPost()) {
-			$_POST[$key] = $value;	
-			return;
-		}
-		
-		if (self::isGet()) {
-			$_GET[$key] = $value;	
-			return;
-		}
-		
-		if (self::isDelete() || self::isDelete()) {
+			$tip =& $_POST;
+		} elseif (self::isGet()) {
+			$tip =& $_GET;
+		} elseif (self::isDelete() || self::isPut()) {
 			self::initPutDelete();
-			self::$put_delete[$key] = $value;	
-			return;
+			$tip =& self::$put_delete;
+		}
+		
+		if ($bracket_pos = strpos($key, '[')) {
+			$array_dereference = substr($key, $bracket_pos);
+			$key               = substr($key, 0, $bracket_pos);
+			
+			preg_match_all('#(?<=\[)[^\[\]]+(?=\])#', $array_dereference, $array_keys, PREG_SET_ORDER);
+			$array_keys = array_map('current', $array_keys);
+			array_unshift($array_keys, $key);
+			
+			foreach (array_slice($array_keys, 0, -1) as $array_key) {
+				if (!isset($tip[$array_key]) || !is_array($tip[$array_key])) {
+					$tip[$array_key] = array();
+				}
+				$tip =& $tip[$array_key];
+			}
+			$tip[end($array_keys)] = $value;
+			
+		} else {
+			$tip[$key] = $value;
 		}
 	}
 	
