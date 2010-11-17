@@ -1,32 +1,4 @@
 $(function (){
-	/*
-	//Autoupdate scroll
-	$('document').ready(function(){		
-		updatestatus();		
-		scrollalert();
-	});
-	function updatestatus(){
-		//Show number of loaded items
-		var totalItems=$('#content p').length;
-		$('#status').text('Loaded '+totalItems+' Items');
-	}
-	function scrollalert(){
-		var scrolltop=$('#scrollbox').attr('scrollTop');
-		var scrollheight=$('#scrollbox').attr('scrollHeight');
-		var windowheight=$('#scrollbox').attr('clientHeight');
-		var scrolloffset=20;
-		if(scrolltop>=(scrollheight-(windowheight+scrolloffset)))
-		{
-			//fetch new items
-			$('#status').text('Loading more items...');
-			$.get('new-items.html', '', function(newitems){
-				$('#content').append(newitems);
-				updatestatus();
-			});
-		}
-		setTimeout('scrollalert();', 1500);
-	}
-	*/
 	$(".linkable").mouseenter(function () {
 			$(this).addClass("highlight");
 		}).mouseleave(function (){
@@ -38,30 +10,49 @@ $(function (){
 	$("#uploadBox").dialog({
 		autoOpen: false
 	});
+	/*
 	$("#subcc").children("select").attr("disabled","true");
 	$("#classific").children("select").attr("disabled","true");
-	$("#addsubcc").attr("disabled","true");
-	$("#addclassific").attr("disabled","true");
+	*/
+	$("#subcc select").hide();
+	$("#classific select").hide();
+	$("#subcc").hide();
+	$("#classific").hide();
+	$("#addsubcc").hide();
+	$("#addclassific").hide();
+	$("#addsubcc select").hide();
+	$("#addclassific select").hide();
+	
 	$("#idInput").attr("disabled","true");
-	$("#maincc").click(function (){
-		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).children("select").val() },
+	
+	$("#maincc select").click(function (){
+		$("#subcc").fadeIn();
+		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
 		function (data){
-			$("#subcc").children("select").html("<option></option>"+data).removeAttr("disabled");
+			if(data != "")
+				$("#subcc img").fadeOut("slow", function (){
+					$("#subcc select").html("<option></option>"+data).fadeIn();
+				});
 		});
 	});
-	$("#subcc").click(function (){
-		$("#subcc").children("select").removeAttr("disabled");
-		$.post("parser/Inv_classification.php", { type: "option", key: $(this).children("select").val() },
+	$("#subcc select").click(function (){
+		$("#classific").fadeIn();
+		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
 		function (data){
-			$("#classific").children("select").html("<option></option>"+data).removeAttr("disabled");
+			if(data != "")
+				$("#classific img").fadeOut("slow", function (){
+					$("#classific select").html("<option></option>"+data).fadeIn();
+				});
 		});
 	});
 	$("tr.linkable").click(function (){
 		window.open("inventory-view.php?"+"id="+$(this).children("#itemID").children().text());
 	});
+	
 	$("#newItem").click(function (){
-		$(".addItem").show();
+		$(".addItem").fadeIn();
 	});
+	/*
 	$("#addmaincc").click(function (){
 		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
 		function (data){
@@ -76,9 +67,6 @@ $(function (){
 			$("table#tableDetail").show();
 		});
 	});
-	$("#idInput").blur(function (){
-		$("#idSpan").text($("#addclassific").val() + $("#idInput").val());
-	});
 	$("#addclassific").blur(function (){
 		if($(this).val() != "")
 		{
@@ -88,13 +76,78 @@ $(function (){
 			})
 		}
 	});
+	$("#idInput").blur(function (){
+		$("#idSpan").text($("#addclassific").val() + $("#idInput").val());
+	});
+	*/
+	$("#addmaincc select").mousedown(function (){
+		if($("#addsubcc").is(":visible"))
+		{
+			$("#addsubcc select").fadeOut(function (){
+				$("#addsubcc img").show();
+				resetAddForm();
+				$("#addclassific").hide();
+				$("#addclassific select").hide();
+			});	
+		}
+	});
+	$("#addmaincc select").mouseup(function (){
+		$("#addsubcc").fadeIn();
+		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
+		function (data){
+			if(data != "")
+				$("#addsubcc img").fadeOut("slow", function (){
+					$("#addsubcc select").html(data).fadeIn();
+				});
+		});
+	});
+	$("#addsubcc select").mousedown(function (){
+		if($("#addclassific").is(":visible"))
+		{
+			$("#addclassific select").fadeOut(function (){
+				$("#addclassific img").show();
+				resetAddForm();
+			});
+		}
+	});
+	$("#addsubcc select").mouseup(function (){
+		$("#addclassific").fadeIn();
+		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
+		function (data){
+			if(data != "")
+				$("#addclassific img").fadeOut("slow", function (){
+					$("table#tableDetail").fadeIn();
+					$("#addclassific select").html(data).fadeIn();
+					if($("#addclassific select").val() != "")
+					{
+						$.post("parser/Inv_item.php",{type: "lastCode", classific: $("#addclassific select").val()}, function (data){
+							$("#idInput").val(data);
+							$("#idSpan").text($("#addclassific select").val()+$("#idInput").val());
+						})
+					}
+				});
+		});
+	});
+	$("#addclassific select").mouseup(function (){
+		if($(this).val() != "")
+		{
+			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
+				$("#idInput").val(data);
+				$("#idSpan").text($("#addclassific select").val()+$("#idInput").val());
+			})
+		}
+	});
+	$("#idInput").blur(function (){
+		$("#idSpan").text($("#addclassific select").val() + $("#idInput").val());
+	});
+	
 	$("#addBTN").click(function (){
 		$.post("parser/Inv_item.php", { 
 			type: "add", 
 			id: $("#idSpan").text(), 
-			main_category_code: $("#addmaincc").val(),
-			sub_category_code: $("#addsubcc").val(),
-			classification_code: $("#addclassific").val(),
+			main_category_code: $("#addmaincc select").val(),
+			sub_category_code: $("#addsubcc select").val(),
+			classification_code: $("#addclassific select").val(),
 			item_code: $("#idInput").val(),
 			description: $("#desc").val(),
 			weight: $("#weight").val(),
@@ -118,25 +171,13 @@ $(function (){
 				$("#dialogBox").dialog('option', 'title', 'Success');
 				$("#dialogBox").dialog('open');
 				$(".tobeDelete").fadeOut();
-				/*
-				$("#uploadBox").dialog('option', 'title', 'Success');
-				$("#uploadify").uploadify({
-					'uploader'	: './resources/library/jquery.uploadify/uploadify.swf',
-					'script'    : './resources/library/jquery.uploadify/uploadify.php',
-					'cancelImg'	: './resources/library/jquery.uploadify/cancel.png',
-					'auto'		: true,					
-					'folder'	: 'storage/image/'+$("#idSpan").text(),
-					'onComplete': function (evt, queueID, fileObj, response) {
-									$.post("parser/Inv_item.php", {
-										type: "url",
-										url: fileObj.filePath,
-										key: $("#idSpan").text()
-									});
-								}
-				});
-				$("#uploadBox").dialog('open');
-				*/
 			}
 		});
 	});
 });
+
+function resetAddForm()
+{
+	$("#idSpan").html("");
+	$("#idInput").val("");
+}

@@ -294,3 +294,8 @@ form select{
 	padding-right: 4px;
 	cursor: pointer;
 }
+
+.selectRep{
+	padding-left: 70px;
+	padding-right: 70px;
+}
