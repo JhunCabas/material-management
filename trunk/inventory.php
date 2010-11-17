@@ -24,20 +24,24 @@ $tmpl->place('menu');
 				</div>
 				<br />
 				<form action = "inventory.php" method = "get">
-					<label for="maincc">Choose Main Category: </label>
 					<span id="maincc">
+						<label for="maincc">Choose Main Category: </label>
 						<select name = "maincc">
 							<option value="all">All</option>
 							<?php Inv_maincategory::findAllOption(); ?>
 						</select>
 					</span>
-					<label for="subcc">Choose Sub Category: </label>
+					
 					<span id="subcc">
+						<label for="subcc">Choose Sub Category: </label>
+						<img src="img/layout/ajax-loader.gif" class="selectRep"/>
 						<select name = "subcc">
 						</select>
 					</span>
-					<label for="classific">Choose Classification: </label>
+					
 					<span id="classific">
+						<label for="classific">Choose Classification: </label>
+						<img src="img/layout/ajax-loader.gif" class="selectRep"/>
 						<select name = "classific">
 						</select>
 					</span>
@@ -146,14 +150,23 @@ $tmpl->place('menu');
 				<tr id="newItem" class="addItem hideFirst">
 					<td colspan="7">
 						<form id="addDetail">
+							<span id="addmaincc">
 							<label for="addmaincc">Choose Main Category: </label>
-								<select id="addmaincc" name = "addmaincc">
+								<select name = "addmaincc">
 									<?php Inv_maincategory::findAllOption(); ?>
 								</select>
+							</span>
+							<span id="addsubcc">
 							<label for="addsubcc">Choose Sub Category: </label>
-								<select id="addsubcc" name = "addsubcc"></select>
+								<select name = "addsubcc"></select>
+								<img src="img/layout/ajax-loader.gif" class="selectRep"/>
+							</span>
+							<span id="addclassific">
 							<label for="addclassific">Choose Classification: </label>
-								<select id="addclassific" name = "addclassific"></select><br />
+								<select name = "addclassific"></select>
+								<img src="img/layout/ajax-loader.gif" class="selectRep"/>
+							</span>
+							<br />
 							<table id="tableDetail" class="hideFirst">
 							<tbody>
 								<tr><td>Item Code: </td><td><input type="hidden" id="idInput"></input><span id="idSpan"></span><br /></td></tr>
