@@ -12,7 +12,8 @@
      */
 	static function findAll($limit=null)
 	{
-		return fRecordSet::build('Production_issue',null,
+		return fRecordSet::build('Production_issue',
+			array('status!' => 'cancelled'),
 			array('doc_date' => 'desc'),
 			$limit); 
 	}
