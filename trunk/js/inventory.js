@@ -25,15 +25,38 @@ $(function (){
 	
 	$("#idInput").attr("disabled","true");
 	
-	$("#maincc select").click(function (){
+	$("#maincc select").mousedown(function (){
+		if($("#subcc").is(":visible"))
+		{
+			$("#subcc select").fadeOut(function (){
+				$("#subcc img").show();
+				$("#classific").hide();
+				$("#classific select").hide();
+			});	
+		}
+	});
+	$("#maincc select").mouseup(function (){
 		$("#subcc").fadeIn();
-		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
-		function (data){
-			if(data != "")
-				$("#subcc img").fadeOut("slow", function (){
-					$("#subcc select").html("<option></option>"+data).fadeIn();
-				});
-		});
+		if($(this).val() != "all")
+		{
+			$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
+			function (data){
+				if(data != "")
+					$("#subcc img").fadeOut("slow", function (){
+						$("#subcc select").html("<option></option>"+data).fadeIn();
+					});
+			});
+		}
+		else
+		{
+			$("#subcc").fadeOut();
+			$("#subcc img").fadeOut();
+			$("#subcc select").fadeOut();
+			$("#subcc select").val("");
+			$("#classific").fadeOut();
+			$("#classific select").fadeOut();
+			$("#classific select").val("");
+		}
 	});
 	$("#subcc select").click(function (){
 		$("#classific").fadeIn();
@@ -52,34 +75,7 @@ $(function (){
 	$("#newItem").click(function (){
 		$(".addItem").fadeIn();
 	});
-	/*
-	$("#addmaincc").click(function (){
-		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
-		function (data){
-			$("#addsubcc").html(data).removeAttr("disabled");
-		});
-	});
-	$("#addsubcc").click(function (){
-		$(this).removeAttr("disabled");
-		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
-		function (data){
-			$("#addclassific").html(data).removeAttr("disabled");
-			$("table#tableDetail").show();
-		});
-	});
-	$("#addclassific").blur(function (){
-		if($(this).val() != "")
-		{
-			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
-				$("#idInput").val(data);
-				$("#idSpan").text($("#addclassific").val()+$("#idInput").val());
-			})
-		}
-	});
-	$("#idInput").blur(function (){
-		$("#idSpan").text($("#addclassific").val() + $("#idInput").val());
-	});
-	*/
+	
 	$("#addmaincc select").mousedown(function (){
 		if($("#addsubcc").is(":visible"))
 		{
