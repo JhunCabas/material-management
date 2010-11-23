@@ -33,11 +33,14 @@ $tmpl->place('menu');
 					{
 						$productionDetails = Production_issue_detail::findDetail($productionEntry->getDocNumber());
 						$statusAll = "completed";
-						foreach($productionDetails as $productionDetail)
-						{
-							if($productionDetail->getStatus() == "pending")
-								$statusAll = "pending";
-						}
+						if($productionEntry->getStatus() != "cancelled")
+							foreach($productionDetails as $productionDetail)
+							{
+								if($productionDetail->getStatus() == "pending")
+									$statusAll = "pending";
+							}
+						else
+							$statusAll = "cancelled";
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$productionEntry->prepareIssuer()."</td>";
