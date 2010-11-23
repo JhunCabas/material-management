@@ -9,6 +9,16 @@
 				$inv_item = new Inv_item();
 				$inv_item->populate();
 				$inv_item->store();
+				
+				$branches = Branch::findAll();
+				foreach($branches as $branch)
+				{
+					$stock = new Inv_stock();
+					$stock->setBranchId($branch->getId());
+					$stock->setItemId($inv_item->getId());
+					$stock->setQuantity(0);
+					$stock->store();
+				}
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
 			}
