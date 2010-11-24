@@ -82,7 +82,12 @@ $tmpl->place('header');
 				</tr>
 				<tr>
 					<td class="caption">Currency</td>
-					<td><span id="curr" class="varInput"><?php echo $inv_item->prepareCurrency(); ?></span></td>
+					<td><span id="curr" class="varInput">
+						<?php 
+							$item_currency = new Currency($inv_item->getCurrencyId());
+							echo $item_currency->prepareCountry(); 
+						?>
+						</span></td>
 				</tr>
 				<tr>
 					<td class="caption">Purchase Year</td>
