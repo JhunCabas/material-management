@@ -84,8 +84,12 @@ $tmpl->place('header');
 					<td class="caption">Currency</td>
 					<td><span id="curr" class="varInput">
 						<?php 
-							$item_currency = new Currency($inv_item->getCurrencyId());
-							echo $item_currency->prepareCountry(); 
+							try{
+								$item_currency = new Currency($inv_item->getCurrencyId());
+								echo $item_currency->prepareCountry(); 
+							}catch(fExpectedException $e) {
+								echo $e->printMessage();
+							}
 						?>
 						</span></td>
 				</tr>

@@ -10,10 +10,7 @@ $(function (){
 	$("#uploadBox").dialog({
 		autoOpen: false
 	});
-	/*
-	$("#subcc").children("select").attr("disabled","true");
-	$("#classific").children("select").attr("disabled","true");
-	*/
+
 	$("#subcc select").hide();
 	$("#classific select").hide();
 	$("#subcc").hide();
@@ -35,7 +32,7 @@ $(function (){
 			});	
 		}
 	});
-	$("#maincc select").mouseup(function (){
+	$("#maincc select").change(function (){
 		$("#subcc").fadeIn();
 		if($(this).val() != "all")
 		{
@@ -58,7 +55,16 @@ $(function (){
 			$("#classific select").val("");
 		}
 	});
-	$("#subcc select").click(function (){
+	
+	$("#subcc select").mousedown(function (){
+		if($("#classific").is(":visible"))
+		{
+			$("#classific select").fadeOut(function (){
+				$("#classific img").show();
+			});	
+		}
+	});
+	$("#subcc select").change(function (){
 		$("#classific").fadeIn();
 		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
 		function (data){
@@ -87,7 +93,7 @@ $(function (){
 			});	
 		}
 	});
-	$("#addmaincc select").mouseup(function (){
+	$("#addmaincc select").change(function (){
 		$("#addsubcc").fadeIn();
 		$.post("parser/Inv_subcategory.php", { type: "option", key: $(this).val() },
 		function (data){
@@ -106,7 +112,7 @@ $(function (){
 			});
 		}
 	});
-	$("#addsubcc select").mouseup(function (){
+	$("#addsubcc select").change(function (){
 		$("#addclassific").fadeIn();
 		$.post("parser/Inv_classification.php", { type: "option", key: $(this).val() },
 		function (data){
@@ -124,7 +130,7 @@ $(function (){
 				});
 		});
 	});
-	$("#addclassific select").mouseup(function (){
+	$("#addclassific select").change(function (){
 		if($(this).val() != "")
 		{
 			$.post("parser/Inv_item.php",{type: "lastCode", classific: $(this).val()}, function (data){
