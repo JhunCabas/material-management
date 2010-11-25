@@ -134,8 +134,17 @@
 						$purchase_detail->setQuantity($row->{'itemQuan'});
 						$purchase_detail->setUnitPrice($row->{'itemUnitP'});
 						$purchase_detail->setExtendedPrice($row->{'itemExtP'});
+						
+						//Automatic price update
+						$item = new Inv_item($row->{'itemCode'});
+						$item->setCurrencyId($_POST['currency']);
+						$item->setRate($row->{'itemUnitP'});
+						
 						if(!$error)
+						{
 							$purchase_detail->store();
+							$item->store();
+						}
 					}catch (fExpectedException $e) {
 						echo $e->printMessage();
 						$error = true;
@@ -251,6 +260,14 @@
 						$purchase_detail->setQuantity($row->{'itemQuan'});
 						$purchase_detail->setUnitPrice($row->{'itemUnitP'});
 						$purchase_detail->setExtendedPrice($row->{'itemExtP'});
+						
+						if(($_POST['approver_1'] != null)&&($_POST['approver_1_date'] != null))
+						{
+							$item = new Inv_item($row->{'itemCode'});
+							$item->setCurrencyId($purchase->getCurrency());
+							$item->setRate($row->{'itemUnitP'});
+							$item->store();
+						}
 						if(!$error)
 							$purchase_detail->store();
 					}catch (fExpectedException $e) {
