@@ -39,7 +39,7 @@ $tmpl->place('menu');
 					$hideCancel = false;$counter = 1;
 					foreach($production_details as $production_detail)
 					{
-						echo "<tr id=\"rowNo".$counter."\"><td id=\"detailId\" class=\"hideFirst\">".$production_detail->prepareId()."</td><td>".$counter."</td><td id=\"itemCode\">".$production_detail->prepareItemId()."</td>";
+						echo "<tr id=\"rowNo".$counter."\"><td id=\"detailId\" class=\"hideFirst\">".$production_detail->getId()."</td><td>".$counter."</td><td id=\"itemCode\">".$production_detail->prepareItemId()."</td>";
 						$item = new Inv_item($production_detail->getItemId());
 						echo "<td class=\"itemDesc\">".$item->prepareDescription()."</td>
 								<td id=\"itemQuan\">".$production_detail->prepareQuantity()."</td>
