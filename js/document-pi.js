@@ -84,7 +84,7 @@ function addingRow()
 											}
 										})
 										.result(function(e, item) {
-											$(this).parent().parent().find("#descAuto").text(item.desc);
+											$(this).parent().parent().find("#descAuto").text(decodeHTML(item.desc));
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
 										});
 	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input size=\"20\" class=\"remarks\"/></td>";
@@ -122,4 +122,14 @@ function jsonForm()
 					});
 		jsonString = jsonString.substring(0, jsonString.length-1) + "}";
 	return jsonString;
+}
+
+function decodeHTML(encodedString)
+{
+	return $("<div />").html(encodedString).text();
+}
+
+function encodeHTML(decodedString)
+{
+	return $("<div />").text(decodedString).html().replace(/"/g,'&quot;');
 }

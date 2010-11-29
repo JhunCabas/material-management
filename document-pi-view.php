@@ -36,12 +36,13 @@ $tmpl->place('menu');
 			</thead>
 			<tbody>
 				<?php
-					$counter = 1;
+					$hideCancel = false;$counter = 1;
 					foreach($production_details as $production_detail)
 					{
 						echo "<tr id=\"rowNo".$counter."\"><td id=\"detailId\" class=\"hideFirst\">".$production_detail->prepareId()."</td><td>".$counter."</td><td id=\"itemCode\">".$production_detail->prepareItemId()."</td>";
 						$item = new Inv_item($production_detail->getItemId());
-						echo "<td>".$item->prepareDescription()."</td><td id=\"itemQuan\">".$production_detail->prepareQuantity()."</td>
+						echo "<td class=\"itemDesc\">".$item->prepareDescription()."</td>
+								<td id=\"itemQuan\">".$production_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$production_detail->prepareRemark()."</td>";
 						if($production_detail->getStatus() == "pending")
 							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\">
@@ -53,7 +54,10 @@ $tmpl->place('menu');
 									<img src=\"./img/layout/ajax-loader2.gif\" />
 								</li></ul></td></tr>";
 						else
+						{
 							echo "<td id=\"iconCell\"><ul id=\"icons\" class=\"ui-widget ui-helper-clearfix\"><li title=\"Complete\" class=\"ui-state-default ui-corner-all\"><span class=\"ui-icon ui-icon-check\"></span></li><li title=\"Loading\" class=\"hideFirst ui-corner-all\"><img src=\"./img/layout/ajax-loader2.gif\" /></li></ul></td></tr>";
+							$hideCancel = true;
+						}
 						$counter++;
 					}
 				?>
@@ -82,7 +86,8 @@ $tmpl->place('menu');
 		<?php 
 					if($production->getStatus() == 'pending')
 					{
-						echo "<input type=\"button\" id=\"cancelBTN\" value=\"Cancel\" style=\"float: right;\"/>";
+						if(!$hideCancel)
+							echo "<input type=\"button\" id=\"cancelBTN\" value=\"Cancel\" style=\"float: right;\"/>";
 						echo "<input type=\"button\" id=\"submitBTN\" value=\"Submit\" style=\"float: right;\"/>";
 					}
 					$me = fAuthorization::getUserToken(); 

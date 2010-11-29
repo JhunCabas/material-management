@@ -31,16 +31,29 @@ $tmpl->place('menu');
 					$productionEntries = Production_issue::findAll(20);
 					foreach($productionEntries as $productionEntry)
 					{
-						$productionDetails = Production_issue_detail::findDetail($productionEntry->getDocNumber());
-						$statusAll = "completed";
-						if($productionEntry->getStatus() != "cancelled")
+						
+						//$statusAll = "completed";
+						if($productionEntry->getStatus() == "pending")
+						{
+							$statusAll = "checking";
+							$productionDetails = Production_issue_detail::findDetail($productionEntry->getDocNumber());
 							foreach($productionDetails as $productionDetail)
 							{
 								if($productionDetail->getStatus() == "pending")
 									$statusAll = "pending";
 							}
+							if($statusAll == "checking")
+							{
+								$statusAll = "completed";
+								$productionEntry->setStatus("completed");
+								$productionEntry->store();
+							}
+						}	
 						else
-							$statusAll = "cancelled";
+						{
+							$statusAll = $productionEntry->prepareStatus();
+						}
+						
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
 						echo "<td>".$productionEntry->prepareIssuer()."</td>";

@@ -10,6 +10,7 @@ $(function (){
 			$(this).parent().html($("#whoami").val());
 	});
 	$("li#save").click(function (){
+		
 		var rowNo = $(this).parent().parent().parent().attr("id");
 		$(this).next().addClass("loadingOpen").show();
 		var branch = $("#branchId").text();
@@ -31,6 +32,7 @@ $(function (){
 				 $("#dialogBox").dialog('option', 'title', 'Success');
 				 $("#dialogBox").dialog('open');
 				$("#"+rowNo).find("li#save").hide();
+				$("#cancelBTN").hide();
 			}
 		});
 	});
