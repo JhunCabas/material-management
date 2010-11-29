@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 12, 2009 at 07:46 PM
+-- Generation Time: Nov 29, 2010 at 01:24 PM
 -- Server version: 5.1.37
 -- PHP Version: 5.3.0
 
@@ -42,11 +42,11 @@ CREATE TABLE IF NOT EXISTS `branches` (
 CREATE TABLE IF NOT EXISTS `currencies` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `country` varchar(20) NOT NULL,
-  `exchange` float NOT NULL,
+  `exchange` decimal(14,2) NOT NULL DEFAULT '1.00',
   `month` date NOT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=30 ;
 
 -- --------------------------------------------------------
 
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `good_receipt_note_details` (
   `remark` varchar(500) DEFAULT NULL,
   `assessment` enum('OK','NG','Q','X') NOT NULL DEFAULT 'OK',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=552 ;
 
 -- --------------------------------------------------------
 
@@ -127,13 +127,14 @@ CREATE TABLE IF NOT EXISTS `inv_items` (
   `sub_category_code` varchar(20) NOT NULL,
   `classification_code` varchar(20) NOT NULL,
   `item_code` varchar(20) NOT NULL,
-  `description` varchar(1000) DEFAULT NULL,
+  `description` varchar(1500) DEFAULT NULL,
   `weight` int(9) DEFAULT NULL,
   `dimension` int(9) DEFAULT NULL,
   `part_number` varchar(30) DEFAULT NULL,
   `unit_of_measure` varchar(10) DEFAULT NULL,
   `rate` decimal(14,2) DEFAULT NULL,
   `currency` varchar(3) DEFAULT NULL,
+  `currency_id` int(10) DEFAULT NULL,
   `purchase_year` int(4) DEFAULT NULL,
   `detailed_description` varchar(100) DEFAULT NULL,
   `image_url` varchar(1000) DEFAULT NULL,
@@ -157,6 +158,25 @@ CREATE TABLE IF NOT EXISTS `inv_maincategories` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inv_movements`
+--
+
+CREATE TABLE IF NOT EXISTS `inv_movements` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `item_id` varchar(20) NOT NULL,
+  `document_number` varchar(50) NOT NULL,
+  `branch_id` varchar(10) NOT NULL,
+  `quantity` int(11) NOT NULL DEFAULT '0',
+  `date` date NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` tinyint(1) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id` (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `inv_stocks`
 --
 
@@ -167,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `inv_stocks` (
   `quantity` int(15) NOT NULL DEFAULT '0',
   `transit` int(15) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8240 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=20440 ;
 
 -- --------------------------------------------------------
 
@@ -220,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `material_transfer_details` (
   `from_branch` varchar(10) DEFAULT NULL,
   `status` enum('transit','completed','pending') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=6 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=47 ;
 
 -- --------------------------------------------------------
 
@@ -238,7 +258,7 @@ CREATE TABLE IF NOT EXISTS `production_issues` (
   `issuer_date` date DEFAULT NULL,
   `receiver` varchar(20) DEFAULT NULL,
   `receiver_date` date DEFAULT NULL,
-  `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
+  `status` enum('pending','cancelled','completed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`doc_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -256,7 +276,7 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
   `remark` varchar(500) DEFAULT NULL,
   `status` enum('pending','completed') NOT NULL DEFAULT 'pending',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=19 ;
 
 -- --------------------------------------------------------
 
@@ -267,6 +287,7 @@ CREATE TABLE IF NOT EXISTS `production_issue_details` (
 CREATE TABLE IF NOT EXISTS `purchases` (
   `doc_number` varchar(50) NOT NULL,
   `po_number` varchar(50) DEFAULT NULL,
+  `mof_number` varchar(50) DEFAULT NULL,
   `running_number` int(6) NOT NULL,
   `doc_date` date NOT NULL,
   `po_date` date DEFAULT NULL,
@@ -274,8 +295,8 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `doc_tag` enum('po','pr') NOT NULL DEFAULT 'pr',
   `branch_id` varchar(10) NOT NULL,
   `currency` varchar(20) DEFAULT NULL,
-  `discount` float NOT NULL,
-  `total` float NOT NULL DEFAULT '0',
+  `discount` double NOT NULL,
+  `total` double NOT NULL DEFAULT '0',
   `supplier_1` varchar(20) NOT NULL,
   `supplier_2` varchar(20) DEFAULT NULL,
   `supplier_3` varchar(20) DEFAULT NULL,
@@ -293,7 +314,8 @@ CREATE TABLE IF NOT EXISTS `purchases` (
   `delivery` text,
   `special_instruction` text,
   `status` enum('approved','cancelled','rejected','unapproved','completed','grn') NOT NULL DEFAULT 'unapproved',
-  PRIMARY KEY (`doc_number`)
+  PRIMARY KEY (`doc_number`),
+  UNIQUE KEY `mof_number` (`mof_number`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -308,10 +330,10 @@ CREATE TABLE IF NOT EXISTS `purchase_details` (
   `item_id` varchar(20) NOT NULL,
   `description` text NOT NULL,
   `quantity` int(15) NOT NULL DEFAULT '0',
-  `unit_price` float NOT NULL DEFAULT '0',
-  `extended_price` float NOT NULL DEFAULT '0',
+  `unit_price` decimal(14,2) NOT NULL DEFAULT '0.00',
+  `extended_price` decimal(14,2) NOT NULL DEFAULT '0.00',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=3399 ;
 
 -- --------------------------------------------------------
 
@@ -332,7 +354,7 @@ CREATE TABLE IF NOT EXISTS `suppliers` (
   `fax_no` varchar(20) DEFAULT NULL,
   `status` int(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=44 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=151 ;
 
 -- --------------------------------------------------------
 
