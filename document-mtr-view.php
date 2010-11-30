@@ -23,7 +23,8 @@ $tmpl->place('menu');
 				$mattrans_details = Material_transfer_detail::findDetail($_GET['id']);
 	?>
 	<h2>Material Transfer</h2>
-	<div class="form-frame span-23 last">
+	  <div align=left> <a href=report/mtf-pdf.php?MTFnum=<?=$_GET['id']?>><b>Download PDF</b></a></div><br>
+  <div class="form-frame span-23 last">
 		<h3>Material Transfer Form</h3><br />
 		<label for="doc_num">Document Number </label>
 			<?php echo $mattrans->prepareDocNumber(); ?><input id="doc_num" type="hidden" value="<?php echo $mattrans->getDocNumber(); ?>"></input><br />
