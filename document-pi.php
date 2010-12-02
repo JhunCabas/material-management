@@ -42,7 +42,7 @@ $tmpl->place('menu');
 		<table id="approveContent">
 			<tbody>
 				<tr>
-					<td><label>Issued and Received by </label></td><td id="issuer"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="issDate" class="datepicker"></input></td>
+					<td><label>Issued and Received by </label></td><td id="issuer"><?php echo fAuthorization::getUserToken();?></td><td><label>Date </label><input type="text" id="issDate" class="datepicker"></input></td>
 				</tr>
 		</table>
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
