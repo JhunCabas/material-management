@@ -53,6 +53,8 @@ $tmpl->place('menu');
 			try{
 				$inv_stocks = Inv_stock::findByBranchLimit($branch,$start,$end);
 				$times =  ceil($inv_stocks->count(TRUE)/500);
+				$branchName = new Branch($_GET['branch']);
+				echo "<h3>".$branchName->prepareName()."</h3>";
 				if($times < 2)
 				{
 					echo "<span id=\"pagination\"><a href=\"inventory-stock.php?branch=$branch\">First </a>";
@@ -67,9 +69,8 @@ $tmpl->place('menu');
 					echo "<a href=\"inventory-stock.php?branch=$branch&page=$times\">Last</a></span>";
 				}
 				
-				$branch = new Branch($_GET['branch']);
-				printf("<h3>%s</h3><table><thead><tr><th>Item ID</th><th>Description</th><th>Quantity</th></tr></thead><tbody>"
-					,$branch->prepareName());
+				
+				printf("<table><thead><tr><th>Item ID</th><th>Description</th><th>Quantity</th></tr></thead><tbody>");
 				foreach($inv_stocks as $inv_stock)
 				{
 					$inv_item = new Inv_item($inv_stock->getItemId());
