@@ -24,7 +24,7 @@
 	static function findAllLimit($first = 0, $last = 2)
 	{
 		return fRecordSet::buildFromSQL('Inv_item',
-			"SELECT * FROM inv_items LIMIT $first , $last",
+			"SELECT * FROM inv_items ORDER BY `id` ASC LIMIT $first , $last",
 			"SELECT count(*) FROM inv_items");
 	}
 	

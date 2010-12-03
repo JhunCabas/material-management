@@ -26,6 +26,7 @@ $tmpl->place('menu');
 					<?php Branch::findAllOption(); ?>
 				</select>
 			</span>
+			<input type="hidden" name="page" value="1" />
 			<input id="submitBTN" type="submit" value="Submit" />
 		</form>
 		<form action = "inventory-stock.php" method = "get">
@@ -38,8 +39,34 @@ $tmpl->place('menu');
 		<?php 
 		if(isSet($_GET['branch']))
 		{
+			if(!(isSet($_GET['page'])) || fRequest::get('page', 'integer') == 1)
+			{
+				$start = 1; 
+				$end = 500;
+			}else
+			{
+				$start = (fRequest::get('page', 'integer') - 1)*500 + 1;
+				$end = $start + 500 - 1;
+			}
+			$branch	= fRequest::get('branch', 'string');
+			$itemId = fRequest::get('item', 'string');
 			try{
-				$inv_stocks = Inv_stock::findByBranch($_GET['branch']);
+				$inv_stocks = Inv_stock::findByBranchLimit($branch,$start,$end);
+				$times =  ceil($inv_stocks->count(TRUE)/500);
+				if($times < 2)
+				{
+					echo "<span id=\"pagination\"><a href=\"inventory-stock.php?branch=$branch\">First </a>";
+					echo "<a href=\"inventory-stock.php?branch=$branch&page=$times\">Last</a></span>";
+				}else
+				{
+					echo "<span id=\"pagination\"><a href=\"inventory-stock.php?branch=$branch\">First </a>";
+					for($i=1;$i<$times;$i++)
+					{
+						echo "<a href=\"inventory-stock.php?branch=$branch&page=$i\">$i </a></span>";
+					}
+					echo "<a href=\"inventory-stock.php?branch=$branch&page=$times\">Last</a></span>";
+				}
+				
 				$branch = new Branch($_GET['branch']);
 				printf("<h3>%s</h3><table><thead><tr><th>Item ID</th><th>Description</th><th>Quantity</th></tr></thead><tbody>"
 					,$branch->prepareName());
@@ -58,7 +85,7 @@ $tmpl->place('menu');
 		}else if(isSet($_GET['item']))
 		{
 			try{
-				$inv_stocks = Inv_stock::findByItem($_GET['item']);
+				$inv_stocks = Inv_stock::findByItem($itemId);
 				$item = new Inv_item($_GET['item']);
 				printf("<br /><h3>%s - %s</h3><table><thead><tr><th>Branch</th><th>Quantity</th></tr></thead><tbody>"
 					,$item->prepareId(),$item->prepareDescription());
