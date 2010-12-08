@@ -86,7 +86,7 @@ $tmpl->place('menu');
 		}else if(isSet($_GET['item']))
 		{
 			try{
-				$inv_stocks = Inv_stock::findByItem($itemId);
+				$inv_stocks = Inv_stock::findByItem($_GET['item']);
 				$item = new Inv_item($_GET['item']);
 				printf("<br /><h3>%s - %s</h3><table><thead><tr><th>Branch</th><th>Quantity</th></tr></thead><tbody>"
 					,$item->prepareId(),$item->prepareDescription());
