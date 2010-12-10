@@ -41,17 +41,17 @@ $tmpl->place('menu');
 		{
 			if(!(isSet($_GET['page'])) || fRequest::get('page', 'integer') == 1)
 			{
-				$start = 1; 
+				$start = 0; 
 				$end = 500;
 			}else
 			{
-				$start = (fRequest::get('page', 'integer') - 1)*500 + 1;
+				$start = (fRequest::get('page', 'integer') -1)*500;
 				$end = $start + 500 - 1;
 			}
 			$branch	= fRequest::get('branch', 'string');
 			$itemId = fRequest::get('item', 'string');
 			try{
-				$inv_stocks = Inv_stock::findByBranchLimit($branch,$start,$end);
+				$inv_stocks = Inv_stock::findByBranchLimit($branch,$start,500);
 				$times =  ceil($inv_stocks->count(TRUE)/500);
 				$branchName = new Branch($_GET['branch']);
 				echo "<h3>".$branchName->prepareName()."</h3>";
