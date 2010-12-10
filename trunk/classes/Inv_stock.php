@@ -22,10 +22,10 @@
 			array('item_id' => 'asc'));
 	}
 	
-	static function findByBranchLimit($key,$first = 0,$last = 100)
+	static function findByBranchLimit($key,$first = 0,$number = 500)
 	{
 		return fRecordSet::buildFromSQL('Inv_stock',
-			"SELECT * FROM inv_stocks WHERE `branch_id` = '$key' ORDER BY `item_id` ASC LIMIT $first , $last",
+			"SELECT * FROM inv_stocks WHERE `branch_id` = '$key' ORDER BY `item_id` ASC LIMIT $first , $number",
 			"SELECT count(*) FROM inv_stocks WHERE `branch_id` = '$key'");
 	}
 	
