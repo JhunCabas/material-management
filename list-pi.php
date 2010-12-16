@@ -20,7 +20,7 @@ $tmpl->place('menu');
 		if(fAuthorization::checkAuthLevel('admin'))
 		{
 	?>
-	<h3>List</h3>
+	<h3>List (Pending)</h3>
 	<table>
 		<thead>
 			<tr><th>Document Number</th><th>Document Date</th><th>Issuer and Receiver</th><th style="width: 100px;">Status</th></tr>
@@ -28,13 +28,13 @@ $tmpl->place('menu');
 		<tbody>
 			<?php
 				try{
-					$productionEntries = Production_issue::findAll(20);
+					$productionEntries = Production_issue::findByStatus('pending');
 					foreach($productionEntries as $productionEntry)
 					{
 						
 						//$statusAll = "completed";
-						if($productionEntry->getStatus() == "pending")
-						{
+						//if($productionEntry->getStatus() == "pending")
+						//{
 							$statusAll = "checking";
 							$productionDetails = Production_issue_detail::findDetail($productionEntry->getDocNumber());
 							foreach($productionDetails as $productionDetail)
@@ -48,11 +48,11 @@ $tmpl->place('menu');
 								$productionEntry->setStatus("completed");
 								$productionEntry->store();
 							}
-						}	
-						else
-						{
-							$statusAll = $productionEntry->prepareStatus();
-						}
+						//}	
+						//else
+						//{
+						//	$statusAll = $productionEntry->prepareStatus();
+						//}
 						
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
 						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
@@ -66,5 +66,27 @@ $tmpl->place('menu');
 		</tbody>
 	</table>
 	<?php }?>
+	<h3>List (Completed)</h3>
+	<table>
+		<thead>
+			<tr><th>Document Number</th><th>Document Date</th><th>Issuer and Receiver</th><th style="width: 100px;">Status</th></tr>
+		</thead>
+		<tbody>
+			<?php
+				try{
+					$productionEntries = Production_issue::findByStatus('completed',10);
+					foreach($productionEntries as $productionEntry)
+					{
+						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$productionEntry->prepareDocNumber()."</td>";
+						echo "<td>".$productionEntry->prepareDocDate("j F Y")."</td>";
+						echo "<td>".$productionEntry->prepareIssuer()."</td>";
+						echo "<td>".$productionEntry->prepareStatus()."</td></tr>";
+					}
+				}catch (fExpectedException $e) {
+					echo $e->printMessage();
+				}
+			?>
+		</tbody>
+	</table>
 </div>
 <?php $tmpl->place('footer'); ?>
