@@ -30,12 +30,12 @@ $tmpl->place('menu');
 		<table id="formContent">
 			<thead>
 				<tr><td>No</td>
-					<td>Item Code</td><td width="400">Description</td><td>Quantity</td><td>UOM</td><td>Remarks</td></tr>
+					<td>Item Code</td><td width="400">Description</td><td>Quantity</td><td>Available</td><td>UOM</td><td>Remarks</td></tr>
 			</thead>
 			<tbody>
 			</tbody>
 			<tfoot>
-				<tr><td colspan="6" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
+				<tr><td colspan="7" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td></tr>
 			</tfoot>
 		</table>
 		<label>Notes</label><br /><textarea id="notes"rows="4" cols="10" style="height: 30px; margin-bottom: 20px;"></textarea>

@@ -22,6 +22,17 @@
 				}
 				Inv_stock::addStock($row->{'itemCode'},$_POST['branch'],$row->{'quantity'});
 			}
+		}else if($_POST['type'] == "ACcount")
+		{
+			try{
+				$branch = fRequest::get('branch');
+				$itemcode = fRequest::get('item');
+				$stocks = Inv_stock::findStockByBranch($itemcode, $branch);
+				$stock = $stocks[0];
+				echo $stock->prepareQuantity();
+			}catch (fExpectedException $e) {
+				echo $e->printMessage();
+			}
 		}
 	}
 ?>
