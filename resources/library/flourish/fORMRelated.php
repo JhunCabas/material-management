@@ -13,7 +13,10 @@
  * @package    Flourish
  * @link       http://flourishlib.com/fORMRelated
  * 
- * @version    1.0.0b36
+ * @version    1.0.0b39
+ * @changes    1.0.0b39  Fixed a bug with ::validate() not properly removing validation messages about a related primary key value not being present yet, if the column and related column names were different [wb, 2010-11-24]
+ * @changes    1.0.0b38  Updated ::overrideRelatedRecordName() to prefix any namespace from `$class` to `$related_class` if not already present [wb, 2010-11-24]
+ * @changes    1.0.0b37  Fixed a documentation typo [wb, 2010-11-04]
  * @changes    1.0.0b36  Fixed ::getPrimaryKeys() to not throw SQL exceptions [wb, 2010-10-20]
  * @changes    1.0.0b35  Backwards Compatibility Break - changed the validation messages array to use nesting for child records [wb-imarc+wb, 2010-10-03]
  * @changes    1.0.0b35  Updated ::getPrimaryKeys() to always return primary keys in a consistent order when no order bys are specified [wb, 2010-07-26]
@@ -359,7 +362,7 @@ class fORMRelated
 	 * @param  array  &$related_records  The related records for the record
 	 * @param  string $related_class     The related class name
 	 * @param  string $route             The route to the related class
-	 * @return fActiveRecord  An instace of the class specified
+	 * @return fActiveRecord  An instance of the class specified
 	 */
 	static public function createRecord($class, $values, &$related_records, $related_class, $route=NULL)
 	{
@@ -838,7 +841,9 @@ class fORMRelated
 		
 		$class         = fORM::getClass($class);
 		$table         = fORM::tablize($class);
+		
 		$related_class = fORM::getClass($related_class);
+		$related_class = fORM::getRelatedClass($class, $related_class);
 		$related_table = fORM::tablize($related_class);
 		
 		$schema = fORMSchema::retrieve($class);
@@ -1246,6 +1251,8 @@ class fORMRelated
 		
 		$class         = fORM::getClass($class);
 		$table         = fORM::tablize($class);
+		
+		$related_class = fORM::getRelatedClass($class, $related_class);
 		$related_table = fORM::tablize($related_class);
 		
 		$schema = fORMSchema::retrieve($class);
@@ -1610,6 +1617,7 @@ class fORMRelated
 		$schema              = fORMSchema::retrieve($class);
 		$table               = fORM::tablize($class);
 		$related_table       = fORM::tablize($related_class);
+		$relationship        = fORMSchema::getRoute($schema, $table, $related_table, $route);
 		
 		$first_pk_column     = self::determineFirstPKColumn($class, $related_class, $route);
 		$filter              = self::determineRequestFilter($class, $related_class, $route);
@@ -1634,8 +1642,8 @@ class fORMRelated
 			
 			foreach ($record_messages as $column => $record_message) {
 				// Ignore validation messages about the primary key since it will be added
-				if ($column == $route) {
-					continue;
+				if ($column == $relationship['related_column']) {
+				    continue;
 				}
 				
 				if ($one_to_one) {
@@ -1692,7 +1700,7 @@ class fORMRelated
 	 */
 	static private function validateManyToMany($class, $related_class, $route, $related_info)
 	{
-		$related_record_name = fORMRelated::getRelatedRecordName($class, $related_class, $route);
+		$related_record_name = self::getRelatedRecordName($class, $related_class, $route);
 		$record_number = 1;
 		
 		$messages = array();
