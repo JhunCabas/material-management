@@ -49,8 +49,11 @@ $tmpl->place('menu');
 	<?php
 				foreach($purchaseEntries as $purchaseEntry)
 				{
-					echo "<tr class=\"linkable PR\"><td class=\"docNumber\">".$purchaseEntry->prepareDocNumber()."</td>";
-					echo "<td>".$purchaseEntry->preparePoNumber()."</td>";
+					echo "<tr class=\"linkable\"><td class=\"docNumber PR\">".$purchaseEntry->prepareDocNumber()."</td>";
+					if($purchaseEntry->getPoNumber() != NULL)
+						echo "<td class=\"PO\">".$purchaseEntry->preparePoNumber()."</td>";
+					else
+						echo "<td>".$purchaseEntry->preparePoNumber()."</td>";
 					echo "<td>".$purchaseEntry->prepareMofNumber()."</td></tr>";
 				}
 				echo "</tbody></table></div>";
