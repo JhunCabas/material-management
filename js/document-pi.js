@@ -35,6 +35,8 @@ $(function (){
 		var notes = $("#notes").val();
 		var issuer = $("#issuer").text();
 		var issuer_date = $("#issDate").val();
+		if(checkQuantity())
+		{
 		if(confirm("Continue?"))
 		$.post("parser/Production_issue.php",{
 			type: "add",
@@ -62,6 +64,9 @@ $(function (){
 					 });
 				 }
 		});
+		}else{
+			alert("Not enough quantity in stock on one of your items. Item cant be submitted.");
+		}
 	});
 });
 
@@ -70,6 +75,7 @@ function addingRow()
 	var itemCodeInner = $("<input size=\"7\" class=\"itemCode\"></input>")
 						.autocomplete("parser/autocomplete/Inv_item.php",{
 											width: 300,
+											mustMatch: true,
 											parse: function(data) {
 												return $.map(eval(data), function(row) {
 													return {
@@ -86,8 +92,21 @@ function addingRow()
 										.result(function(e, item) {
 											$(this).parent().parent().find("#descAuto").text(decodeHTML(item.desc));
 											$(this).parent().parent().find("#uomAuto").text(item.uom);
+											var innerSetting = $(this);
+											$.post("parser/Inv_stock.php", { type: "ACcount", 
+												branch: $("#branch_id").val(), 
+												item: $(this).parent().parent().find(".itemCode").val() },
+												function(data){
+													innerSetting.parent().parent().find(".availability").text(data);
+											});
 										});
-	var addRow = "<td id=\"descAuto\"></td><td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td><td id=\"uomAuto\"></td><td><input size=\"20\" class=\"remarks\"/></td>";
+	var descRow = "<td id=\"descAuto\"></td>";
+	var quanRow = "<td><input class=\"itemQuan\" size=\"5\" value=\"0\"/></td>";
+	//var quanRow = $("<td></td>").addClass("itemQuan").attr("size",5).val(0)
+	//	.bind("change", function (){
+	//		$(this)
+	//	});
+	var addRow = "<td class=\"availability\"></td><td id=\"uomAuto\"></td><td><input size=\"20\" class=\"remarks\"/></td>";
 	var counterCell = $("<td></td>").text(++counter)
 						.bind("dblclick", function (){
 							if(confirm("Confirm delete row?"))
@@ -97,7 +116,7 @@ function addingRow()
 							}
 						});
 	var itemCode = $("<td></td>").html(itemCodeInner);
-	var wholeRow = $("<tr class=\"jsonRow\" id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(addRow);
+	var wholeRow = $("<tr class=\"jsonRow\" id=\"rowNo"+ counter +"\"></tr>").append(counterCell).append(itemCode).append(descRow).append(quanRow).append(addRow);
 	$("#formContent tbody").append(wholeRow);
 }
 
@@ -109,6 +128,20 @@ function getRunningNumber()
 		$("#doc_num").val($("#doc_type").val()+"/"+$("#hiddenBranch").val()+"/"+$("#run_num").val()+"/"+Date.parseExact($(".datepicker").val(), "M/d/yyyy").toString("MM/yyyy"));
 		$("#loaderBar").hide();
 	});
+}
+
+function checkQuantity()
+{
+	var Result = true;
+	$(".jsonRow").each(function (){
+		currentQ = parseInt($(this).find(".itemQuan").val());
+		maxQ = parseInt($(this).find(".availability").text());
+		
+		if(currentQ > maxQ)
+			Result = false;
+	});
+	
+	return Result;
 }
 
 function jsonForm()
