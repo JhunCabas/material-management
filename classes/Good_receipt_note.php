@@ -17,9 +17,10 @@
 			$limit);    
     }
 	
-	static function findAllByBranch($branch=null)
+	static function findAllByBranch($branch=null,$limit=null)
     {
-        return fRecordSet::build('Good_receipt_note',null,
+        return fRecordSet::build('Good_receipt_note',
+			array('branch_id=' => $branch),
 			array('doc_date' => 'desc'),
 			$limit);    
     }

@@ -17,10 +17,6 @@ $tmpl->place('menu');
 	<?php $tmpl->place('menuDocument'); ?>
 	<h2>Good Receipt Note</h2>
 	<h3>Add Good Receipt Note : <a href="document-grn.php">Form</a></h3>
-	<?php 
-		if(fAuthorization::checkAuthLevel('admin'))
-		{
-	?>
 	<h3>List</h3>
 	<table>
 		<thead>
@@ -28,8 +24,12 @@ $tmpl->place('menu');
 		</thead>
 		<tbody>
 			<?php
+				$user = new User(fAuthorization::getUserToken());
 				try{
-					$grnEntries = Good_receipt_note::findAll(20);
+					if(fAuthorization::checkAuthLevel('admin'))
+						$grnEntries = Good_receipt_note::findAll(20);
+					else
+						$grnEntries = Good_receipt_note::findAllByBranch($user->prepareBranchId(),20);
 					foreach($grnEntries as $grnEntry)
 					{
 						echo "<tr class=\"linkable\"><td class=\"docNumber\">".$grnEntry->prepareDocNumber()."</td>";
@@ -44,6 +44,5 @@ $tmpl->place('menu');
 			?>
 		</tbody>
 	</table>
-	<?php }?>
 </div>
 <?php $tmpl->place('footer'); ?>
