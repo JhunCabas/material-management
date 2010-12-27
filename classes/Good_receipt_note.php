@@ -16,6 +16,13 @@
 			array('doc_date' => 'desc'),
 			$limit);    
     }
+	
+	static function findAllByBranch($branch=null)
+    {
+        return fRecordSet::build('Good_receipt_note',null,
+			array('doc_date' => 'desc'),
+			$limit);    
+    }
 
 	static function findCurrentMonth($branch)
 	{		

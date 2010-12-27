@@ -31,7 +31,14 @@ $tmpl->place('menu');
 		<label for="doc_num">Document Number </label>
 			<span id="docNum"><?php echo $purchase->prepareDocNumber(); ?></span>
 		<label class="mofLabel" for="mof_num">MOF Number</label>
-			<span id="mof_num"><?php echo $purchase->prepareMofNumber(); ?></span>
+			<span id="mof_num">
+			<?php 
+			//echo $purchase->preparePoNumber();
+				if($purchase->getPoNumber() != NULL)
+					echo '<a href="document-po-view.php?id='.$purchase->prepareDocNumber().'">'.$purchase->prepareMofNumber().'</a>';
+				else
+					echo $purchase->prepareMofNumber(); 
+			?></span>
 		<br />
 		<label for="doc_date">Document Date </label>
 			<span id="doc_date"><?php echo $purchase->prepareDocDate("j F Y"); ?></span><br />
