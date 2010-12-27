@@ -96,7 +96,8 @@ $tmpl->place('menu');
 				<tbody>
 			<?php
 				try{
-					$mattrans = Material_transfer::findByBranchFrom(10,$user->getBranchId());
+					//$mattrans = Material_transfer::findByBranchFrom(10,$user->getBranchId());
+					$mattrans = Material_transfer::findByBranchToFro($user->getBranchId(),20);
 					foreach($mattrans as $mattran)
 					{
 						$toBranch = new Branch($mattran->getBranchTo());

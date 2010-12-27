@@ -50,6 +50,13 @@
 			$limit);
 	}
 	
+	static function findByBranchToFro($branch,$limit=null)
+	{
+		return fRecordSet::buildFromSQL('Material_transfer',
+			"SELECT material_transfers.* FROM material_transfers WHERE `status` = 'pending' AND (`branch_to` = '$branch' OR `branch_from` = '$branch')",
+			"SELECT count(*) FROM material_transfers");
+	}
+	
 	static function findAllComplete($limit=null)
 	{
 		return fRecordSet::build('Material_transfer',
