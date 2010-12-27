@@ -33,7 +33,6 @@ $tmpl->place('menu');
 		<label class="mofLabel" for="mof_num">MOF Number</label>
 			<span id="mof_num">
 			<?php 
-			//echo $purchase->preparePoNumber();
 				if($purchase->getPoNumber() != NULL)
 					echo '<a href="document-po-view.php?id='.$purchase->prepareDocNumber().'">'.$purchase->prepareMofNumber().'</a>';
 				else
