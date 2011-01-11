@@ -92,15 +92,8 @@ $starting = 63;
                   $remark = $row['remark'];
             			
       $remarke = str_split($remark, 19);
-     
-       if (strlen($remark) > 19 )
-      {
-       $starting = $starting + 5;
-      $pdf->Text(166,$starting,$remarke[1]);
-       }
-       
                  
-      $desc = str_split($description, 52);
+      $desc = str_split($description, 50);
      
      
       $pdf->Text(12,$starting,$count);
@@ -110,8 +103,12 @@ $starting = 63;
       $pdf->Text(153,$starting,$unitmeasure);
       $pdf->Text(166,$starting,$remarke[0]);
       
-      
-       if (strlen($description) > 52 )
+       if (strlen($remark) > 19 )
+      {
+       $starting = $starting + 5;
+      $pdf->Text(166,$starting,$remarke[1]);
+       }
+       if (strlen($description) > 50 )
       {
        $starting = $starting + 5;
       $pdf->Text(46,$starting,$desc[1]);
@@ -269,14 +266,9 @@ $starting = 63;
             			
       $remarke = str_split($remark, 19);
      
-       if (strlen($remark) > 19 )
-      {
-       $starting = $starting + 5;
-      $pdf->Text(166,$starting,$remarke[1]);
-       }
-       
+     
                  
-      $desc = str_split($description, 52);
+      $desc = str_split($description, 50);
      
      
       $pdf->Text(12,$starting,$count);
@@ -286,8 +278,13 @@ $starting = 63;
       $pdf->Text(153,$starting,$unitmeasure);
       $pdf->Text(166,$starting,$remarke[0]);
       
-      
-       if (strlen($description) > 52 )
+      if (strlen($remark) > 19 )
+      {
+       $starting = $starting + 5;
+      $pdf->Text(166,$starting,$remarke[1]);
+       }
+         
+       if (strlen($description) > 50 )
       {
        $starting = $starting + 5;
       $pdf->Text(46,$starting,$desc[1]);
