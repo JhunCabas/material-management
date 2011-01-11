@@ -1,8 +1,20 @@
 <?php
 include './resources/init.php';
+echo "TEST";
+try{
+//Find all available branches
+echo "TEST2";
+}catch (Exception $e) {
+	var_dump($e);
+}
 
+try{
 //Find all available branches
 $branches = Branch::findAll();
+}catch (Exception $e) {
+	//fURL::redirect(URL_ROOT."authentication.php");
+	var_dump($e);
+}
 
 //Find all items
 $items = Inv_item::findAll();
