@@ -90,6 +90,7 @@ $tmpl->place('menu');
 				?>
 			</tbody>
 			<?php
+				$totalchecker = $totalchecker - $purchase->getDiscount();
 				if($totalchecker != $purchase->getTotal())
 				{
 					$purchaseNu = new Purchase($_GET['id']);
