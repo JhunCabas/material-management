@@ -84,7 +84,30 @@ $tmpl->place('menu');
 					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Unit Price</th><th>Extended Price</th></tr>
 			</thead>
 			<tbody>
+				<?php
+					$counter = 1;
+					$totalchecker = 0;
+					foreach($purchase_details as $purchase_detail)
+					{
+						echo "<tr><td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
+						$item = new Inv_item($purchase_detail->getItemId());
+						echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
+							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->prepareUnitPrice()."</td>
+								<td>".$purchase_detail->prepareExtendedPrice()."</td></tr>";
+						$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
+						$counter++;
+					}
+				?>
 			</tbody>
+				<?php
+				$totalchecker = $totalchecker - $purchase->getDiscount();
+				if($totalchecker != $purchase->getTotal())
+				{
+					$purchaseNu = new Purchase($_GET['id']);
+					$purchaseNu->setTotal($totalchecker);
+					$purchaseNu->store();
+				}
+				?>
 			<tfoot>
 				<tr><td colspan="5"></td><td>Discount</td><td><input type="text" id="discountRate" value="<?php echo $purchase->prepareDiscount(2); ?>"></input></td></tr>
 				<tr><td colspan="5" id="addRowBTN"><div class="ui-icon ui-icon-circle-plus span-1 last"></div>Add Row</td><td class="tfootCaption">Total</td><td id="purchaseTotal"><?php echo $purchase->prepareTotal(2); ?></td></tr>
