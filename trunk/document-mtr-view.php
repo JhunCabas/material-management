@@ -40,7 +40,7 @@ $tmpl->place('menu');
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
-					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>In <?php echo $fromBranch->prepareId(); ?></th><th width="75px">Icons</th></tr>
+					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>In <?php echo $fromBranch->getId(); ?></th><th width="75px">Icons</th></tr>
 			</thead>
 			<tbody>
 				<?php
@@ -48,7 +48,7 @@ $tmpl->place('menu');
 					foreach($mattrans_details as $mattrans_detail)
 					{
 						echo "<tr class=\"jsonRow\"><td>".$counter."</td><td class=\"itemCode\">".$mattrans_detail->prepareItemId().
-							"<input class=\"itemId\" type=\"hidden\" value=\"".$mattrans_detail->prepareId()."\"></input></td>";
+							"<input class=\"itemId\" type=\"hidden\" value=\"".$mattrans_detail->getId()."\"></input></td>";
 						$item = new Inv_item($mattrans_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td class=\"itemQuan\">".$mattrans_detail->prepareQuantity()."</td>
 							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$mattrans_detail->prepareRemark()."</td>";
@@ -64,13 +64,13 @@ $tmpl->place('menu');
 							echo "<td><span class=\"loader hideFirst\"><img src=\"./img/layout/ajax-loader2.gif\" /></span>";
 							if($mattrans_detail->getStatus() == "pending" && $quanRow >= $mattrans_detail->getQuantity())
 								echo "<input type=\"button\" value=\"Transit\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"transitBTN\"></input></td>";
+										key=\"".$mattrans_detail->getId()."\" class=\"transitBTN\"></input></td>";
 							else if($mattrans_detail->getStatus() == "transit")
 							{
 								echo "<input type=\"button\" value=\"Reject\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"rejectBTN\"></input>";
+										key=\"".$mattrans_detail->getId()."\" class=\"rejectBTN\"></input>";
 								echo "<input type=\"button\" value=\"Accept\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"acceptBTN\"></input>";
+										key=\"".$mattrans_detail->getId()."\" class=\"acceptBTN\"></input>";
 								echo "</td>";
 							}
 							else if($mattrans_detail->getStatus() == "completed")
@@ -82,7 +82,7 @@ $tmpl->place('menu');
 							echo "<td><span class=\"loader hideFirst\"><img src=\"./img/layout/ajax-loader2.gif\" /></span>";
 							if($mattrans_detail->getStatus() == "pending" && $quanRow >= $mattrans_detail->getQuantity())
 								echo "<input type=\"button\" value=\"Transit\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"transitBTN\"></input></td>";
+										key=\"".$mattrans_detail->getId()."\" class=\"transitBTN\"></input></td>";
 							else if($mattrans_detail->getStatus() == "pending" && $quanRow < $mattrans_detail->getQuantity())
 								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
 							else if($mattrans_detail->getStatus() == "completed")
@@ -95,9 +95,9 @@ $tmpl->place('menu');
 							if($mattrans_detail->getStatus() == "transit")
 							{
 								echo "<input type=\"button\" value=\"Reject\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"rejectBTN\"></input>";
+										key=\"".$mattrans_detail->getId()."\" class=\"rejectBTN\"></input>";
 								echo "<input type=\"button\" value=\"Accept\" 
-										key=\"".$mattrans_detail->prepareId()."\" class=\"acceptBTN\"></input>";
+										key=\"".$mattrans_detail->getId()."\" class=\"acceptBTN\"></input>";
 								echo "</td>";
 							}
 							else if($mattrans_detail->getStatus() == "pending")
