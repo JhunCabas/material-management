@@ -23,6 +23,7 @@ $today = date("dMy");
           AND A.currency = B.id
           AND YEAR( A.po_date ) = $year
           AND MONTH( A.po_date ) = $month
+          AND A.status ='completed'
           ORDER BY doc_type";
     			 connectToDB();
             $result = mysql_query($sql) or die ("error");
