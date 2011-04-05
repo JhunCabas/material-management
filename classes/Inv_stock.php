@@ -140,4 +140,24 @@
 			echo "Error";
 		}
 	}
+	
+	static function resetStock($id,$quantity)
+	{
+		try{
+			$record = new self($id);
+			$record->setQuantity($quantity);
+			$record->store();
+			
+			$movement = new Inv_movement();
+			//$movement->setItemId($record->getItemId());
+			//$movement->setBranchId($record->getBranchId());
+			//$movement->setDocumentNumber("Reset");
+			//$movement->setQuantity($quantity);
+			//$movement->setDate(Date());
+			$movement->store();
+		} catch (fExpectedException $e) {
+			echo $e->printMessage();
+		}
+		echo $record->getQuantity();
+	}
 }
