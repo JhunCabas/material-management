@@ -33,6 +33,9 @@
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
 			}
+		}else if($_POST['type'] == "reset")
+		{
+			echo Inv_stock::resetStock(fRequest::get('target'),fRequest::get('quantity'));
 		}
 	}
 ?>

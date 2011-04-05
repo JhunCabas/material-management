@@ -5,6 +5,7 @@ $tmpl->place('header');
 ?>
 <script type="text/javascript" src="./resources/library/jquery.autocomplete/jquery.autocomplete.min.js"></script>
 <script type="text/javascript" src="./resources/library/jquery.autocomplete/lib/jquery.bgiframe.min.js"></script>
+<script type="text/javascript" src="./resources/library/jquery.blockUI.js"></script>
 <link media="screen, projection" href="./resources/library/jquery.autocomplete/jquery.autocomplete.css" type="text/css" rel="stylesheet"/>
 <script type="text/javascript" src="./js/admin-stock.js"></script>
 <?php
@@ -33,7 +34,7 @@ $tmpl->place('menu');
 				foreach($inv_stocks as $inv_stock)
 				{
 					$branch = new Branch($inv_stock->getBranchId());
-						printf("<tr><td>%s</td><td><input type=\"text\" value=\"%s\" /> %s</td><td><input type=\"button\" value=\"Update\"/></td></tr>",$branch->prepareName()." [".$branch->prepareId()."]",$inv_stock->prepareQuantity(),$item->prepareUnitOfMeasure());
+						printf("<tr><td>%s</td><td><input type=\"text\" value=\"%s\" /> %s</td><td><input class=\"updateBTN\" id=\"%s\" type=\"button\" value=\"Update\"/></td></tr>",$branch->prepareName()." [".$branch->prepareId()."]",$inv_stock->getQuantity(),$item->prepareUnitOfMeasure(),$inv_stock->getId());
 				}
 				echo "</tbody></table>";
 			} catch (fExpectedException $e) {
@@ -43,4 +44,5 @@ $tmpl->place('menu');
 		?>
 	</div>
 </div>
+<div id="messageBox" style="display: none;">Loading</div>
 <?php $tmpl->place('footer'); ?>
