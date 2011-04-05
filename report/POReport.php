@@ -5,7 +5,7 @@ session_start();
 
 extract($_REQUEST);
 extract($_GET);
-//error_reporting(E_ALL);
+error_reporting(E_ALL);
 
 $header=" ";
 $today = date("dMy");
@@ -14,7 +14,8 @@ $today = date("dMy");
     
     $mthName = date("F", $timestamp);
 
-    $POTotal['1']=0;    $POTotal['2'];    $POTotal['3']=0;    $POTotal['4']=0;
+    $POTotal['1']=0;    
+    $POTotal['2']=0;    $POTotal['3']=0;    $POTotal['4']=0;
     $POTotal['5']=0;    $POTotal['6']=0;
     
     
@@ -25,8 +26,6 @@ $today = date("dMy");
           AND MONTH( A.po_date ) = $month
           AND (A.status ='completed' OR A.status = 'approved')
           ORDER BY doc_type";
-          
-        
     			 connectToDB();
             $result = mysql_query($sql) or die ("error");
     		
@@ -47,18 +46,76 @@ $today = date("dMy");
 
 ?>
 
+<img src="UMW.jpg" /></p>
+
 <img src="image.php?month=<?=$month?>&year=<?=$year?>" />
+
+<table width="300" border="2" cellspacing="0" cellpadding="0" color="#000000">
+  
+  <tr> <font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
+  
+      <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO Category </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> Amount </font></div></td>
+                         
+   
+    </font> </tr>
+
+  
+  <tr  align=\"center\">
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 1 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['1']; ?></font></div></td>
+   
+   </tr>                      
+   <tr  align=\"center\"> 
+                          <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 2 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['2']; ?></font></div></td>
+     
+   </tr>                      
+   <tr  align=\"center\"> 
+                         
+                           <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 3 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['3']; ?></font></div></td>
+     
+   </tr>                      
+   <tr align=\"center\"> 
+                         
+                           <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 4 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['4']; ?></font></div></td>
+       
+   </tr>                      
+   <tr  align=\"center\"> 
+                       
+                           <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 5 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['5']; ?></font></div></td>
+   
+   </tr>                      
+   <tr  align=\"center\"> 
+                        <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> PO 6 </font></td>
+                            
+                            <td><font face=\"Verdana, Arial, Helvetica, sans-serif\"> <?php echo $POTotal['6']; ?></font></div></td>
+                         
+       </tr>
+  
+  
+</table>
+
 <br/><p/><a href=POReport.php?op=excel&month=<?=$month?>&year=<?=$year?>> Download as Excel file </a><p/>
 <?php
 
 }
 else if ($op == 'excel')
 {
-
 /** PHPExcel */
 include('class/PHPExcel.php');
 /** PHPExcel_IOFactory */
-include('class/PHPExcel/IOFactory.php');
+include('class/PHPExcel2/IOFactory.php');
 
 // Redirect output to a client’s web browser (Excel5)
 header('Content-Type: application/vnd.ms-excel');
@@ -78,7 +135,7 @@ $objPHPExcel->getProperties()->setCreator("UMW UPSB System MMS ")
 							 ->setDescription("UPSB System MMS Purchase Order Report.")
 							 ->setKeywords("office 2007 openxml php")
 							 ->setCategory("UPSB System MMS Purchase Order Report");
-
+   
 //doc_type, total, currency, exchange
 /*if ( $op == 'month')
 {
@@ -97,34 +154,34 @@ $table = "  <td>#</td>
 */
 
  
-  
+
 			
               //$objPHPExcel->getActiveSheet()->mergeCells('C9:I9'); //merge
               
       $objDrawing = new PHPExcel_Worksheet_Drawing();
       
-    
+  
     $objPHPExcel->getActiveSheet()->getColumnDimension('B')->setWidth(15);
     $objPHPExcel->getActiveSheet()->getColumnDimension('C')->setWidth(10);
     $objDrawing->setWorksheet($objPHPExcel->getActiveSheet());
     
     $objDrawing->setName('Paid');
     $objDrawing->setDescription('Paid');
-    $objDrawing->setPath('umw.jpg');
+    $objDrawing->setPath('UMW.jpg');
     $objDrawing->setCoordinates('B2');
     $objDrawing->setOffsetX(110);
     $objDrawing->setRotation(25);
     $objDrawing->getShadow()->setVisible(true);
     $objDrawing->getShadow()->setDirection(45);
 
-      
+     
     	$objPHPExcel->setActiveSheetIndex(0);        
     $objPHPExcel->getActiveSheet()->setCellValue('B13', 'PO Category');
     $objPHPExcel->getActiveSheet()->setCellValue('C13', "$mthName");
 
 
           
-           for ($i = 1; $i < 6; $i++) 
+           for ($i = 1; $i < 7; $i++) 
             {
             //echo "$i = ". $POTotal[$i];
             $place = $i +14;
