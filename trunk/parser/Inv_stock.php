@@ -35,7 +35,7 @@
 			}
 		}else if($_POST['type'] == "reset")
 		{
-			echo Inv_stock::resetStock(fRequest::get('target'),fRequest::get('quantity'));
+			echo Inv_stock::resetStock(fRequest::get('target'),fRequest::get('quantity','integer'));
 		}
 	}
 ?>

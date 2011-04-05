@@ -11,7 +11,8 @@ $(function (){
 	});
 	$(".updateBTN").click(function (){
 		var target = $(this).attr("id");
-		var quantity = $(this).parent().parent().find("input");
+		var quantity = $(this).parent().parent().find("input").val();
+		var tochange = $(this);
 		$.blockUI({ 
 			message: $('#messageBox'),
 			css: { 
@@ -24,10 +25,10 @@ $(function (){
 				color: '#fff' 
 			} 
 		}); 
-		$.post("parser/Inv_stock.php",{type: "reset", target: target, quantity: quantity.val()},
+		$.post("parser/Inv_stock.php",{type: "reset", target: target, quantity: quantity},
 			function(data)
 			{
-				quantity.find("input").val(data);
+				tochange.parent().parent().find("input[type=text]").val(data);
 			});
 	});
 	$("#autocompleteItem").autocomplete("parser/autocomplete/Inv_item.php",{

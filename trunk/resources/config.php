@@ -12,6 +12,7 @@ fTimestamp::setDefaultTimezone('Asia/Kuala_Lumpur');
 fAuthorization::setLoginPage(URL_ROOT . 'authentication.php');
 fAuthorization::setAuthLevels(
     array(
+		'super' => 1000,
         'admin' => 100,
         'user'  => 50,
         'guest' => 25
