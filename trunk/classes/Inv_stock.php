@@ -144,16 +144,18 @@
 	static function resetStock($id,$quantity)
 	{
 		try{
+			
 			$record = new self($id);
+			$previous_q = $record->getQuantity();
 			$record->setQuantity($quantity);
 			$record->store();
 			
 			$movement = new Inv_movement();
-			//$movement->setItemId($record->getItemId());
-			//$movement->setBranchId($record->getBranchId());
-			//$movement->setDocumentNumber("Reset");
-			//$movement->setQuantity($quantity);
-			//$movement->setDate(Date());
+			$movement->setItemId($record->getItemId());
+			$movement->setBranchId($record->getBranchId());
+			$movement->setDocumentNumber("Reset");
+			$movement->setQuantity($quantity - $previous_q);
+			$movement->setDate(date('n/j/Y'));
 			$movement->store();
 		} catch (fExpectedException $e) {
 			echo $e->printMessage();
