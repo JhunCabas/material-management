@@ -30,6 +30,16 @@
 				$branch = new Branch();
 				$branch->populate();
 				$branch->store();
+								
+				$inv_items = Inv_item::findAll();
+				foreach($inv_items as $inv_item)
+				{
+					$stock = new Inv_stock();
+					$stock->setBranchId($branch->getId());
+					$stock->setItemId($inv_item->getId());
+					$stock->setQuantity(0);
+					$stock->store();
+				}
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
 			}
