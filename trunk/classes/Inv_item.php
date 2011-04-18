@@ -15,6 +15,35 @@
         return fRecordSet::build('Inv_item');    
     }
 	
+	static function findAllUB($db)
+	{
+		return $db->unbufferedQuery("SELECT * FROM inv_items");
+	}
+	
+	static function findId()
+	{
+		$results = fRecordSet::build('Inv_item');  
+		$listofId = array();
+		foreach($results as $result)
+		{
+			array_push($listofId,$result->getId());
+		}
+		
+		return $listofId;
+	}
+	
+	static function findIdUB($db)
+	{
+		$results = $db->unbufferedQuery("SELECT id FROM inv_items"); 
+		$listofId = array();
+		foreach($results as $result)
+		{
+			array_push($listofId,$result['id']);
+		}
+		
+		return $listofId;
+	}
+	
 	static function findLike($key)
 	{
 		return fRecordSet::build('Inv_item',
