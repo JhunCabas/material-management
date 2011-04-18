@@ -30,13 +30,13 @@
 				$branch = new Branch();
 				$branch->populate();
 				$branch->store();
-								
-				$inv_items = Inv_item::findAll();
-				foreach($inv_items as $inv_item)
+				$theId = $branch->getId();
+				$ids = Inv_item::findIdUB($db);
+				foreach($ids as $id)
 				{
 					$stock = new Inv_stock();
-					$stock->setBranchId($branch->getId());
-					$stock->setItemId($inv_item->getId());
+					$stock->setBranchId($theId);
+					$stock->setItemId($id);
 					$stock->setQuantity(0);
 					$stock->store();
 				}
