@@ -79,7 +79,7 @@ session_start();
     	function exportStock()
     		{
     		$count='1';
-        $sql ="	SELECT * FROM umw_mms.inv_stocks A order by branch_id";
+        $sql ="	SELECT * FROM umw_mms.inv_stocks A order by branch_id, item_id";
     			 connectToDB();
             $result = mysql_query($sql) or die ("error");
     		while ( $row = mysql_fetch_array($result))
@@ -479,6 +479,38 @@ session_start();
          return $table;
       }		
  
+ //added for Stock Tracker cron
+
+###################################
+###### export Stock Tracker cronjob to Excel######
+#  header branch_id, item_id, quantity, transit
+###################################
+    	function getStockTracker()
+    		{
+    		$count='1';
+            $sql ="
+            SELECT * FROM inv_stocks i
+            where quantity =0
+            and transit =0
+            order by branch_id asc";
+            
+    			 connectToDB();
+            $result = mysql_query($sql) or die ("error");
+    		while ( $row = mysql_fetch_array($result))
+    			{
+    	
+      		$table .= "
+            <tr bgcolor=\"#FFFFFF\"> 
+              <td>".$row['branch_id']."</td>
+              <td>".$row['item_id']."</td>
+              <td>".$row['quantity']."</td>";
+     
+    	   $count++;
+         }
+         return $table;
+      }		
+ 
+
 
 ###################################			         
 //end get  
