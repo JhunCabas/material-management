@@ -124,6 +124,8 @@
 				//$purchase->setDocNumber($key);
 				if(!$error)
 					$purchase->store();
+					
+				Purchase::checkDuplicatePo($purchase->getDocNumber());
 				foreach($jsonForm as $row)
 				{
 					try{
@@ -247,6 +249,8 @@
 				}
 				if(!$error)
 					$purchase->store();
+				
+				Purchase::checkDuplicatePo($purchase->getDocNumber());
 				foreach($jsonForm as $row)
 				{
 					try{
