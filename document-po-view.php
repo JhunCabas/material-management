@@ -27,6 +27,7 @@ $tmpl->place('menu');
 		<h3>Purchase Order</h3><br />
 		<label for="doc_num">Document Number </label>
 			<?php 
+				Purchase::checkDuplicatePo($_GET['id']);
 				echo $purchase->preparePoNumber(); 
 				echo "<input id=\"PrNumber\" type=\"hidden\" value=\"".$purchase->prepareDocNumber()."\" />";
 			?>
