@@ -94,6 +94,25 @@
 		else
 			return 0;
 	}
+	
+	static function checkDuplicatePo($key)
+	{
+		$purchase = new Purchase($key);
+		//Search Duplicate
+		$records = fRecordSet::build('Purchase',
+			array('po_number=' => $purchase->getPoNumber()));
+		if($records->count() > 1)
+		{
+			//Generate New PO
+			echo 'Duplicate PO';
+			$exploded = explode('/', $purchase->getPoNumber());
+			echo (int)$exploded[2] + 1;
+			$exploded[2] = sprintf("%03d",(int)$exploded[2] + 1);
+			$newPONumber = implode('/',$exploded);
+			$purchase->setPoNumber($newPONumber);
+			$purchase->store();
+		}
+	}
  }
 
 ?>
