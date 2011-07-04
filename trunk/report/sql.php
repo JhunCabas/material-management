@@ -447,6 +447,7 @@ session_start();
             AND p.doc_tag = 'po'
             AND YEAR(p.po_date) = '$year'
             AND MONTH(p.po_date) = '$month'
+            AND (p.status ='completed' OR p.status = 'approved')
             GROUP BY p.doc_type, p.supplier_1
             
             UNION
