@@ -335,8 +335,8 @@ session_start();
     		$count='1';
       $sql ="	select A.*,C.*
               FROM production_issues A,branches C
-              WHERE YEAR( A.doc_date ) = 2009
-                AND MONTH( A.doc_date ) = 11
+              WHERE YEAR( A.doc_date ) = $year
+                AND MONTH( A.doc_date ) = $month
               AND A.branch_id = C.id
               ORDER BY status";
     			 connectToDB();
