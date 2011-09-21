@@ -272,7 +272,7 @@ $pdf->Text(130,208,"Payment Terms:");
 $pdf->Text(130,210,"-----------------------");
 $pdf->Text(130,214,$payment);
 $pdf->Text(12,235,"Prepared By : ".$requester);
-$pdf->Text(12,247,"Endorsed By : Karthigeyan Nallasamy /");
+$pdf->Text(12,247,"Approved By : Karthigeyan Nallasamy /");
 $pdf->Text(40,252," Chew Kwong Chee ");
 $pdf->Text(12,263,"Approved By : Pendin Saragih");
 
