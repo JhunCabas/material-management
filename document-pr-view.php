@@ -89,12 +89,12 @@ $tmpl->place('menu');
 					$totalchecker = 0;
 					foreach($purchase_details as $purchase_detail)
 					{
-						echo "<tr><td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
-						$item = new Inv_item($purchase_detail->getItemId());
-						echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
-							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->getUnitPrice()."</td>
-								<td>".$purchase_detail->getExtendedPrice()."</td></tr>";
-						$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
+						//echo "<tr><td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
+						//$item = new Inv_item($purchase_detail->getItemId());
+						//echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
+						//	 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->getUnitPrice()."</td>
+						//		<td>".$purchase_detail->getExtendedPrice()."</td></tr>";
+						//$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
 						$counter++;
 					}
 				?>
