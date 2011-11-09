@@ -92,8 +92,8 @@ $tmpl->place('menu');
 						echo "<tr><td>".$counter."</td><td>".$purchase_detail->prepareItemId()."</td>";
 						$item = new Inv_item($purchase_detail->getItemId());
 						echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
-							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->prepareUnitPrice()."</td>
-								<td>".$purchase_detail->prepareExtendedPrice()."</td></tr>";
+							 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->getUnitPrice()."</td>
+								<td>".$purchase_detail->getExtendedPrice()."</td></tr>";
 						$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
 						$counter++;
 					}

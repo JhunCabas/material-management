@@ -10,8 +10,7 @@
 				$purchase->populate();
 				$json_form = fRequest::get('jsonForm');
 				$jsonForm = fJSON::decode($json_form);
-				if(!$error)
-					$purchase->store();
+				$total = 0;
 				foreach($jsonForm as $row)
 				{
 					try{
@@ -21,7 +20,10 @@
 						$purchase_detail->setDescription($row->{'itemDesc'});
 						$purchase_detail->setQuantity($row->{'itemQuan'});
 						$purchase_detail->setUnitPrice($row->{'itemUnitP'});
-						$purchase_detail->setExtendedPrice($row->{'itemExtP'});
+						$extendedPrice = $row->{'itemQuan'} * $row->{'itemUnitP'};
+						$total = $total + $extendedPrice;
+						$purchase_detail->setExtendedPrice(round($extendedPrice, 2));
+						//$purchase_detail->setExtendedPrice($row->{'itemExtP'});
 						if(!$error)
 							$purchase_detail->store();
 					}catch (fExpectedException $e) {
@@ -29,6 +31,12 @@
 						$error = true;
 					}
 					
+				}
+				if(!$error)
+				{
+					$total = $total - $_POST['discount'];
+					$purchase->setTotal(round($total,2));
+					$purchase->store();
 				}
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
@@ -135,7 +143,10 @@
 						$purchase_detail->setDescription($row->{'itemDesc'});
 						$purchase_detail->setQuantity($row->{'itemQuan'});
 						$purchase_detail->setUnitPrice($row->{'itemUnitP'});
-						$purchase_detail->setExtendedPrice($row->{'itemExtP'});
+						$extendedPrice = $row->{'itemQuan'} * $row->{'itemUnitP'};
+						$total = $total + $extendedPrice;
+						$purchase_detail->setExtendedPrice(round($extendedPrice, 2));
+						//$purchase_detail->setExtendedPrice($row->{'itemExtP'});
 						
 						//Automatic price update
 						$item = new Inv_item($row->{'itemCode'});
@@ -152,6 +163,12 @@
 						$error = true;
 					}
 
+				}
+				if(!$error)
+				{
+					$total = $total - $_POST['discount'];
+					$purchase->setTotal(round($total,2));
+					$purchase->store();
 				}
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
@@ -263,7 +280,10 @@
 						$purchase_detail->setDescription($row->{'itemDesc'});
 						$purchase_detail->setQuantity($row->{'itemQuan'});
 						$purchase_detail->setUnitPrice($row->{'itemUnitP'});
-						$purchase_detail->setExtendedPrice($row->{'itemExtP'});
+						$extendedPrice = $row->{'itemQuan'} * $row->{'itemUnitP'};
+						$total = $total + $extendedPrice;
+						$purchase_detail->setExtendedPrice(round($extendedPrice, 2));
+						//$purchase_detail->setExtendedPrice($row->{'itemExtP'});
 						
 						if(($_POST['approver_1'] != null)&&($_POST['approver_1_date'] != null))
 						{
@@ -279,6 +299,12 @@
 						$error = true;
 					}
 					
+				}
+				if(!$error)
+				{
+					$total = $total - $_POST['discount'];
+					$purchase->setTotal(round($total,2));
+					$purchase->store();
 				}
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
