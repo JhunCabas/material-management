@@ -51,6 +51,7 @@
 				$json_form = fRequest::get('jsonForm');
 				$jsonForm = fJSON::decode($json_form);
 				$currentDocType = $_POST['doc_type'];
+				$total = 0;
 				switch($currentDocType)
 				{
 					case "1":
@@ -182,6 +183,7 @@
 				$purchase->populate();
 				$json_form = fRequest::get('jsonForm');
 				$jsonForm = fJSON::decode($json_form);
+				$total = 0;
 				if(($_POST['approver_1'] != null)&&($_POST['approver_1_date'] != null))
 				{
 					$currentDocType = $purchase->getDocType();
