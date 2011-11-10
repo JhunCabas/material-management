@@ -11,6 +11,10 @@
 				$json_form = fRequest::get('jsonForm');
 				$jsonForm = fJSON::decode($json_form);
 				$total = 0;
+				if(!$error)
+				{
+					$purchase->store();
+				}
 				foreach($jsonForm as $row)
 				{
 					try{
@@ -32,12 +36,10 @@
 					}
 					
 				}
-				if(!$error)
-				{
-					$total = $total - $_POST['discount'];
-					$purchase->setTotal(round($total,2));
-					$purchase->store();
-				}
+				$total = $total - $_POST['discount'];
+				$purchase->setTotal(round($total,2));
+				$purchase->store();
+
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
 				$error = true;
@@ -269,7 +271,7 @@
 				if(!$error)
 					$purchase->store();
 				
-				Purchase::checkDuplicatePo($purchase->getDocNumber());
+				//Purchase::checkDuplicatePo($purchase->getDocNumber());
 				foreach($jsonForm as $row)
 				{
 					try{
