@@ -94,7 +94,7 @@ $tmpl->place('menu');
 						//echo "<td>".$item->prepareDescription()."</td><td>".$purchase_detail->prepareQuantity()."</td>
 						//	 	<td>".$item->prepareUnitOfMeasure()."</td><td>".$purchase_detail->getUnitPrice()."</td>
 						//		<td>".$purchase_detail->getExtendedPrice()."</td></tr>";
-						//$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
+						$totalchecker = $totalchecker + $purchase_detail->getExtendedPrice();
 						$counter++;
 					}
 				?>

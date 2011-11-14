@@ -37,8 +37,10 @@
 					
 				}
 				$total = $total - $_POST['discount'];
+				//echo round($total,2);
 				$purchase->setTotal(round($total,2));
 				$purchase->store();
+				//echo $purchase->getTotal();
 
 			}catch (fExpectedException $e) {
 				echo $e->printMessage();
