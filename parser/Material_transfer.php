@@ -55,6 +55,7 @@
 					throw new fProgrammerException('Status Overidden: '.$mattrans_detail->getStatus());
 				Inv_stock::transitStock($mattrans_detail->getItemId(),$mattrans->getBranchFrom(),$mattrans_detail->getQuantity());
 				$mattrans_detail->setStatus("transit");
+				$mattrans_detail->setApprover($_POST['user']);
 				$mattrans_detail->store();
 				
 				$mat_details = Material_transfer_detail::findDetail($mattrans->getDocNumber());
@@ -79,6 +80,7 @@
 					throw new fProgrammerException('Status Overidden: '.$mattrans_detail->getStatus());
 				Inv_stock::rejectTransit($mattrans_detail->getItemId(),$mattrans->getBranchFrom(),$mattrans_detail->getQuantity());
 				$mattrans_detail->setStatus("pending");
+				$mattrans_detail->setApprover(NULL);
 				$mattrans_detail->store();
 				
 				$mat_details = Material_transfer_detail::findDetail($mattrans->getDocNumber());
@@ -104,6 +106,7 @@
 				Inv_stock::moveTransit($mattrans_detail->getItemId(),
 					$mattrans->getBranchFrom(),$mattrans->getBranchTo(),$mattrans_detail->getQuantity());
 				$mattrans_detail->setStatus("completed");
+				$mattrans_detail->setReceiver($_POST['user']);
 				$mattrans_detail->store();
 				
 				$mat_details = Material_transfer_detail::findDetail($mattrans->getDocNumber());

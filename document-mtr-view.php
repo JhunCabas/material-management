@@ -40,7 +40,7 @@ $tmpl->place('menu');
 		<table id="formContent">
 			<thead>
 				<tr><th>No</th>
-					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>In <?php echo $fromBranch->getId(); ?></th><th width="75px">Icons</th></tr>
+					<th>Item Code</th><th width="300px">Description</th><th>Quantity</th><th>UOM</th><th>Remarks</th><th>In <?php echo $fromBranch->getId(); ?></th><th width="75px">Receiver</th></tr>
 			</thead>
 			<tbody>
 				<?php
@@ -74,7 +74,7 @@ $tmpl->place('menu');
 								echo "</td>";
 							}
 							else if($mattrans_detail->getStatus() == "completed")
-								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+								echo "<span>".$mattrans_detail->prepareReceiver()."</span></td>";
 							else
 								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
 						}else if($mattrans->getBranchFrom() == $myBranch)
@@ -86,7 +86,7 @@ $tmpl->place('menu');
 							else if($mattrans_detail->getStatus() == "pending" && $quanRow < $mattrans_detail->getQuantity())
 								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
 							else if($mattrans_detail->getStatus() == "completed")
-								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+								echo "<span>".$mattrans_detail->prepareReceiver()."</span></td>";
 							else
 								echo "<span class=\"ui-icon ui-icon-clock\"></span></td>";
 						}else if($mattrans->getBranchTo() == $myBranch)
@@ -103,7 +103,7 @@ $tmpl->place('menu');
 							else if($mattrans_detail->getStatus() == "pending")
 								echo "<span class=\"ui-icon ui-icon-clock\"></span></td>";
 							else if($mattrans_detail->getStatus() == "completed")
-								echo "<span class=\"ui-icon ui-icon-check\"></span></td>";
+								echo "<span>".$mattrans_detail->prepareReceiver()."</span></td>";
 							else
 								echo "<span class=\"error-not-enough ui-state-error ui-corner-all\">Not Enough</span></td>";
 						}else{

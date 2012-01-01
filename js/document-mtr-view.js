@@ -57,6 +57,7 @@ $(function (){
 			$(this).hide();
 		$.post("parser/Material_transfer.php",{
 			type: "transit",
+			user: $("#whoami").val(),
 			key: $(this).attr("key")}, function (data){
 				if(data != "")
 				{
@@ -109,6 +110,7 @@ $(function (){
 			$(this).hide();
 		$.post("parser/Material_transfer.php",{
 			type: "accept",
+			user: $("#whoami").val(),
 			key: $(this).attr("key")}, function (data){
 				if(data != "")
 				{
