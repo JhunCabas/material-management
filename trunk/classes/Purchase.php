@@ -43,17 +43,29 @@
 	static function findByBranch($branch,$doctype)
 	{
 		return fRecordSet::buildFromSQL('Purchase',
+				"SELECT purchases.* FROM purchases WHERE purchases.doc_number LIKE '" . "PR" . $doctype . "/" . $branch . "/" . "%" . "' AND YEAR( purchases.doc_date ) = YEAR( CURDATE( ) ) AND MONTH( purchases.doc_date ) = MONTH( CURDATE( ) )",
+				"SELECT count(*) FROM purchases"
+			);
+		/*
+		return fRecordSet::buildFromSQL('Purchase',
 				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = '$branch') AS tbl WHERE purchases.requester = tbl.username AND purchases.doc_type = '$doctype' AND YEAR( purchases.doc_date ) = YEAR( CURDATE( ) ) AND MONTH( purchases.doc_date ) = MONTH( CURDATE( ) )",
 				"SELECT count(*) FROM purchases"
 			);
+		*/
 	}
 	
 	static function findPOByBranch($branch,$doctype)
 	{
 		return fRecordSet::buildFromSQL('Purchase',
+				"SELECT purchases.* FROM purchases WHERE purchases.po_number LIKE '" . "PO" . $doctype . "/" . $branch . "/" . "%" . "' AND YEAR( purchases.doc_date ) = YEAR( CURDATE( ) ) AND MONTH( purchases.doc_date ) = MONTH( CURDATE( ) )",
+				"SELECT count(*) FROM purchases"
+			);
+		/*
+		return fRecordSet::buildFromSQL('Purchase',
 				"SELECT purchases.* FROM purchases, (SELECT * FROM users WHERE branch_id = '$branch') AS tbl WHERE purchases.requester = tbl.username AND purchases.doc_tag = 'po' AND purchases.doc_type = '$doctype' AND YEAR( purchases.po_date ) = YEAR( CURDATE( ) ) AND MONTH( purchases.po_date ) = MONTH( CURDATE( ) )",
 				"SELECT count(*) FROM purchases"
 			);
+		*/
 	}
 	
 	static function findAllPR($limit=null)
