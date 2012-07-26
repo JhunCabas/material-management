@@ -40,6 +40,15 @@
 		
 		return $records->count() + 1;
 	}
+
+	static function findStatus($po)
+	{
+		$records = fRecordSet::build('Good_receipt_note', array('po_no=' => $po));
+		if($records->count() > 1) 
+			return false;
+		else
+			return true;
+	}
  }
 
 ?>

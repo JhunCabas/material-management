@@ -23,6 +23,7 @@ $tmpl->place('menu');
 		</form>
 	<?php
 		}else{
+			if(Good_receipt_note::findStatus($_GET['id'])) {
 			try{
 				echo "<input type=\"hidden\" id=\"prNum\" value=\"".Purchase::getByPoNumber($_GET['id'])."\" />";
 				$purchase = new Purchase(Purchase::getByPoNumber($_GET['id']));
@@ -91,10 +92,11 @@ $tmpl->place('menu');
 		</table>
 		<input type="button" id="submitBTN" value="Submit" style="float: right;"/>
 		<?php 
-				$me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
-				$meRecord = new User($me); echo "<input type=\"hidden\" id=\"branchami\" value=\"".$meRecord->prepareBranchId()."\"/>";
-				}catch	(fExpectedException $e) {
-					echo $e->printMessage();
+					$me = fAuthorization::getUserToken(); echo "<input type=\"hidden\" id=\"whoami\" value=\"".$me."\"/>";
+					$meRecord = new User($me); echo "<input type=\"hidden\" id=\"branchami\" value=\"".$meRecord->prepareBranchId()."\"/>";
+					}catch	(fExpectedException $e) {
+						echo $e->printMessage();
+					}
 				}
 			}
 		?>
