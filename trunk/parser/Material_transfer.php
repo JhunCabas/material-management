@@ -35,6 +35,11 @@
 		{
 			try{
 				$mattrans = new Material_transfer($_POST['doc_num']);
+				$mat_details = Material_transfer_detail::findDetail($mattrans->getDocNumber());
+				foreach($mat_details as $mat_detail)
+				{
+					Inv_stock::rejectTransit($mat_detail->getItemId(),$mattrans->getBranchFrom(),$mat_detail->getQuantity());
+				}
 				$mattrans->setStatus("cancelled");
 				$mattrans->store();
 			}catch (fExpectedException $e)
@@ -43,7 +48,6 @@
 			}
 		}else if($_POST['type'] == "count")
 		{
-			//$records = Material_transfer::findAll();
 			$records = Material_transfer::findCurrentMonth($_POST['branch']);
 			echo sprintf("%03d",$records->count() + 1);
 		}else if($_POST['type'] == "transit")
