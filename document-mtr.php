@@ -48,7 +48,7 @@ $tmpl->place('menu');
 			<tbody>
 				<tr>
 					<td><label>Requester </label></td><td id="requester"><?php echo fAuthorization::getUserToken();?></td><td><label>Date </label><input type="text" id="reqDate" class="datepicker"></input></td>
-					<tr>
+					<tr style="display: none;">
 						<td><label>Approver </label></td><td id="approver"><input type="button" value="Sign Here" class="signHere" /></td><td><label>Date </label><input type="text" id="appDate" class="datepicker"></input></td>
 					</tr>
 				</tr>
