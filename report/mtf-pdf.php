@@ -90,6 +90,9 @@ AND B.item_id= D.id
             			$approver_date = $row['approver_date'];
             		$requester = $row['requester'];
             		$requester_date = $row['requester_date'];
+                //added new receiver Sept2012
+                
+            		$receiver = $row['receiver'];
             			
             		$doc_date = $row['doc_date'];
             			$branch_from = $row['name'];
@@ -199,7 +202,7 @@ $pdf->Text(12,244,"Date : ".$requester_date);
 $pdf->Text(12,253,"Signature ");
 
 
-$pdf->Text(135,240,"Name : ".$approver);
+$pdf->Text(135,240,"Name : ".$receiver);
 $pdf->Text(135,244,"Date : ".$approver_date);
 $pdf->Text(135,253,"Signature ");
 
@@ -298,6 +301,9 @@ AND B.item_id= D.id
             			$approver_date = $row['approver_date'];
             		$requester = $row['requester'];
             		$requester_date = $row['requester_date'];
+                //added new receiver Sept2012
+                
+            		$receiver = $row['receiver'];
             			
             		$doc_date = $row['doc_date'];
             			$branch_from = $row['name'];
@@ -407,7 +413,7 @@ $pdf->Text(12,244,"Date : ".$requester_date);
 $pdf->Text(12,253,"Signature ");
 
 
-$pdf->Text(135,240,"Name : ".$approver);
+$pdf->Text(135,240,"Name : ".$receiver);
 $pdf->Text(135,244,"Date : ".$approver_date);
 $pdf->Text(135,253,"Signature ");
 
