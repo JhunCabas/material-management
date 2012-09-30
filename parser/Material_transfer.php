@@ -36,10 +36,13 @@
 			try{
 				$mattrans = new Material_transfer($_POST['doc_num']);
 				$mat_details = Material_transfer_detail::findDetail($mattrans->getDocNumber());
+
 				foreach($mat_details as $mat_detail)
 				{
-					Inv_stock::rejectTransit($mat_detail->getItemId(),$mattrans->getBranchFrom(),$mat_detail->getQuantity());
+					if($mattrans_detail->getStatus() == "transit")
+						Inv_stock::rejectTransit($mat_detail->getItemId(),$mattrans->getBranchFrom(),$mat_detail->getQuantity());
 				}
+
 				$mattrans->setStatus("cancelled");
 				$mattrans->store();
 			}catch (fExpectedException $e)
