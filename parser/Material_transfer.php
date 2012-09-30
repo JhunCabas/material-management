@@ -39,7 +39,7 @@
 
 				foreach($mat_details as $mat_detail)
 				{
-					if($mattrans_detail->getStatus() == "transit")
+					if($mat_detail->getStatus() == "transit")
 						Inv_stock::rejectTransit($mat_detail->getItemId(),$mattrans->getBranchFrom(),$mat_detail->getQuantity());
 				}
 
