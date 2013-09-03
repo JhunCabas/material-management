@@ -26,7 +26,7 @@ $(function (){
 		 var exchange = $(this).parent().parent().parent().find("input#cExchange").val();
 		 var saveDate = Date.parse(month + " 1st " + year); 
 		 $(this).parent().parent().parent().addClass("tobeEdit");
-		 $.post("parser/Currency.php",{type: "edit", key: key, country: country, month: saveDate, exchange: exchange},
+		 $.post("parser/Currency.php",{type: "edit", key: key, country: country, month: saveDate.toISOString(), exchange: exchange},
 		 function (data){
 		 	if(data != "")
 			 {
@@ -53,7 +53,7 @@ $(function (){
 		 var year = $("#nuYear").val();
 		 var saveDate = Date.parse(month + " 1st " + year); 
 		 if(confirm("Continue?") && saveDate != null)
-			$.post("parser/Currency.php",{type: "add", month:saveDate, exchange: exchange, country: country},function (data){
+			$.post("parser/Currency.php",{type: "add", month: saveDate.toISOString(), exchange: exchange, country: country},function (data){
 		 		if(data != "")
 				 {
 				 	 $("#dialogBox").html(data);
